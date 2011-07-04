@@ -1,0 +1,30 @@
+= Migration Instructions =
+
+South is an essential tool to keep your AA database up to date when changes are made to the underlying database structure (aka schema changes).
+See "Schema changes" in the ChangeLog file for descriptions of when schema changes occur
+
+1. Ensure that South is installed (one time only)...
+
+* sudo easy_install South
+
+2. Ensure that the aabrowser app is using South (one time only)...
+
+* Add "south" to INSTALLED_APPS in settings.py
+* ./manage.py syncdb
+
+  to load the South table into the database.
+
+  YOU MUST HAVE THE CODE IN THE PRE_CHANGE STATE at this point (if necessary svn revert first!)
+
+* Run ./manage.py convert_to_south aabrowser
+  South will automatically make and pretend to apply your first migration.
+
+3. Use South to migrate the database (bringing it in line with the code)... (to be done each time schema changes)
+
+* svn update
+  to bring the code up to date, and include schema changes)
+* ./manage.py schemamigration aabrowser --auto
+* ./manage.py migrate aabrowser
+
+
+
