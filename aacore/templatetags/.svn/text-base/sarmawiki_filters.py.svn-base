@@ -1,0 +1,281 @@
+from sarmawiki.models import *
+from django.template.defaultfilters import stringfilter
+from django import template
+register = template.Library()
+from sarmawiki.lxml_utils import html_sub
+import re, os, urlparse, httplib2
+# from settings import URLMAPPERS, SESAME_URL, HTTP_CACHE_PATH
+from settings import SESAME_URL, HTTP_CACHE_PATH
+from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
+from sarmawiki.facet import getDocumentTags
+from django.contrib.sites.models import Site
+from sarmawiki.sesame import sparql_query_list
+from sarmadocs.models import Document
+
+RELATIONSHIPS = None
+
+@register.filter
+def rel_name (url):
+    url = unicode(url)
+    ret = url    
+    global RELATIONSHIPS
+    if RELATIONSHIPS == None:
+        RELATIONSHIPS = {}
+        for rel in Relationship.objects.all():
+            RELATIONSHIPS[rel.url] = rel
+    rel = RELATIONSHIPS.get(url)
+    if rel:
+        ret = rel.name
+        if not ret:
+            (_, ret) = os.path.split(urlparse.urlparse(rel.url).path)
+    
+    return ret
+
+#@register.filter
+#@stringfilter
+#def mapurl(value):
+#    for key, newbase in URLMAPPERS.items():
+#        if value.startswith(key):
+#            return newbase + value[len(key):]
+#    return value
+
+#from django.contrib.sites.models import Site
+#TAGURL = "http://" + Site.objects.get_current().domain + reverse('sarmawiki.views.tag', args=["TAGNAME"])
+#TAGURL_PAT = re.compile(re.escape(TAGURL).replace("TAGNAME", "(.+)"))
+
+#@register.filter
+#def rdfvalue (value):
+#    return TAGURL
+#    if (type(value) == rdflib.term.Literal):
+#        if value.datatype:
+#            return value.toPython()        
+#        else:
+#            return value.encode("utf-8")
+#    elif (type(value) == rdflib.term.URIRef):
+#        url = urllib.unquote(value.encode("utf-8"))
+#        m = TAGURL_PAT.search(url)
+#        if m:
+#            return dewikify(m.group(1))
+#        else:
+#            return url
+#    return value.encode("utf-8")
+
+nowikipat = re.compile("\\bnowiki\\b", re.I)
+
+def automarkupfilter (node):
+    if node.tag == "a":
+        return False
+    klass = node.get("class")
+    if klass and nowikipat.search(klass):
+        return False
+    return True
+
+# import urlparse, os
+# import httplib2, urllib, rdflib
+# from sesame import sparql_query_list, parse_json_sparql_results, SparqlQuery
+
+def getTags (http, repo):
+    query = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+SELECT DISTINCT ?tag 
+WHERE {
+?doc dc:title ?title .
+"""
+    rels = list(Relationship.objects.filter(autotag=True))
+    if not rels: return []
+    for (i, rel) in enumerate(rels):
+        query += """{ ?doc <%s> ?tag }\n""" % rel.url
+        if i+1 < len(rels):
+            query += "UNION\n"
+    query += "}"
+    ret = sparql_query_list(http, repo, query)
+    return [x.get("tag") for x in ret]
+
+@register.filter
+def automarkupdoctags (value, doc):
+    http = httplib2.Http(HTTP_CACHE_PATH)
+    # tags = getTags(http, SESAME_URL)
+    # load document specific tags and markup with roles intact...
+    # need mapping of tagurls to relations for this document
+    relsByTag = {}        
+    norels = [x.url for x in Relationship.objects.exclude(facet=True)]
+    docurl = "http://" + Site.objects.get_current().domain + doc.get_absolute_url()
+    bindings = getDocumentTags(http, SESAME_URL, docurl, norels)
+    for b in bindings:
+        rel = str(b.get("rel"))
+        r = Relationship.objects.get(url=rel)
+        if r.autotag:
+            obj = str(b.get("obj"))
+            relsByTag[obj] = compacturl(rel)
+
+    tags = relsByTag.keys()
+    t = []
+    for x in tags:
+        try:
+            tagname = dewikify(os.path.split(urlparse.urlsplit(str(x)).path)[1])
+            if tagname:
+                t.append(tagname)
+        except UnicodeEncodeError:
+            pass
+    tags = t
+
+    tags.sort(key=lambda x: len(x), reverse=True)
+    pat = "|".join([re.escape(x) for x in tags if len(x) >= 1])
+    pat = "\\b(%s)\\b" % pat
+    pat = re.compile(pat, re.I)
+    baseurl = "http://" + Site.objects.get_current().domain + reverse('sarmawiki.views.facet')
+    def sub (m):
+        name = m.group(0)
+        tagurl = baseurl + wikify(name)
+        if tagurl in relsByTag:
+            rel = relsByTag[tagurl]
+            return '<a href="%s" rel="%s" class="suggestion">%s</a>' % (tagurl, rel, name)
+        else:
+            return name
+    ret = html_sub(pat, sub, value, filter=automarkupfilter)
+    return mark_safe(ret)
+
+@register.filter
+def automarkuptags (value):
+    http = httplib2.Http(HTTP_CACHE_PATH)
+    tags = getTags(http, SESAME_URL)
+    if tags: # Tag.objects.count():
+        # tags = [dewikify(os.path.split(urlparse.urlsplit(str(x)).path)[1]) for x in tags]
+        t = []
+        for x in tags:
+            try:
+                tagname = dewikify(os.path.split(urlparse.urlsplit(str(x)).path)[1])
+                if tagname:
+                    t.append(tagname)
+            except UnicodeEncodeError:
+                pass
+        tags = t
+        tags.sort(key=lambda x: len(x), reverse=True)
+
+        pat = "|".join([re.escape(x) for x in tags if len(x) >= 3])
+        pat = "\\b(%s)\\b" % pat
+        pat = re.compile(pat, re.I)
+        baseurl = "http://" + Site.objects.get_current().domain + reverse('sarmawiki.views.facet')
+        def sub (m):
+            name = m.group(0)
+            tagurl = baseurl + wikify(name)
+            return '<a href="%s" class="suggestion genericsuggestion">%s</a>' % (tagurl, name)
+        ret = html_sub(pat, sub, value, filter=automarkupfilter)
+        return mark_safe(ret)
+    else:
+        return mark_safe(value)
+    
+@register.filter
+@stringfilter
+def urlfilename(value):
+    return os.path.split(urlparse.urlparse(value).path)[1]
+
+@register.filter
+@stringfilter
+def compacturl (url):
+    for ns in RelationNamespace.objects.all():
+        if url.startswith(ns.url):
+            return ns.name + ":" + url[len(ns.url):]
+    return url
+
+###############################################
+###############################################
+
+class LinkForm:
+    """
+    [[ rel :: namespace : item # fragment | label ]]
+    """
+
+    # [[ rel :: namespace : item # fragment | label ]]
+    # (?:\# \s* (?P<fragment>[^\]]+?) )? \s*
+    pat = re.compile(r"""\[\[ \s*
+        (?P<contents>
+            (?:(?P<rel>[^\]#]+?) \s* ::)? \s*
+            (?:(?P<namespace>[^\]#]+?) \s* :)? \s*
+            (?P<item>[^\]#]+?)\s*
+            (?:\# \s* (?P<fragment>[^\]]+?) )? \s*
+            (?:\| \s* (?P<label>[^\]]+?) \s*)?
+        ) \s*
+    \]\]""", re.X)
+
+    # White space-preserving pattern
+    ppat = re.compile(r"""\[\[
+        (?P<rel> \s* (?P<rel_name> [^\]#]+? ) \s* ::)?
+        (?P<namespace> \s* (?P<namespace_name> [^\]#]+? ) \s* :)?
+        (?P<item> \s* (?P<item_name> [^\]#]+? ) \s* )
+        (?P<fragment> \# (?P<fragment_name> [^\]]+? ) \s* )?
+        (?P<label> \| \s* (?P<label_name> [^\]]+? ) \s*)?
+    \]\]""", re.X)
+
+    # (?:#\s*(?P<fragment>[^\]]+?))?
+    def __init__(self, match):
+        self.source = match.group(0)
+        d = match.groupdict()
+        # HACK! CHECK IF ORIGINAL looks like a URL (http only at the moment!)
+        contents = d['contents']
+        urlparts = urlparse.urlparse(contents)
+        if urlparts:
+            scheme = urlparts[0]
+            if scheme.lower() == "http" or scheme.lower() == "https":
+                self.rel = None
+                self.namespace = None
+                self.item = contents
+                self.fragment = None
+                self.label = None
+                try:
+                    hashpos = contents.rindex("#")
+                    self.item = contents[:hashpos]
+                    self.fragment = contents[hashpos + 1:]
+                except ValueError:
+                    pass
+                return
+
+        self.rel = d['rel']
+        if self.rel:
+            if ":" not in self.rel:
+                self.rel = "sarma:"+self.rel
+
+        self.namespace = d['namespace']
+        self.item = d['item']
+        self.fragment = d['fragment']
+        self.label = d['label']
+
+
+def Link_markup_sub(match):
+    link = LinkForm(match)
+    label = link.label or link.item
+    rel = link.rel or ""
+    namespace = link.namespace or "tag"
+    item = link.item
+    if not item.startswith("http://"):
+        if namespace == "page" or namespace=="pages":
+            item = reverse("sarmawiki.views.page", args=[wikify(item)])
+        elif namespace == "tag" or namespace == "tags":
+            item = reverse("sarmawiki.views.tag", args=[wikify(item)])
+        elif namespace == "doc" or namespace=="docs":
+            try:
+                doc = Document.objects.get(pk=int(item))
+                label = link.label or doc.title
+                item = reverse("sarmadocs.views.doc", args=[doc.id])
+            except Document.DoesNotExist:
+                item = "#"
+                label = "Document %s not found!" % item
+    if rel:    
+        return """<a href="%s" rel="%s">%s</a>""" \
+            % (item, rel, label)
+    else:
+        return """<a href="%s">%s</a>""" \
+            % (item, label)
+def Link_markup(text):
+    """ translate text to a list of Link objects """
+    return LinkForm.pat.sub(Link_markup_sub, text)
+
+@stringfilter
+def wikilinks(value, autoescape=None):
+    value = Link_markup(value)
+    return value
+
+register.filter('wikilinks', wikilinks)
+
+
+

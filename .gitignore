@@ -1,0 +1,4 @@
+*.pyc
+# db files, sqlite & RDF hashes
+*.db
+*~

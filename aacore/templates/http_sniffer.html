@@ -1,0 +1,15 @@
+{% if original_url != url %}
+<div class="redirected">
+    Redirected from <a href="{{original_url}}" property="aa:redirected_from">{{ original_url }}</a>
+</div>
+{% endif %}
+
+<dl>
+<dt>Content-type</dt>
+<dd property="aa:content_type">{{ content_type }}</dd>
+{% if charset %}<dt>charset</dt>
+<dd property="aa:charset">{{ charset }}</dd>{%endif%}
+<dt>Content-length</dt>
+<dd property="aa:content_length" content="{{content_length}}">{{ content_length|filesizeformat }}</dd>
+</dl>
+
