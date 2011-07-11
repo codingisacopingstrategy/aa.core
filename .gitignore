@@ -2,3 +2,4 @@
 # db files, sqlite & RDF hashes
 *.db
 *~
+.svn
