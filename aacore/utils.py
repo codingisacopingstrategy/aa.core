@@ -1,5 +1,6 @@
 import urllib
 
+
 def wikify (name):
     """
     Turns a "raw" name into a URL wiki name (aka slug)
@@ -35,4 +36,3 @@ def dewikify (name):
     name = urllib.unquote(name)
     name = name.replace("_", " ")
     return name
-

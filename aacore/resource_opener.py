@@ -139,4 +139,3 @@ if __name__ == "__main__":
     r2 = ResourceOpener(url2)
     print r1.get()
     print r2.get()
-

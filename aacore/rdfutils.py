@@ -1,7 +1,9 @@
 import RDF
 from settings import *
 
+
 # if model is None: raise Exception("new RDF.model failed")
+
 
 def put_url (theuri):
     storage = RDF.HashStorage(RDF_STORAGE_NAME, options="hash-type='bdb',contexts='yes',dir='"+RDF_STORAGE_DIR+"'") # dir='.'
@@ -23,5 +25,3 @@ def put_url (theuri):
 def get_model ():
     storage = RDF.HashStorage(RDF_STORAGE_NAME, options="hash-type='bdb',contexts='yes',dir='"+RDF_STORAGE_DIR+"'") # dir='.'
     return RDF.Model(storage)
-
-
