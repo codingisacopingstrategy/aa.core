@@ -24,14 +24,14 @@ from utils import *
 def page_list(request):
     """ A listing of All Pages (like MediaWiki Special:AllPages) """
     context = {}
-    return django.shortcuts.render_to_response("aa_page_list.html", context, context_instance = django.template.RequestContext(request))
+    return django.shortcuts.render_to_response("aacore/page_list.html", context, context_instance = django.template.RequestContext(request))
 
 def page_detail (request, slug):
     """ Main view of a page """
     context = {}
     name = dewikify(slug)
     page = django.shortcuts.get_object_or_404(Page, name=name)
-    return django.shortcuts.render_to_response("aa_page.html", context, context_instance = django.template.RequestContext(request))
+    return django.shortcuts.render_to_response("aacore/page.html", context, context_instance = django.template.RequestContext(request))
 
 import sniffer
 
@@ -49,7 +49,7 @@ def sniff (request):
         context['data'] = data
         context['annotations'] = annotations    
         context['url'] = data.url
-    return django.shortcuts.render_to_response("aa_sniff.html", context, context_instance = django.template.RequestContext(request))
+    return django.shortcuts.render_to_response("aacore/sniff.html", context, context_instance = django.template.RequestContext(request))
 
 ##### RDF VIEWS #################
 import RDF
@@ -127,6 +127,6 @@ def sandbox (request):
         embed_pat = re.compile(r"\{\{(?P<content>.+)\}\}", re.I)
         context['result'] = embed_pat.sub(sub, text)
 
-    return django.shortcuts.render_to_response("aa_sandbox.html", context, context_instance = django.template.RequestContext(request))
+    return django.shortcuts.render_to_response("aacore/sandbox.html", context, context_instance = django.template.RequestContext(request))
 
 
