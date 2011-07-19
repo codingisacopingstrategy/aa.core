@@ -104,27 +104,9 @@ def sandbox (request):
     context['text'] = text
 
     if text:
-        url = None
-        def pipeline_process(content, part):
-            global url
-            if part.startswith("http"):
-                url = part.strip()
-                return pipeline_url(content, url)
-            elif part.startswith ("xpath"):
-                (cmd, xpath) = part.split(" ", 1)
-                xpath = xpath.strip()
-                return pipeline_xpath(content, xpath, url=url)
-
-        def sub(m):
-            d = m.groupdict()
-            parts = d.get("content", "").strip().split("|")
-            parts = [x.strip() for x in parts]
-            content = ""
-            for part in parts:
-                content = pipeline_process(content, part)
-            return content
-
-        embed_pat = re.compile(r"\{\{(?P<content>.+)\}\}", re.I)
-        context['result'] = embed_pat.sub(sub, text)
+        from django.template import Template, Context
+        t = Template("{% load fiters %}\n" + text)
+        c = Context({})
+        context['result'] = t.render(c)
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
