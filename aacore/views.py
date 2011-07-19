@@ -15,25 +15,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
 
-import django
+
+import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse
+from django.shortcuts import (render_to_response, get_object_or_404)
+from django.http import HttpResponse
+from django.template import RequestContext
+
+import sniffer
 from models import *
+from rdfutils import *
 from utils import *
 
-# from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, HttpResponseForbidden, HttpResponseNotAllowed
 
 def page_list(request):
     """ A listing of All Pages (like MediaWiki Special:AllPages) """
     context = {}
-    return django.shortcuts.render_to_response("aacore/page_list.html", context, context_instance = django.template.RequestContext(request))
+    return render_to_response("aacore/page_list.html", context, context_instance=RequestContext(request))
 
 def page_detail (request, slug):
     """ Main view of a page """
     context = {}
     name = dewikify(slug)
-    page = django.shortcuts.get_object_or_404(Page, name=name)
-    return django.shortcuts.render_to_response("aacore/page.html", context, context_instance = django.template.RequestContext(request))
-
-import sniffer
+    page = get_object_or_404(Page, name=name)
+    return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
 def sniff (request):
     """
@@ -49,22 +53,18 @@ def sniff (request):
         context['data'] = data
         context['annotations'] = annotations    
         context['url'] = data.url
-    return django.shortcuts.render_to_response("aacore/sniff.html", context, context_instance = django.template.RequestContext(request))
+    return render_to_response("aacore/sniff.html", context, context_instance=RequestContext(request))
 
 ##### RDF VIEWS #################
-import RDF
-from rdfutils import *
-
 def rdfdump (request):
     """ debug view to see the contents of the RDF store (in turtle/text format) """
     model = get_model()
     ser = RDF.Serializer(name="turtle")
-    return django.http.HttpResponse(ser.serialize_model_to_string(model), mimetype="text/plain")
+    return HttpResponse(ser.serialize_model_to_string(model), mimetype="text/plain")
 
 ##### PIPELINE PROCESSING #########
 
 # """ {{ http://www.jabberwocky.com/carroll/walrus.html | htmlcrop /html/body/p[2] }} """
-import re, html5lib, lxml, urllib2, lxml.cssselect, urlparse
 
 def pipeline_url (stdin, url):
     request = urllib2.Request(url)
@@ -127,6 +127,4 @@ def sandbox (request):
         embed_pat = re.compile(r"\{\{(?P<content>.+)\}\}", re.I)
         context['result'] = embed_pat.sub(sub, text)
 
-    return django.shortcuts.render_to_response("aacore/sandbox.html", context, context_instance = django.template.RequestContext(request))
-
-
+    return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))

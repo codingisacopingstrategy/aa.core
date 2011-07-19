@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+
 import re, urlparse
+
 from models import *
 from aacore.settings import DEFAULT_REL_NAMESPACE
+
 
 class LinkForm:
     """
@@ -65,6 +68,7 @@ class LinkForm:
         self.fragment = d['fragment']
         self.label = d['label']
 
+
 # NEED TO;
 # (1) RESOLVE REL (namespace:name)
 # (2) LOOKUP THE REL TO GET ITS RELTYPE AND CODE ACCORDINGLY
@@ -96,24 +100,12 @@ def render_html (match):
         if not target.startswith("http"):
             target = reverse("aacore.views.page", args=[wikify(target)])
         return """<a href="%s">%s</a>""" % (target, label)
-        
-#    if not item.startswith("http://"):
-#        if namespace == "page" or namespace=="pages":
-#            item = reverse("sarmawiki.views.page", args=[wikify(item)])
-#        elif namespace == "tag" or namespace == "tags":
-#            item = reverse("sarmawiki.views.tag", args=[wikify(item)])
-#        elif namespace == "doc" or namespace=="docs":
-#            try:
-#                doc = Document.objects.get(pk=int(item))
-#                label = link.label or doc.title
-#                item = reverse("sarmadocs.views.doc", args=[doc.id])
-#            except Document.DoesNotExist:
-#                item = "#"
-#                label = "Document %s not found!" % item
+
 
 def markup(text):
     """ translate text to a list of Link objects """
     return LinkForm.pat.sub(render_html, text)
+
 
 if __name__ == "__main__":
     import sys, codecs
@@ -123,4 +115,3 @@ if __name__ == "__main__":
     except IndexError:
         fin = sys.stdin
     sys.stdout.write(markup(fin.read()))
-
