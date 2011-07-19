@@ -16,7 +16,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(DIRNAME, 'activearchive.db'),                      # Or path to database file if using sqlite3.
+        'NAME': os.path.join(DIRNAME, 'aa.db'),                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -96,11 +96,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.markup',
-    'aacore',
+    'aacore'
 )
 
-
-# AA-specific
-EXIFTOOL = "exiftool"
-FFMPEGPATH = "ffmpeg"
-CONVERTPATH = "convert"
