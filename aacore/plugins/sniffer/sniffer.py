@@ -36,7 +36,7 @@ class HttpSniffer (Sniffer):
     """ Annotation describing the contents of the http headers """
     @classmethod
     def sniff (cls, url, reqfile, info):
-        t = loader.get_template('http_sniffer.html')
+        t = loader.get_template('aacore/http_sniffer.html')
         c = Context(info)
         return t.render(c)
 
