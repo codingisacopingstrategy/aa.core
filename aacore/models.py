@@ -64,6 +64,23 @@ class Resource (models.Model):
 
 
 ############################
+# PAGES 
+############################
+
+class Page(models.Model):
+    """Wiki pages"""
+    name = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    
+    def __unicode__(self):
+        return self.name
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ('aa-page-detail')
+
+
+############################
 # RELATIONSHIP
 ############################
 
