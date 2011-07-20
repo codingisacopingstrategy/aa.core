@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Page Title</title>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js" type="text/javascript"></script>
+<!--<script type="text/javascript" language="javascript" charset="utf-8" src="jquery.collagecode.js"></script>-->
+<script type="text/javascript" language="javascript" charset="utf-8" src="jquery.tiling.js"></script>
+<style type="text/css" media="screen">
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+    }
+    div#wrapper {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px
+    }
+    div.box {
+     /*   border: 1px solid black;*/
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ie-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        overflow: hidden;
+        overflow-y: auto;
+    }
+    ul, li {
+        list-style: none;
+    }
+    input[type=checkbox] {
+        float: left;
+    }
+    .positionable {
+        border: 1px solid black;
+        padding: 5;
+    }
+    .moveable {
+        position: absolute;
+    }
+    .tiled {
+        position: static;
+    }
+    .print {
+        position: static;
+    }
+    .infront {
+        z-index: 10;
+    }
+    .behind {
+        z-index: 0;
+    }
+</style>
+
+<script type="text/javascript" language="javascript" charset="utf-8">
+    $(document).ready(function(){
+        // GENERATES TABLE OF CONTENT
+        $(".positionable h1").each(function(){
+            $(this).parent().attr("id",$(this).text());
+            $("ul#TOC").append("<input type='checkbox' checked='checked' rel='#" + $(this).text() + "' /><li>" + $(this).text() + "</li>")
+        });
+        // SHOW/HIDE BOXES
+        $("#TOC input:checkbox").click(function(){
+            id = $(this).attr("rel");
+            if($(this).is(":checked")){
+                $(id).show();
+            } else {
+                $(id).hide();
+            }
+        });
+        // FREE LAYOUT
+        $("#free").click(function () {
+            $(".positionable").removeClass("tiled print");
+            $(".positionable").addClass("moveable");
+            $('.moveable').draggable({
+                start: function(event, ui) {
+                    $('.infront').removeClass('infront').addClass('behind');
+                    $(this).addClass('infront').removeClass("behind");
+                },
+                handle: 'h1', 
+            });
+        });
+        // DOCUMENT/PRINT LAYOUT
+        $("#document").click(function () {
+            $(".positionable").removeClass("tiled moveable");
+            $(".positionable").addClass("print");
+        });
+        // TILED LAYOUT
+        $("#tile").click(function () {
+            $(".positionable").removeClass("print moveable");
+            $(".positionable").addClass("tiled");
+        });
+    });
+    // tiling...
+    // random
+    // automatic table of contents
+    // layer visibility clicking...
+
+</script>
+
+</head>
+<body id="ID" onload="">
+<div id="wrapper">
+
+    <div id="layout-controls">
+        <button id ="free">free</button>
+        <button id ="document">document</button>
+        <button id ="tile">tile</button>
+    </div>
+
+    <ul id="TOC">
+    </ul>
+
+    <div class="positionable" style="top: 250px; left: 100px">
+        <h1>Context</h1>
+        <h2>Livres de Chevet</h2>
+    </div>
+
+    <div class="positionable" style="top: 400px; left: 300px">
+        <h1>Preface</h1>
+        Nightstand books includ HTML5.
+        <span property="aa:start">00:04,565</span>
+        <span property="aa:end">00:05,565</span>
+    </div>
+
+    <div class="positionable" style="top: 50px; left: 500px">
+        <h1>Quotes</h1>
+        More stuff
+        <span property="aa:start">00:04,565</span>
+        <span property="aa:end">00:05,565</span>
+    </div>
+
+</div>
+
+    <script type="text/javascript" charset="utf-8">
+        // TILING JAVASCRIPT
+        $(document).ready(function() {
+            // Initialize the plugin
+            $("div#wrapper").tiling({
+                'layouts' : [
+                    'horizontal',
+                    'vertical',
+                    'fair',
+                ], 
+                'selector' : 'div.tiled',
+                'post_init' : function() {
+                    // console.log('triggered!');
+                },
+            });
+            $("div#wrapper").tiling("tile_horizontally");
+
+            // Binds keys to change the layout
+            $(window).keypress(function(event) {
+                // Press F to adapt the font size
+                if (event.which == '102') {
+                    event.preventDefault();
+                    $("div#wrapper").tiling("adapt_fontsize");
+                }
+                // Press N to go to the next layout
+                if (event.which == '110') {
+                    event.preventDefault();
+                    $("div#wrapper").tiling("next");
+                }
+                // Press P to go to the previous layout
+                if (event.which == '112') {
+                    event.preventDefault();
+                    $("div#wrapper").tiling("previous");
+                }
+            });
+
+            $(window).resize(function() {
+                $("div#wrapper").tiling("update");
+            });
+        });
+    </script>
+</body>
+</html>
