@@ -1,6 +1,7 @@
 # Django settings for activearchive run project.
 import os
 
+SITE_BASE_URL = "http://localhost:8000"
 
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
@@ -49,7 +50,7 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(DIRNAME, 'static/')
+MEDIA_ROOT = os.path.join(DIRNAME, 'media/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

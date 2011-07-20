@@ -79,3 +79,25 @@ def sandbox (request):
         context['result'] = t.render(c)
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
+
+from aacore.spider import spider
+
+def _import (request):
+    """ Import view """
+
+    context = {}
+    url = request.REQUEST.get("url", "")
+    context['url'] = url
+    if url:
+        context['spider'] = spider(url)
+
+    if request.method == "POST":
+        submit = request.REQUEST.get("_submit")
+        if submit == "import":
+            for importurl in request.REQUEST.getlist("importurl"):
+                (res, created) = Resource.objects.get_or_create(url=importurl)
+            return HttpResponse ("ok")
+            
+    return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
+
+

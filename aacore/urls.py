@@ -8,4 +8,5 @@ urlpatterns = patterns('aacore.views',
     url(r'^pages/(?P<slug>[-\w]+)/$', 'page_detail', {}, name='aa-page-detail'),
     url(r'^sandbox/$', 'sandbox', {}, name='aa-sandbox'),
     url(r'^rdfdump/$', 'rdfdump', {}, name='aa-rdf-dump'),
+    url(r'^import/$', '_import', {}, name='aa-import'),
 )

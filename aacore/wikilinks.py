@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-
 import re, urlparse
-
 from models import *
 from aacore.settings import DEFAULT_REL_NAMESPACE
-
+from django.core.urlresolvers import reverse
 
 class LinkForm:
     """
@@ -23,10 +21,11 @@ class LinkForm:
 
     #        (?:(?P<namespace>[^\]#]+?) \s* :)? \s*
     # [[ rel :: namespace : target # fragment | label ]]
+    #        (?P<target>[^\]#]+?)\s*
     pat = re.compile(r"""\[\[ \s*
         (?P<contents>
             (?:(?P<rel>[^\]#]+?) \s* ::)? \s*
-            (?P<target>[^\]#]+?)\s*
+            (?P<target>.+?)\s*
             (?:\# \s* (?P<fragment>[^\]]+?) )? \s*
             (?:\| \s* (?P<label>[^\]]+?) \s*)?
         ) \s*
@@ -95,7 +94,10 @@ def render_html (match):
             target = reverse("aacore.views.page", args=[wikify(target)])
             return """<a href="%s" rel="%s">%s</a>""" % (target, rel.compacturl, label)
         else:
-            return """<span property="%s" content="%s">%s</span>""" % (rel.compacturl, target, label)
+            if label != target:
+                return """<span property="%s" content="%s">%s</span>""" % (rel.compacturl, target, label)
+            else:
+                return """<span property="%s">%s</span>""" % (rel.compacturl, target)
     else:
         if not target.startswith("http"):
             target = reverse("aacore.views.page", args=[wikify(target)])
