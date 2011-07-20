@@ -2,7 +2,7 @@ import html5lib, urllib2, lxml
 
 from django.template.defaultfilters import stringfilter
 from django import template
-
+import urlparse
 
 register = template.Library()
 

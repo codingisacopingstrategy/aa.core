@@ -5,6 +5,68 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 
 
+############################
+# RESOURCE
+############################
+
+RESOURCE_TYPES = (
+    ('audio', 'audio'),
+    ('video', 'video (no audio)'),
+    ('audio/video', 'video'),
+    ('image', 'image'),
+    ('html', 'html'),
+    ('text', 'text'),
+    ('', '')
+)
+
+RESOURCE_STATUS = (
+    ('active', 'active'),
+    ('default', 'default'),
+    ('inactive', 'inactive')
+)
+
+class AAWait (Exception):
+    """ This exception is used when a resource is not yet available.
+    The URL is a special "task-tracking" URL that can be used to poll until task is done.
+    (Returns a JSON object with a "done" boolean value.)
+    """
+    def __init__ (self, url):
+        self.url = url
+
+class AANotAvailable (Exception):
+    pass
+
+class Resource (models.Model):
+    """ Resource is the main class of AA. In a nutshell: a resource is an (augmented) URL """
+    url = models.URLField(verify_exists=False)
+    content_type = models.CharField(max_length=255, default="", blank=True)
+    content_length = models.IntegerField(default=0)
+    charset = models.CharField(max_length=64, default="", blank=True)
+    last_modified = models.DateTimeField(null=True, blank=True)
+    etag = models.CharField(max_length=255, default="", blank=True)
+
+    status = models.CharField(max_length=255, choices=RESOURCE_STATUS, default="default")
+    _type = models.CharField(max_length=255, choices=RESOURCE_TYPES, blank=True)
+
+    def getLocalFile (self):
+        """
+        Return: an absolute path to a local file (if available)
+        Throws: AAWait when local file is not (yet) available
+        """
+        pass
+
+    def getMetadata (self):
+        """
+        Returns: a dictionary of key-value pairs (where keys are RDF style URLs)
+        Throws: AAWait when not yet available.
+        """
+        pass
+
+
+############################
+# RELATIONSHIP
+############################
+
 RELTYPES = (
     ('uri', 'URI'),
     ('wikipage', 'WikiPage'),
@@ -44,19 +106,3 @@ class Relationship (models.Model):
     def __unicode__ (self):
         return self.url
 
-
-RESOURCE_TYPES = (
-    ('audio', 'audio'),
-    ('video', 'video (no audio)'),
-    ('audio/video', 'video'),
-    ('image', 'image'),
-    ('html', 'html'),
-    ('text', 'text'),
-    ('', '')
-)
-
-RESOURCE_STATUS = (
-    ('active', 'active'),
-    ('default', 'default'),
-    ('inactive', 'inactive')
-)

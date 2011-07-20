@@ -1,0 +1,3 @@
+[[videoinfo:: theora, yuv420p, [PAR 295:264 DAR 295:216], 25 tbr, 25 tbn, 25 tbc]]
+
+
