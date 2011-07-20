@@ -49,3 +49,113 @@ def embed (value, arg):
     else:
         return None
 embed.is_safe = True
+
+
+#@register.filter
+#def crop(uri, size='200w'):
+    #""" Takes an image ressource uri as input value and a size as argument
+    #returns the url of the new image
+    #usage:
+        #{{ http://mysite.org/myimage.png | crop }}
+    #"""
+    #SCALE_WIDTH = 'w'
+    #SCALE_HEIGHT = 'h'
+    #SCALE_BOTH = 'both'
+
+    #def scale(max_x, pair):
+        #x, y = pair
+        #new_y = (float(max_x) / x) * y
+        #return (int(max_x), int(new_y))
+
+    ## defining the size
+    #if (size.lower().endswith('h')):
+        #mode = 'h'
+        #size = size[:-1]
+        #height = int(size.strip())
+        #width = ""
+    #elif (size.lower().endswith('w')):
+        #mode = 'w'
+        #size = size[:-1]
+        #width = int(size.strip())
+        #height = ""
+    #else:
+        #mode = 'both'
+        #size = size.split("x")
+        #width = int(size[0].strip())
+        #height = int(size[1].strip())
+        
+    ## defining the filename and the miniature filename
+    #filehead, filetail = os.path.split(file.path)
+    #basename, format = os.path.splitext(filetail)
+    #miniature = basename + '_thumb_' + str(width) + str(height) + format
+    #filename = file.path
+    #miniature_filename = os.path.join(filehead, miniature)
+    #filehead, filetail = os.path.split(file.url)
+    #miniature_url = filehead + '/' + miniature
+
+    #if os.path.exists(miniature_filename) and os.path.getmtime(filename)>os.path.getmtime(miniature_filename):
+        #os.unlink(miniature_filename)
+
+    ## if the image wasn't already resized, resize it
+    #if not os.path.exists(miniature_filename):
+        
+        ## See http://redskiesatnight.com/2005/04/06/sharpening-using-image-magick/
+        ## for unsharpening values
+        #if mode == SCALE_HEIGHT:
+            #cmd = 'convert %s -resize x%d -unsharp 0.5x0.5+0.75+0.05     %s' % (filename, height, miniature_filename)
+        #elif mode == SCALE_WIDTH:
+            #cmd = 'convert %s -resize %d -unsharp 0.5x0.5+0.75+0.05 %s' % (filename, width, miniature_filename)
+        #elif mode == SCALE_BOTH:
+            #cmd = 'convert %s -resize %dx%d -unsharp 0.5x0.5+0.75+0.05 %s' % (filename, width, height, miniature_filename)
+        #else:
+            #raise Exception("Thumbnail size must be in ##w, ##h, or ##x## format.")
+        
+        #os.system(cmd)   
+
+    #return miniature_url
+
+
+@register.filter
+@stringfilter
+def zoom (value):
+    """ Takes a url as input value and an xpath as argument.
+    Returns a collection of html elements
+    usage:
+        {{ "http://upload.wikimedia.org/wikipedia/commons/c/cd/Tympanum_central_mosaic_santa_Maria_del_Fiore_Florence.jpg"|zoom }}
+    """
+    return """
+    <span> 
+        <a id="in" href="#">+</a> 
+        <a id="out" href="#">-</a> 
+        <a id="fit" href="#">fit</a> 
+        <a id="orig" href="#">orig</a> 
+        <a id="update" href="#">update</a> 
+    </span> 
+    <div id="viewer" class="viewer" style="width: 300px; height: 300px; position: relative; border: 1px solid black"></div>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" ></script> 
+    <script type="text/javascript" src="http://test.dpetroff.ru/jquery.iviewer/test/jquery.mousewheel.min.js" ></script>
+    <script type="text/javascript" src="http://test.dpetroff.ru/jquery.iviewer/jquery.iviewer.js" ></script> 
+    <script type="text/javascript">
+    var $ = jQuery;
+    $(document).ready(function(){
+    $("#viewer").iviewer({
+        src: "%s", 
+        update_on_resize: false,
+        zoom: 200,
+        initCallback: function () {
+            var object = this;
+            $("#in").click(function(){ object.zoom_by(1);}); 
+            $("#out").click(function(){ object.zoom_by(-1);}); 
+            $("#fit").click(function(){ object.fit();}); 
+            $("#orig").click(function(){  object.set_zoom(100); }); 
+            $("#update").click(function(){ object.update_container_info();});
+        },
+        onFinishLoad: function() {
+            $("#viewer").data('viewer').setCoords(-500,-500);
+        },
+    });
+    });
+    </script>""" % value
+
+    
+zoom.is_safe = True
