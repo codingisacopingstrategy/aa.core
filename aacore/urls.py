@@ -1,6 +1,5 @@
 from django.conf.urls.defaults import *
 
-
 urlpatterns = patterns('aacore.views',
     # url(r'^$', 'foo', {}, name='aa-foo'),
     url(r'^sniff/$', 'sniff', {}, name='aa-sniff'),

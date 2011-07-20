@@ -39,6 +39,8 @@ class AANotAvailable (Exception):
 class Resource (models.Model):
     """ Resource is the main class of AA. In a nutshell: a resource is an (augmented) URL """
     url = models.URLField(verify_exists=False)
+    pipeline = models.CharField(max_length=1024, blank=True)
+
     content_type = models.CharField(max_length=255, default="", blank=True)
     content_length = models.IntegerField(default=0)
     charset = models.CharField(max_length=64, default="", blank=True)
