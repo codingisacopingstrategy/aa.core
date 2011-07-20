@@ -62,37 +62,6 @@ def rdfdump (request):
     ser = RDF.Serializer(name="turtle")
     return HttpResponse(ser.serialize_model_to_string(model), mimetype="text/plain")
 
-##### PIPELINE PROCESSING #########
-
-# """ {{ http://www.jabberwocky.com/carroll/walrus.html | htmlcrop /html/body/p[2] }} """
-
-def pipeline_url (stdin, url):
-    request = urllib2.Request(url)
-    request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.1.5) Gecko/20091109 Ubuntu/9.10 (karmic) Firefox/3.5.5")
-    return urllib2.urlopen(request)
-
-def pipeline_xpath (stdin, xpath, url=None): 
-    htmlparser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), namespaceHTMLElements=False)
-    page = htmlparser.parse(stdin)
-    p = page.xpath(xpath)
-    if p:
-        return "\n".join([lxml.etree.tostring(absolutize_refs(url, item), encoding='unicode') for item in p])
-#        if url:
-#            return "\n".join([lxml.etree.tostring(absolutize_refs(url, item), encoding='unicode') for item in p])
-#        else:
-#            return "\n".join([lxml.etree.tostring(item, encoding='unicode') for item in p])
-##        
-#        p = p[0]
-#        if url:
-#            absolutize_refs(url, p)
-#        return lxml.etree.tostring(p, encoding='unicode')
-        # return "".join([t for t in p.itertext()])
-
-def absolutize_refs (baseurl, lxmlnode):
-    for elt in lxml.cssselect.CSSSelector("*[src]")(lxmlnode):
-        elt.set('src', urlparse.urljoin(baseurl, elt.get("src")))
-    return lxmlnode
-
 def sandbox (request):
     """
     Sample page to test wikitext / embed processing. Unlike a real wiki sandbox, this page is always ephemeral (nothing is saved)
@@ -105,7 +74,7 @@ def sandbox (request):
 
     if text:
         from django.template import Template, Context
-        t = Template("{% load fiters %}\n" + text)
+        t = Template("{% load filters %}\n" + text)
         c = Context({})
         context['result'] = t.render(c)
 
