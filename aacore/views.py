@@ -17,9 +17,11 @@
 
 
 import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse
-from django.shortcuts import (render_to_response, get_object_or_404)
+from django.shortcuts import (render_to_response, get_object_or_404, redirect)
 from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
+
 
 from plugins import sniffer
 from models import *
@@ -36,8 +38,39 @@ def page_detail (request, slug):
     """ Main view of a page """
     context = {}
     name = dewikify(slug)
-    page = get_object_or_404(Page, name=name)
-    return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
+    try:
+        page = Page.objects.get(name=name)
+        context['page'] = page
+        from django.template import Template, Context
+        t = Template("{% load filters %}\n" + page.content)
+        c = Context({})
+        context['content'] = t.render(c)
+        return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
+    except Page.DoesNotExist:
+        url = reverse('aa-page-edit', kwargs={'slug':slug})
+        return redirect(url)
+
+def page_edit (request, slug):
+    """ Edit view of a page """
+    context = {}
+    name = dewikify(slug)
+    try:
+        page = Page.objects.get(name=name)
+        context['page'] = page
+        context['content'] = page.content
+    except Page.DoesNotExist:
+        page = None
+    if request.method == "POST":
+        content = request.POST.get('content', '')
+        if page:
+            page.content = content 
+            page.save()
+        else:
+            page = Page(content=content, name=name)
+            page.save()
+        url = reverse('aa-page-detail', kwargs={'slug':slug})
+        return redirect(url)
+    return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
 
 def sniff (request):
     """
