@@ -17,41 +17,51 @@
 
 
 import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse
+
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
 from django.http import HttpResponse
-from django.template import RequestContext
+from django.template import RequestContext, Template, Context
 from django.core.urlresolvers import reverse
 
-
+from aacore.spider import spider
 from plugins import sniffer
 from models import *
 from rdfutils import *
 from utils import *
 
 
-def page_list(request):
-    """ A listing of All Pages (like MediaWiki Special:AllPages) """
+def page_list (request):
+    """
+    A listing of All Pages (like MediaWiki Special:AllPages)
+    """
     context = {}
     return render_to_response("aacore/page_list.html", context, context_instance=RequestContext(request))
 
 def page_detail (request, slug):
-    """ Main view of a page """
+    """
+    Page detail view
+    """
     context = {}
     name = dewikify(slug)
     try:
         page = Page.objects.get(name=name)
         context['page'] = page
-        from django.template import Template, Context
+
+        # This is a trick to use of django filter in the pages
         t = Template("{% load filters %}\n" + page.content)
         c = Context({})
         context['content'] = t.render(c)
+
         return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
     except Page.DoesNotExist:
+        # Redirects to the edit page
         url = reverse('aa-page-edit', kwargs={'slug':slug})
         return redirect(url)
 
 def page_edit (request, slug):
-    """ Edit view of a page """
+    """
+    Page edition view
+    """
     context = {}
     name = dewikify(slug)
     try:
@@ -97,7 +107,8 @@ def rdfdump (request):
 
 def sandbox (request):
     """
-    Sample page to test wikitext / embed processing. Unlike a real wiki sandbox, this page is always ephemeral (nothing is saved)
+    Sample page to test wikitext / embed processing. Unlike a real wiki
+    sandbox, this page is always ephemeral (nothing is saved)
     Options: 
     This view does not alter the database / create new resources (?)
     """
@@ -106,21 +117,22 @@ def sandbox (request):
     context['text'] = text
 
     if text:
-        from django.template import Template, Context
+        # This is a trick to use of django filter in the pages
         t = Template("{% load filters %}\n" + text)
         c = Context({})
         context['result'] = t.render(c)
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
 
-from aacore.spider import spider
-
 def _import (request):
-    """ Import view """
-
+    """
+    Import view
+    """
     context = {}
+
     url = request.REQUEST.get("url", "")
     context['url'] = url
+
     if url:
         context['spider'] = spider(url)
 
@@ -132,5 +144,3 @@ def _import (request):
             return HttpResponse ("ok")
             
     return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
-
-

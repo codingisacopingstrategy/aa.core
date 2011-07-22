@@ -22,11 +22,12 @@ def wikify (name):
     name = urllib.quote(name, safe="")
     return name
 
+
 def dewikify (name):
     """
     Turns URL name/slug into a proper name (reverse of wikify).
     Requires: name may be unicode, str
-    Returns: str    
+    Returns: str
 
     NB dewikify(wikify(name)) may produce a different name (first letter gets capitalized)
     """
