@@ -1,8 +1,12 @@
-from aacore.resource_opener import ResourceOpener
 from django.template import Context, loader
 
+from aacore.resource_opener import ResourceOpener
+
+
 def sniff (url):
-    """ Master sniffer: calls sniff method on all subclasses """
+    """
+    Master sniffer: calls sniff method on all subclasses
+    """
     data = ResourceOpener(url)
     data.get()
     info = {}
@@ -27,7 +31,9 @@ def sniff (url):
     return data, ret
 
 class Sniffer (object):
-    """ Base class of all "sniffer" objects """
+    """
+    Base class of all "sniffer" objects
+    """
     @classmethod
     def sniff (cls, url, reqfile, info):
         return None

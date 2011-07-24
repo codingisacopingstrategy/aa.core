@@ -1,3 +1,4 @@
 from sniffer import sniff, Sniffer
-import ffmpeg_sniffer
 
+import ffmpeg_sniffer
+import identify_sniffer

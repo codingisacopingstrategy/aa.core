@@ -3,6 +3,7 @@ from django.conf import settings
 
 EXIFTOOL = getattr(settings, 'AA_EXIFTOOL', 'exiftool')
 FFMPEG = getattr(settings, 'AA_FFMPEG', 'ffmpeg')
+IDENTIFY = getattr(settings, 'AA_IDENTIFY', 'identify')
 CONVERT = getattr(settings, 'AA_CONVERT', 'convert')
 
 USER_AGENT = getattr(settings, 'AA_USER_AGENT', "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1) Gecko/20090624 Firefox/3.5")
