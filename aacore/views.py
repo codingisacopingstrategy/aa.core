@@ -39,7 +39,19 @@ def page_list (request):
 
 def page_detail (request, slug):
     """
-    Page detail view
+    Displays a wiki page :model:`aacore.Page`.
+
+    **Context**
+
+    ``RequestContext``
+        Request context
+
+    ``page``
+        An instance of :model:`aacore.Page`.
+
+    **Template:**
+
+    :template:`aacore/page.html`
     """
     context = {}
     name = dewikify(slug)
@@ -48,7 +60,7 @@ def page_detail (request, slug):
         context['page'] = page
 
         # This is a trick to use of django filter in the pages
-        t = Template("{% load filters %}\n" + page.content)
+        t = Template("{% load filters aatags %}\n" + page.content)
         c = Context({})
         context['content'] = t.render(c)
 
@@ -61,6 +73,12 @@ def page_detail (request, slug):
 def page_edit (request, slug):
     """
     Page edition view
+
+    template
+        :template:`aacore/edit.html`
+
+    template
+        :template:`aacore/edit.html`
     """
     context = {}
     name = dewikify(slug)
@@ -118,7 +136,7 @@ def sandbox (request):
 
     if text:
         # This is a trick to use of django filter in the pages
-        t = Template("{% load filters %}\n" + text)
+        t = Template("{% load aatags %}{% load filters %}\n" + text)
         c = Context({})
         context['result'] = t.render(c)
 

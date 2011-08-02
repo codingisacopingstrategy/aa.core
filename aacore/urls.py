@@ -1,7 +1,9 @@
 from django.conf.urls.defaults import *
+from django.views.generic.simple import redirect_to
 
 
 urlpatterns = patterns('aacore.views',
+    url('^$', redirect_to, {'url': '/pages/Index/'}),
     url(r'^sniff/$', 'sniff', {}, name='aa-sniff'),
     url(r'^pages/$', 'page_list', {}, name='aa-page-list'),
     url(r'^pages/(?P<slug>[-\w]+)/$', 'page_detail', {}, name='aa-page-detail'),
