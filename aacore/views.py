@@ -60,24 +60,43 @@ def page_detail (request, slug):
         page = Page.objects.get(name=name)
         context['page'] = page
 
-        #p = re.compile(r'(^#.*?)(?=^#)', re.MULTILINE|re.DOTALL)
-        #a = p.split(txt)
+        p = re.compile(r'(^# .*?)(?=^# )', re.MULTILINE|re.DOTALL)
+        md_sections = p.split(page.content)
+        
+        html_sections = []
 
-        # This is a trick to use of django filter in the pages
-        t = Template("{% load filters aatags %}" + page.content)
-        c = Context({})
-        md = markdown.Markdown(extensions=['extra', 'meta'])
-        html = t.render(c)
+        for md_section in md_sections:
+            if len(md_section) != 0:  # Avoids empty annotation boxes
+                # This is a trick to use of django filter in the pages
+                t = Template("{% load filters aatags %}" + md_section)
+                c = Context({})
+                md = markdown.Markdown(extensions=['extra', 'meta'])
+                #html_section.append(md.convert(t.render(c)))
+                fragment = """
+                <div class="section">
+                    <a class="edit" href="#">edit</a>
+                    <div class="source">
+                        <p>
+                        <textarea>%s</textarea>
+                        </p>
+                        <p>
+                        <button class="cancel">Cancel</button>
+                        <button class="save">Save</button>
+                        </p>
+                    </div>
+                    <div class="rendered">%s</div>
+                </div>
+                """ % (md_section, md.convert(t.render(c)))
+                html_sections.append(fragment)
 
-        html = md.convert(t.render(c))
         # Wraps h2 sections
-        import wrap
-        import lxml.etree
-        doc = wrap.parser.parse(html)
-        wrap.treeSectionalize(doc, startLevel=1, stopLevel=2)
-        content = lxml.etree.tostring(doc, pretty_print=True, encoding="UTF-8", method="html")
+        #import wrap
+        #import lxml.etree
+        #doc = wrap.parser.parse(html)
+        #wrap.treeSectionalize(doc, startLevel=1, stopLevel=2)
+        #content = lxml.etree.tostring(doc, pretty_print=True, encoding="UTF-8", method="html")
 
-        context['content'] = mark_safe(content)
+        context['content'] = mark_safe("".join(html_sections))
         return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
     except Page.DoesNotExist:
         # Redirects to the edit page
@@ -87,9 +106,6 @@ def page_detail (request, slug):
 def page_edit (request, slug):
     """
     Page edition view
-
-    template
-        :template:`aacore/edit.html`
 
     template
         :template:`aacore/edit.html`
