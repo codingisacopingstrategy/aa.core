@@ -18,10 +18,9 @@
 
 import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-
 
 from plugins import sniffer
 from models import *
@@ -132,5 +131,21 @@ def _import (request):
             return HttpResponse ("ok")
             
     return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
+
+
+#from tasks import resource_do_task
+#def resource_task(request, id):
+#    res = get_object_or_404(Resource, pk=id)
+#    resource_do_task.delay(res, "foo")
+#    return HttpResponseRedirect('/')
+
+
+import djangotasks
+
+def resource_task(request, id):
+    res = get_object_or_404(Resource, pk=id)
+    task = djangotasks.task_for_object(res.task)
+    djangotasks.run_task(task)
+    return HttpResponseRedirect('/')
 
 

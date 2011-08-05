@@ -3,7 +3,7 @@ import aacore.templatetags.aatags
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
-
+import time
 
 ############################
 # RESOURCE
@@ -36,10 +36,11 @@ class AAWait (Exception):
 class AANotAvailable (Exception):
     pass
 
+
 class Resource (models.Model):
     """ Resource is the main class of AA. In a nutshell: a resource is an (augmented) URL """
     url = models.URLField(verify_exists=False)
-    pipeline = models.CharField(max_length=1024, blank=True)
+    # pipeline = models.CharField(max_length=1024, blank=True)
 
     content_type = models.CharField(max_length=255, default="", blank=True)
     content_length = models.IntegerField(default=0)
@@ -64,6 +65,12 @@ class Resource (models.Model):
         """
         pass
 
+    def task (self):
+        time.sleep(15)
+        return "OK!"
+
+import djangotasks
+djangotasks.register_task(Resource.task, "Test task for resource")
 
 ############################
 # PAGES 
