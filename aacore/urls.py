@@ -11,5 +11,4 @@ urlpatterns = patterns('aacore.views',
     url(r'^sandbox/$', 'sandbox', {}, name='aa-sandbox'),
     url(r'^rdfdump/$', 'rdfdump', {}, name='aa-rdf-dump'),
     url(r'^import/$', '_import', {}, name='aa-import'),
-    url(r'^resources/(?P<id>\d+)/task/$', 'resource_task', {}, name='aa-resource-task'),
 )
