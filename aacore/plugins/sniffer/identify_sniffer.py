@@ -25,8 +25,8 @@ import sniffer, aacore.wikilinks
 class IdentifySniffer (sniffer.Sniffer):
     @classmethod
     def sniff(cls, url, rfile, data):
-        if not data['content_type'].startswith('image/'):
-            return None
+        #if not data['content_type'].startswith('image/'):
+            #return None
         out = system_stdin_stderr(IDENTIFY + ' -verbose "%s"' % url)
         #return "<pre>%s</pre>" % markup(out)
         return "<pre>%s</pre>" % aacore.wikilinks.markup(markup(out))
@@ -119,7 +119,7 @@ def markup (text):
 if (__name__ == "__main__"):
     import sys
     src = sys.argv[1]
-    out = system_stdin_stderr(FFMPEG + ' -i "%s"' % src)
+    out = system_stdin_stderr(IDENTIFY + ' -i "%s"' % src)
     print markup(out)
 
 #    mi = getStreamInfo(src)
