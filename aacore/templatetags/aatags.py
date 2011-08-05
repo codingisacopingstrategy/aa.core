@@ -36,24 +36,13 @@ def compactnamespace (url):
     return url
 
 
-class AaAllPages(template.Node):
-    def render(self, context):
-        pages = aacore.models.Page.objects.all()
-        print(pages)
-        return pages
-
-
-def aa_all_pages(parser, token):
-    try:
-        tag_name  = token.split_contents()
-    except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires exactly 1 arguments" % token.contents.split()[0])
-    return AaAllPages()
-register.tag(aa_all_pages)
-
 def page_list():
+    """
+    Returns an unordered list of all the wiki pages
+    Usage:
+        {% page_list %}
+    """
     return {
         'page_list': aacore.models.Page.objects.all(),
     }
 register.inclusion_tag('aacore/partials/page_list.html')(page_list)
-

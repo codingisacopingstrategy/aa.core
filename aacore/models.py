@@ -4,6 +4,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from utils import wikify
 import aacore.templatetags.aatags
 
 
@@ -78,7 +79,6 @@ class Resource (models.Model):
 # PAGES 
 ############################
 
-from utils import wikify
 class Page(models.Model):
     """
     This is the model class for Wiki pages.
@@ -89,12 +89,7 @@ class Page(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        #print(('aa-page-detail', wikify(self.name)))
-        #return ('aa-page-detail', wikify(self.name))
-        #print reverse("aa-page-detail", kwargs={'slug': wikify(self.name)})
-        # FIXME: For some reason the methos doesn't return anythong although
-        # the permalink is computed!
-        return reverse("aa-page-detail", kwargs={'slug': wikify(self.name)})
+        return ("aa-page-detail", (), {'slug': wikify(self.name)})
 
     def __unicode__(self):
         return self.name 
