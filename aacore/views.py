@@ -16,12 +16,13 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse
+import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse, markdown
 
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
 from django.http import HttpResponse
 from django.template import RequestContext, Template, Context
 from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 
 from aacore.spider import spider
 from plugins import sniffer
@@ -59,11 +60,24 @@ def page_detail (request, slug):
         page = Page.objects.get(name=name)
         context['page'] = page
 
-        # This is a trick to use of django filter in the pages
-        t = Template("{% load filters aatags %}\n" + page.content)
-        c = Context({})
-        context['content'] = t.render(c)
+        #p = re.compile(r'(^#.*?)(?=^#)', re.MULTILINE|re.DOTALL)
+        #a = p.split(txt)
 
+        # This is a trick to use of django filter in the pages
+        t = Template("{% load filters aatags %}" + page.content)
+        c = Context({})
+        md = markdown.Markdown(extensions=['extra', 'meta'])
+        html = t.render(c)
+
+        html = md.convert(t.render(c))
+        # Wraps h2 sections
+        import wrap
+        import lxml.etree
+        doc = wrap.parser.parse(html)
+        wrap.treeSectionalize(doc, startLevel=1, stopLevel=2)
+        content = lxml.etree.tostring(doc, pretty_print=True, encoding="UTF-8", method="html")
+
+        context['content'] = mark_safe(content)
         return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
     except Page.DoesNotExist:
         # Redirects to the edit page
@@ -91,11 +105,17 @@ def page_edit (request, slug):
     if request.method == "POST":
         content = request.POST.get('content', '')
         if page:
-            page.content = content 
-            page.save()
+            if content == "delete":
+                page.delete()
+            else:
+                page.content = content 
+                page.save()
         else:
-            page = Page(content=content, name=name)
-            page.save()
+            if content == "delete":
+                pass
+            else:
+                page = Page(content=content, name=name)
+                page.save()
         url = reverse('aa-page-detail', kwargs={'slug':slug})
         return redirect(url)
     return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
