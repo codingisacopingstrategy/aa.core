@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from utils import wikify
 import aacore.templatetags.aatags
 
-
 ############################
 # RESOURCE
 ############################
@@ -49,7 +48,7 @@ class Resource (models.Model):
     In a nutshell: a resource is an (augmented) URL.
     """
     url = models.URLField(verify_exists=False)
-    pipeline = models.CharField(max_length=1024, blank=True)
+    # pipeline = models.CharField(max_length=1024, blank=True)
 
     content_type = models.CharField(max_length=255, default="", blank=True)
     content_length = models.IntegerField(default=0)
@@ -73,7 +72,6 @@ class Resource (models.Model):
         Throws: AAWait when not yet available.
         """
         pass
-
 
 ############################
 # PAGES 

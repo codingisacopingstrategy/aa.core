@@ -19,7 +19,7 @@
 import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse, markdown
 
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, Template, Context
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
@@ -182,3 +182,4 @@ def _import (request):
             return HttpResponse ("ok")
             
     return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
+
