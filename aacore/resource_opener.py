@@ -15,15 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
 
-
 import re, urllib2, datetime, email.utils, urlparse, os
 
-# USER_AGENT = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1) Gecko/20090624 Firefox/3.5"
 from aacore.settings import USER_AGENT
+
 
 # http://code.activestate.com/recipes/577015-parse-http-date-time-string/
 def parse_http_datetime(s):
     return datetime.datetime(*email.utils.parsedate(s)[:6])
+
 
 # http://www.artima.com/forums/flat.jsp?forum=122&thread=15024
 class NotModifiedHandler(urllib2.BaseHandler):
@@ -32,14 +32,17 @@ class NotModifiedHandler(urllib2.BaseHandler):
         addinfourl.code = code
         return addinfourl
 
+
 def splitContentType (t):
     m = splitContentType.pat.match(t)
     if m:
         d = m.groupdict()
         (mt, charset) = (d['mimetype'], d['charset'])
-        if charset==None: charset = ""
+        if charset == None:
+            charset = ""
         return (mt, charset)
 splitContentType.pat = re.compile(r"""\s*(?P<mimetype>[\w+_-]+/[\w+_-]+)\s*(?:;\s*charset=(?P<charset>[\w-]*)\s*)?""")
+
 
 def conditional_get (url, last_modified=None, etag=None):
     """
@@ -56,12 +59,12 @@ def conditional_get (url, last_modified=None, etag=None):
     opener = urllib2.build_opener(NotModifiedHandler())
     return opener.open(request)
 
+
 class ResourceOpener():
     """
     ResourceOpener simply deals with Conditional GET, and normalizes common headers
     Interesting attributes: original_url, url, file, info, status, content_type, charset, content_length
     """
-    
     def __init__(self, url):
         self.original_url = url
         self.info = {}
@@ -72,7 +75,8 @@ class ResourceOpener():
         self.url = f.geturl()
         if hasattr(f, 'code'):
             self.status = f.code
-            if self.status == 304: return self.status
+            if self.status == 304:
+                return self.status
         else:
             self.status = None
 
@@ -80,11 +84,11 @@ class ResourceOpener():
         self.original_url = self.original_url
         self.content_type = self.info.get('content-type', '').lower()
         (self.content_type, self.charset) = splitContentType(self.content_type)
-        
+
         try:
             self.content_length = long(self.info.get('content-length', 0))
         except ValueError:
-            self.content_length =  0
+            self.content_length = 0
 
         self.last_modified_raw = self.info.get("Last-Modified", "")
         if self.last_modified_raw:
@@ -121,17 +125,20 @@ class ResourceOpener():
                 if total:
                     progress = int(100 * (float(bytes) / total))
                     if progress != lastprogress:
-                        if verbose: print "\t%d%% completed (%d/%d)..." % (progress, bytes, total)
+                        if verbose:
+                            print "\t%d%% completed (%d/%d)..." % (progress, bytes, total)
                         lastprogress = progress
-            if verbose: print "\tWrote %d bytes to %s" % (bytes, cpath)
+            if verbose:
+                print "\tWrote %d bytes to %s" % (bytes, cpath)
             outfile.close()
             return bytes
-            
+
         except ValueError, e:
-            return -1 # Bad URL
+            return -1  # Bad URL
         except urllib2.HTTPError, e:
             return -1
-    
+
+
 if __name__ == "__main__":
     url1 = "http://ubu.artmob.ca/sound/burroughs_william/Break-Through/Burroughs-William-S_01-K-9.mp3"
     url2 = "http://www.youtube.com/watch?v=rUJF6ke1SoE"

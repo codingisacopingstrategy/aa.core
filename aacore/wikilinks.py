@@ -2,9 +2,12 @@
 #-*- coding:utf-8 -*-
 
 import re, urlparse
+
+from django.core.urlresolvers import reverse
+
 from models import *
 from aacore.settings import DEFAULT_REL_NAMESPACE
-from django.core.urlresolvers import reverse
+
 
 class LinkForm:
     """
@@ -16,7 +19,6 @@ class LinkForm:
     [[ foo ]] (target: foo)
     [[ duration:: 03:45:23 ]] (rel: duration, target: 03:45:23)
     [[ homepage:: http://stdin.fr ]] (rel: homepage, target: http://stdin.fr)
-
     """
 
     #        (?:(?P<namespace>[^\]#]+?) \s* :)? \s*
@@ -73,7 +75,9 @@ class LinkForm:
 # (2) LOOKUP THE REL TO GET ITS RELTYPE AND CODE ACCORDINGLY
 
 def render_html (match):
-    """ Render the link in HTML """
+    """
+    Render the link in HTML
+    """
 
     link = LinkForm(match)
     label = link.label or link.target
@@ -105,7 +109,9 @@ def render_html (match):
 
 
 def markup(text):
-    """ translate text to a list of Link objects """
+    """
+    translate text to a list of Link objects
+    """
     return LinkForm.pat.sub(render_html, text)
 
 

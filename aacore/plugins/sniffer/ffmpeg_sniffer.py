@@ -15,14 +15,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
 
-# FFMPEG = "ffmpeg"
-from aacore.settings import FFMPEG
+
 import os, sys, re, subprocess # import Popen, PIPE, STDOUT
+
+from aacore.settings import FFMPEG
 import sniffer, aacore.wikilinks
+
 
 class FFMpegSniffer (sniffer.Sniffer):
     @classmethod
     def sniff(cls, url, rfile, data):
+        # TODO: find the accepted mimetypes for this sniffer
+        #       and uncomment below
+        #if data['content_type'] is not in ["video/mpeg"]:
+            #return None
         out = system_stdin_stderr(FFMPEG + ' -i "%s"' % url)
         return "<pre>%s</pre>" % aacore.wikilinks.markup(markup(out))
 
