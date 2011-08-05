@@ -123,39 +123,8 @@ def zoom (value):
     usage:
         {{ "http://upload.wikimedia.org/wikipedia/commons/c/cd/Tympanum_central_mosaic_santa_Maria_del_Fiore_Florence.jpg"|zoom }}
     """
-    return """
-    <span> 
-        <a id="in" href="#">+</a> 
-        <a id="out" href="#">-</a> 
-        <a id="fit" href="#">fit</a> 
-        <a id="orig" href="#">orig</a> 
-        <a id="update" href="#">update</a> 
-    </span> 
-    <div id="viewer" class="viewer" style="width: 300px; height: 300px; position: relative; border: 1px solid black"></div>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" ></script> 
-    <script type="text/javascript" src="http://test.dpetroff.ru/jquery.iviewer/test/jquery.mousewheel.min.js" ></script>
-    <script type="text/javascript" src="http://test.dpetroff.ru/jquery.iviewer/jquery.iviewer.js" ></script> 
-    <script type="text/javascript">
-    var $ = jQuery;
-    $(document).ready(function(){
-    $("#viewer").iviewer({
-        src: "%s", 
-        update_on_resize: false,
-        zoom: 200,
-        initCallback: function () {
-            var object = this;
-            $("#in").click(function(){ object.zoom_by(1);}); 
-            $("#out").click(function(){ object.zoom_by(-1);}); 
-            $("#fit").click(function(){ object.fit();}); 
-            $("#orig").click(function(){  object.set_zoom(100); }); 
-            $("#update").click(function(){ object.update_container_info();});
-        },
-        onFinishLoad: function() {
-            $("#viewer").data('viewer').setCoords(-500,-500);
-        },
-    });
-    });
-    </script>""" % value
-
+    from django.template.loader import render_to_string
+    rendered = render_to_string('aacore/partials/zoom.html', { 'value': value })
+    return rendered
     
 zoom.is_safe = True
