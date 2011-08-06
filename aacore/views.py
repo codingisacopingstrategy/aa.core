@@ -21,6 +21,7 @@ import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse, markdown
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, Template, Context
+from django.template.loader import get_template 
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
@@ -29,6 +30,7 @@ from plugins import sniffer
 from models import *
 from rdfutils import *
 from utils import *
+from mdx_fenced_style import FencedStyleExtension 
 
 
 def page_list (request):
@@ -56,52 +58,50 @@ def page_detail (request, slug):
     """
     context = {}
     name = dewikify(slug)
+
     try:
         page = Page.objects.get(name=name)
-        context['page'] = page
-
-        p = re.compile(r'(^# .*?)(?=^# )', re.MULTILINE|re.DOTALL)
-        md_sections = p.split(page.content)
-        
-        html_sections = []
-
-        for md_section in md_sections:
-            if len(md_section) != 0:  # Avoids empty annotation boxes
-                # This is a trick to use of django filter in the pages
-                t = Template("{% load filters aatags %}" + md_section)
-                c = Context({})
-                md = markdown.Markdown(extensions=['extra', 'meta'])
-                #html_section.append(md.convert(t.render(c)))
-                fragment = """
-                <div class="section">
-                    <a class="edit" href="#">edit</a>
-                    <div class="source">
-                        <p>
-                        <textarea>%s</textarea>
-                        </p>
-                        <p>
-                        <button class="cancel">Cancel</button>
-                        <button class="save">Save</button>
-                        </p>
-                    </div>
-                    <div class="rendered">%s</div>
-                </div>
-                """ % (md_section, md.convert(t.render(c)))
-                html_sections.append(fragment)
-
-        # Wraps h2 sections
-        #import wrap
-        #import lxml.etree
-        #doc = wrap.parser.parse(html)
-        #wrap.treeSectionalize(doc, startLevel=1, stopLevel=2)
-        #content = lxml.etree.tostring(doc, pretty_print=True, encoding="UTF-8", method="html")
-
-        context['content'] = mark_safe("".join(html_sections))
-        return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
     except Page.DoesNotExist:
         # Redirects to the edit page
         url = reverse('aa-page-edit', kwargs={'slug':slug})
-        return redirect(url)
+        return redirect(url) 
+
+    context['page'] = page
+    myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
+    md = markdown.Markdown(extensions=['extra', 'meta', myext])
+
+    sections = []  # Collects all the rendered sections
+
+    for (url, header, lines) in parse(page.content.splitlines()):
+        if lines or header:  # Avoids empty annotation boxes
+            # Puts back the header with the rest of the section content
+            if header:
+                lines.insert(0, header)
+
+            # Renders the section content
+            # This is a trick to use of django filter in the pages
+            t = Template("{% load filters aatags %}" + "\n".join(lines))
+            c = Context({})
+            rendered = mark_safe(md.convert(t.render(c)))
+
+            # Adds U
+            if url:
+                lines.insert(0, url)
+
+            # Renders the annotation box
+            t = get_template('aacore/partials/annotation.html')
+            c = Context({
+                'rendered': rendered,
+                'target': url,
+                'post_url': reverse('aa-page-edit', kwargs={'slug': slug}),
+                'source': "\n".join(lines)
+            })
+            annotation = t.render(c)
+
+            sections.append(annotation)
+
+    context['content'] = mark_safe("".join(sections))
+    return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
 def page_edit (request, slug):
     """

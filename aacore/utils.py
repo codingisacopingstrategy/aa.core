@@ -37,3 +37,31 @@ def dewikify (name):
     name = urllib.unquote(name)
     name = name.replace("_", " ")
     return name
+
+
+def parse(input_lines):
+    saw_url = False
+    url = None
+    header = None
+    lines = []
+    for line in input_lines:
+        if line.startswith('# '):
+            # We found a header. If we saw a url before it then that belongs to the next block:
+            if saw_url:
+                new_url = lines.pop()
+            else:
+                new_url = None
+
+            # Emit the previous block:
+            yield url, header, lines
+
+            # Set up the next block:
+            saw_url = False
+            url = new_url
+            header = line
+            lines = []
+        else:
+            # Check for a url (this check may have to be stricter).
+            # This only matters if the next line turns out to be a header.
+            saw_url = line.startswith('http://')
+            lines.append(line)

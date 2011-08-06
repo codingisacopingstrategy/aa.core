@@ -1,4 +1,15 @@
+{% extends "aacore/base.html" %}
+
+
+{% block body %}
+<nav>
+    <ul>
+        <li><a href="{% url aa-page-detail slug=page.name %}">view</a></li>
+        <li><a href="">view history</a></li>
+    </ul>
+</nav>
 <form action="." method="post" accept-charset="utf-8">{% csrf_token %}
     <textarea name="content" rows="24" cols="80">{{ content }}</textarea>
     <p><input type="submit" value="Save"></p>
 </form>
+{% endblock %}
