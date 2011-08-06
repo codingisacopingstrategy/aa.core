@@ -3,4 +3,5 @@
 *.db
 *~
 .svn
+*.swp
 venv/
