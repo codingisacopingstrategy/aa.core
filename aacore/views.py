@@ -72,6 +72,7 @@ def page_detail (request, slug):
 
     sections = []  # Collects all the rendered sections
 
+    i = 0
     for (url, header, lines) in parse(page.content.splitlines()):
         if lines or header:  # Avoids empty annotation boxes
             # Puts back the header with the rest of the section content
@@ -93,10 +94,12 @@ def page_detail (request, slug):
             c = Context({
                 'rendered': rendered,
                 'target': url,
-                'post_url': reverse('aa-page-edit', kwargs={'slug': slug}),
+                'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
                 'source': "\n".join(lines)
             })
             annotation = t.render(c)
+
+            i += 1
 
             sections.append(annotation)
 
@@ -135,6 +138,63 @@ def page_edit (request, slug):
         url = reverse('aa-page-detail', kwargs={'slug':slug})
         return redirect(url)
     return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
+
+def page_edit_section (request, slug, id):
+    """
+    Annotation edition view
+
+    template
+        :template:`aacore/edit.html`
+    """
+    name = dewikify(slug)
+    page = Page.objects.get(name=name)
+    if request.method == "POST":
+        content = request.POST.get('content', '')
+        i = 0
+        new_content = []
+        for (url, header, lines) in parse(page.content.splitlines()):
+            if int(id) == i:
+                new_content.append(content)
+            else:
+                if header:
+                    lines.insert(0, header)
+                if url:
+                    lines.insert(0, url)
+                new_content.append("\n".join(lines))
+            i += 1
+        page.content = "\n".join(new_content)
+        page.save()
+    return HttpResponse("ok")
+    #url = reverse('aa-page-detail', kwargs={'slug': slug})
+    #return redirect(url)
+
+
+    #context = {}
+    #name = dewikify(slug)
+    #try:
+        #page = Page.objects.get(name=name)
+        #context['page'] = page
+        #context['content'] = page.content
+        #context['id'] = page._id
+    #except Page.DoesNotExist:
+        #page = None
+    #if request.method == "POST":
+        #content = request.POST.get('content', '')
+        #if page:
+            #if content == "delete":
+                #page.delete()
+            #else:
+                #page.content = content 
+                #page.save()
+        #else:
+            #if content == "delete":
+                #pass
+            #else:
+                #page = Page(content=content, name=name)
+                #page.save()
+        #url = reverse('aa-page-detail', kwargs={'slug':slug})
+        #return redirect(url)
+    #return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
 
 def sniff (request):
     """

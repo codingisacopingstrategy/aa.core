@@ -17,13 +17,14 @@
                 $this.parents("section").find("article.rendered").show();
             });
 
-            $("button.save").click(function() {
+            $("button.save").click(function(e) {
+                e.preventDefault();
+
                 var $this = $(this);
-                var content = "";
-                $("textarea").each(function() {
-                    content += $(this).val();
-                });
-                $.post('edit/', 
+                var content = $this.parents("section").find("textarea").val();
+
+                var post_url = $this.parents("section").attr("data-post-url");
+                $.post(post_url, 
                     {
                         'content': content,
                         'page': "{{ page }}",

@@ -65,3 +65,4 @@ def parse(input_lines):
             # This only matters if the next line turns out to be a header.
             saw_url = line.startswith('http://')
             lines.append(line)
+    yield url, header, lines
