@@ -1,5 +1,5 @@
-<section rel="{{ target }}" data-post-url="{{ post_url }}">
-    <a class="edit" href="#">edit</a>
+<section class="annotation" {% if target %}about="{{ target }}"{% endif %} data-post-url="{{ post_url }}">
+    <p class="handle"><a class="edit" href="#">edit</a></p>
     <form class="source">
         <p>
             <textarea>{{ source }}</textarea>
@@ -9,5 +9,5 @@
             <button class="save">Save</button>
         </p>
     </form>
-    <article class="rendered"><div>{{ rendered }}</div></article>
+    <article rel="aa:annotation" class="rendered"><div>{{ rendered }}</div></article>
 </section>

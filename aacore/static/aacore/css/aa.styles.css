@@ -45,3 +45,14 @@
     font-style: italic;
 
 }
+
+* {
+    font-family: "LiberationSans", Helvetica, Arial, Sans;
+}
+article {
+    background-color: white;
+}
+
+a {
+    color: inherit;
+}

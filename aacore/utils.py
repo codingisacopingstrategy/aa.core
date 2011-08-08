@@ -1,4 +1,18 @@
 import urllib
+import re
+
+
+TIMECODE_RE = re.compile(
+    r"""^
+    (^
+    ((?P<seq>\d+)\r?\n)?
+    (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+    \s* --> \s*
+    (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+    \s*)
+    $""",
+    re.X | re.M
+)
 
 
 def wikify (name):
@@ -39,7 +53,15 @@ def dewikify (name):
     return name
 
 
-def parse(input_lines):
+def parse_header_sections(input_lines):
+    """
+    Takes a markdown text and parses it according to level 1 headers (atx-style)
+    Returns a tuples of 3 elements:
+    1. ressource url : None or url
+    2. header: None or markdown header
+    3. lines: an array of the section lines
+    """
+
     saw_url = False
     url = None
     header = None
@@ -66,3 +88,41 @@ def parse(input_lines):
             saw_url = line.startswith('http://')
             lines.append(line)
     yield url, header, lines
+
+
+def parse_timed_sections(input_lines):
+    """
+    Takes an "active archive SRT" text and split it according to timecodes
+    Returns a tuple:
+    1. Timecode: the timecode as string
+    2. An array of the body lines
+
+    >>> txt = '''
+    ... 00:00:48,850 --> 00:00:50,820
+    ... There's an old joke.
+    ... 00:00:48,850 -->
+    ... Two elderly women are
+    ... at a Catskill mountain resort.
+    ... '''
+    >>> for (timecode, lines) in parse_timed_sections(txt.splitlines()):
+    ...     print (timecode, lines)
+    ('00:00:48,850 --> 00:00:50,820', ["There's an old joke."])
+    ('00:00:48,850 -->', ['Two elderly women are', 'at a Catskill mountain resort.'])
+    """
+    timecode = None
+    lines = []
+    for line in input_lines:
+        if TIMECODE_RE.match(line):
+            if lines != ['']:
+                yield (timecode, lines)
+            lines = []
+            timecode = line
+        else:
+            lines.append(line)
+    if lines != ['']:
+        yield (timecode, lines)
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

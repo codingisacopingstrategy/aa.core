@@ -73,26 +73,57 @@ def page_detail (request, slug):
     sections = []  # Collects all the rendered sections
 
     i = 0
-    for (url, header, lines) in parse(page.content.splitlines()):
-        if lines or header:  # Avoids empty annotation boxes
-            # Puts back the header with the rest of the section content
-            if header:
-                lines.insert(0, header)
+    for (url, header, lines) in parse_header_sections(page.content.splitlines()):
+        # Puts back the header with the rest of the section content
+        if header:
+            lines.insert(0, header)
 
-            # Renders the section content
-            # This is a trick to use of django filter in the pages
+        # Renders every times section
+        timed_sections = []
+
+        j = 0
+        for (timecode, lines) in parse_timed_sections(lines):
             t = Template("{% load filters aatags %}" + "\n".join(lines))
             c = Context({})
             rendered = mark_safe(md.convert(t.render(c)))
 
-            # Adds U
-            if url:
-                lines.insert(0, url)
+            if timecode:
+                # TODO: markup timecode
+                t = get_template('aacore/partials/timed_section.html')
+                c = Context({
+                    'timecode': timecode,
+                    'markdown': timecode + "\n" + "\n".join(lines),
+                    'rendered': rendered,
+                })
+                timed_sections.append(t.render(c))
+            else:
+                timed_sections.append(rendered)
 
+            j += 1
+
+        print(timed_sections)
+
+        # Renders the section content (determined by h1 headers)
+        # Only articles, not source code form
+        # 1. render django template tags
+        # 2. converts to markdown
+        # 3. mark_safe for next inclusion
+        # 4. keeps rendered section in var rendered
+
+        # This is a trick to use of django filter in the pages
+        t = Template("{% load filters aatags %}" + "\n".join(lines))
+        c = Context({})
+        rendered = mark_safe(md.convert(t.render(c)))
+
+        # Adds URL to reconstruct the source
+        if url:
+            lines.insert(0, url)
+
+        if lines and header:  # Avoids empty annotation boxes
             # Renders the annotation box
             t = get_template('aacore/partials/annotation.html')
             c = Context({
-                'rendered': rendered,
+                'rendered': mark_safe("\n".join(timed_sections)),
                 'target': url,
                 'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
                 'source': "\n".join(lines)
@@ -102,6 +133,9 @@ def page_detail (request, slug):
             i += 1
 
             sections.append(annotation)
+        else:
+            sections.append(rendered)
+
 
     context['content'] = mark_safe("".join(sections))
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
@@ -152,7 +186,7 @@ def page_edit_section (request, slug, id):
         content = request.POST.get('content', '')
         i = 0
         new_content = []
-        for (url, header, lines) in parse(page.content.splitlines()):
+        for (url, header, lines) in parse_header_sections(page.content.splitlines()):
             if int(id) == i:
                 new_content.append(content)
             else:
