@@ -46,8 +46,9 @@
 
 }
 
-* {
+body {
     font-family: "LiberationSans", Helvetica, Arial, Sans;
+    letter-spacing: 0.5px;
 }
 article {
     background-color: white;

@@ -17,6 +17,8 @@
 
 
 import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse, markdown
+try: import simplejson as json
+except ImportError: import json
 
 from django.shortcuts import (render_to_response, get_object_or_404, redirect)
 from django.http import HttpResponse, HttpResponseRedirect
@@ -101,8 +103,6 @@ def page_detail (request, slug):
 
             j += 1
 
-        print(timed_sections)
-
         # Renders the section content (determined by h1 headers)
         # Only articles, not source code form
         # 1. render django template tags
@@ -136,8 +136,37 @@ def page_detail (request, slug):
         else:
             sections.append(rendered)
 
-
+    # Finally joins every section/annotation
     context['content'] = mark_safe("".join(sections))
+
+    # Extracts the geometry information from markdown metadata geometry key
+    md.convert(page.content)
+
+    # Geometry entry pattern, eg. "#myheader 300 400 50 50"
+    GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
+
+    try:
+        # Adds the geometry info to the context dictionnary so we can relayout using javascript.  
+        values = {}
+        for i in md.Meta['geometry']:
+            #tokens = i.split()
+            #values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
+
+            # Makes sure the entry is properly formatted
+            m = re.search(GEOMETRY_RE, i)
+
+            if m:
+                d = m.groupdict()
+                values['#' + d['id']] = {
+                    'width': d['width'],
+                    'height': d['height'],
+                    'top': d['top'],
+                    'left': d['left'],
+                }
+        context['geometry'] = json.dumps(values)
+    except KeyError:
+        pass
+
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
 def page_edit (request, slug):
@@ -172,6 +201,68 @@ def page_edit (request, slug):
         url = reverse('aa-page-detail', kwargs={'slug':slug})
         return redirect(url)
     return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
+
+def page_edit_geometry (request, slug):
+    """
+    A view to set/update information about the geometry of a page annotation.
+    Persistance is done in the markdown source itself thanks to the metadata
+    information, so no database is involded.
+
+    method
+        :POST
+    data
+        :_id <str> eg. "#my_header"
+        :width <str> eg. "200"
+        :height <str> eg. "300"
+        :top <str> eg. "50"
+        :left <str> eg. "500"
+        
+        to be implemented:
+        :z-index <str> eg.  "1078"
+    """
+    context = {}
+    name = dewikify(slug)
+    page = Page.objects.get(name=name)
+
+    if request.method == "POST":
+        # Parses the content of the page
+        myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
+        md = markdown.Markdown(extensions=['extra', 'meta', myext])
+        md.convert(page.content)
+
+        new_content = ""  #
+
+        # Retrieves POST data
+        _id = request.POST.get('id', '')
+        width = request.POST.get('width', '0')
+        height = request.POST.get('height', 0)
+        top = request.POST.get('top', 0)
+        left = request.POST.get('left', 0)
+
+        try:
+            match = None
+            # Updates the geometry key if older information about the element is present
+            for i in xrange(len(md.Meta['geometry'])):
+                if md.Meta['geometry'][i].split()[0] == _id:
+                    md.Meta['geometry'][i] = "%s %s %s %s %s" % (_id, width, height, top, left)
+                    match = True
+
+            # Appends the element geometry information if it wasn't there yet
+            if not match:
+                md.Meta['geometry'].append("%s %s %s %s %s" % (_id, width, height, top, left))
+        except KeyError:  # md.Meta['geometry'] doesn't exist yet
+            md.Meta['geometry'] = []
+            md.Meta['geometry'].append("%s %s %s %s %s" % (_id, width, height, top, left))
+
+        # Rebuilds the markdown source with new the updated metadata
+        for i in md.Meta:
+            new_content += i + ": " + "\n    ".join(md.Meta[i]) + "\n"
+        new_content += "\n\n" + "\n".join(md.lines)
+        page.content = new_content
+        page.save()
+
+        return HttpResponse("ok")
+    return HttpResponse("not ok")
 
 def page_edit_section (request, slug, id):
     """

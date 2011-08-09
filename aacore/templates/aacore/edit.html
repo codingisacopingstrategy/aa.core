@@ -4,8 +4,10 @@
 {% block body %}
 <nav>
     <ul>
+        {% if page %}
         <li><a href="{% url aa-page-detail slug=page.name %}">view</a></li>
         <li><a href="">view history</a></li>
+        {% endif %}
     </ul>
 </nav>
 <form action="." method="post" accept-charset="utf-8">{% csrf_token %}
