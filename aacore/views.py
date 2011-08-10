@@ -273,11 +273,22 @@ def page_edit_section (request, slug, id):
     """
     name = dewikify(slug)
     page = Page.objects.get(name=name)
+
+    myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
+    md = markdown.Markdown(extensions=['extra', 'meta', myext])
+    md.convert(page.content)
+
     if request.method == "POST":
         content = request.POST.get('content', '')
-        i = 0
         new_content = []
-        for (url, header, lines) in parse_header_sections(page.content.splitlines()):
+
+        for i in md.Meta:
+            new_content.append(i + ": " + "\n    ".join(md.Meta[i]) + "\n")
+        new_content += "\n\n"
+
+        i = 0
+        for (url, header, lines) in parse_header_sections(md.lines):
+            print(url, header,lines)
             if int(id) == i:
                 new_content.append(content)
             else:
@@ -289,37 +300,8 @@ def page_edit_section (request, slug, id):
             i += 1
         page.content = "\n".join(new_content)
         page.save()
+
     return HttpResponse("ok")
-    #url = reverse('aa-page-detail', kwargs={'slug': slug})
-    #return redirect(url)
-
-
-    #context = {}
-    #name = dewikify(slug)
-    #try:
-        #page = Page.objects.get(name=name)
-        #context['page'] = page
-        #context['content'] = page.content
-        #context['id'] = page._id
-    #except Page.DoesNotExist:
-        #page = None
-    #if request.method == "POST":
-        #content = request.POST.get('content', '')
-        #if page:
-            #if content == "delete":
-                #page.delete()
-            #else:
-                #page.content = content 
-                #page.save()
-        #else:
-            #if content == "delete":
-                #pass
-            #else:
-                #page = Page(content=content, name=name)
-                #page.save()
-        #url = reverse('aa-page-detail', kwargs={'slug':slug})
-        #return redirect(url)
-    #return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
 
 def sniff (request):
     """

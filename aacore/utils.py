@@ -75,7 +75,8 @@ def parse_header_sections(input_lines):
                 new_url = None
 
             # Emit the previous block:
-            yield url, header, lines
+            if url or header or lines:
+                yield url, header, lines
 
             # Set up the next block:
             saw_url = False
