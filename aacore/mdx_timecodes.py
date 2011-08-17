@@ -17,7 +17,7 @@
     >>> myext = TimeCodesExtension()
     >>> md = markdown.Markdown(extensions=[myext])
     >>> md.convert(text)
-    u'<h2 typeof="aa:clip"> %%start::00:03:21%% --&gt; %%end::00:45:56%%</h2>\\n<p>Some text</p>'
+    u'<h2 typeof="aa:clip"> %%aa:start::00:03:21%% --&gt; %%aa:end::00:45:56%%</h2>\\n<p>Some text</p>'
     >>> text = '''
     ... 00:03:21 -->
     ... Some text
@@ -25,7 +25,7 @@
     >>> myext = TimeCodesExtension()
     >>> md = markdown.Markdown(extensions=[myext])
     >>> md.convert(text)
-    u'<h2 typeof="aa:clip"> %%start::00:03:21%% --&gt;</h2>\\n<p>Some text</p>'
+    u'<h2 typeof="aa:clip"> %%aa:start::00:03:21%% --&gt;</h2>\\n<p>Some text</p>'
     >>> text = '''
     ... 00:03:21,012 --> 00:03:28,032
     ... Some text
@@ -33,7 +33,7 @@
     >>> myext = TimeCodesExtension()
     >>> md = markdown.Markdown(extensions=[myext])
     >>> md.convert(text)
-    u'<h2 typeof="aa:clip"> %%start::00:03:21,012%% --&gt; %%end::00:03:28,032%%</h2>\\n<p>Some text</p>'
+    u'<h2 typeof="aa:clip"> %%aa:start::00:03:21,012%% --&gt; %%aa:end::00:03:28,032%%</h2>\\n<p>Some text</p>'
 """
 
 
@@ -70,10 +70,10 @@ class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
         for line in lines:
             m = TIMECODE_RE.search(line)
             if m:
-                newline = u"## {@typeof=aa:clip} %%start::" + m.group('start') + "%% -->"
+                newline = u"## %%aa:start::" + m.group('start') + "%% -->"
                 if m.group('end'):
-                    newline += u" %%end::" + m.group('end') + "%%"
-                newlines.append(newline)
+                    newline += u" %%aa:end::" + m.group('end') + "%%"
+                newlines.append(newline )
             else:
                 newlines.append(line)
         return newlines

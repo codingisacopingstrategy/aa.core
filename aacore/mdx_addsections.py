@@ -75,8 +75,8 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
                         print key
                         wrapper.set(key, value)
                         del child.attrib[key]
-                if typeof:
-                    wrapper.set("typeof", typeof)
+                #if typeof:
+                    #wrapper.set("typeof", typeof)
                 if tagclass:
                     if '%(LEVEL)d' in tagclass:
                         tagclass = tagclass % {'LEVEL': n}

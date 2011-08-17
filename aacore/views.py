@@ -32,7 +32,9 @@ from plugins import sniffer
 from models import *
 from rdfutils import *
 from utils import *
+from mdx_aa import get_aa_markdown
 from mdx_fenced_style import FencedStyleExtension 
+from mdx_timecodes import TimeCodesExtension
 
 
 def page_list (request):
@@ -69,75 +71,74 @@ def page_detail (request, slug):
         return redirect(url) 
 
     context['page'] = page
-    myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
-    md = markdown.Markdown(extensions=['extra', 'meta', myext])
+    md = get_aa_markdown()
+    #sections = []  # Collects all the rendered sections
 
-    sections = []  # Collects all the rendered sections
+    #i = 0
+    #for (url, header, lines) in parse_header_sections(page.content.splitlines()):
+        ## Puts back the header with the rest of the section content
+        #if header:
+            #lines.insert(0, header)
 
-    i = 0
-    for (url, header, lines) in parse_header_sections(page.content.splitlines()):
-        # Puts back the header with the rest of the section content
-        if header:
-            lines.insert(0, header)
+        ## Renders every times section
+        #timed_sections = []
 
-        # Renders every times section
-        timed_sections = []
+        #j = 0
+        #for (timecode, lines) in parse_timed_sections(lines):
+            #t = Template("{% load filters aatags %}" + "\n".join(lines))
+            #c = Context({})
+            #rendered = mark_safe(md.convert(t.render(c)))
 
-        j = 0
-        for (timecode, lines) in parse_timed_sections(lines):
-            t = Template("{% load filters aatags %}" + "\n".join(lines))
-            c = Context({})
-            rendered = mark_safe(md.convert(t.render(c)))
+            #if timecode:
+                ## TODO: markup timecode
+                #t = get_template('aacore/partials/timed_section.html')
+                #c = Context({
+                    #'timecode': timecode,
+                    #'markdown': timecode + "\n" + "\n".join(lines),
+                    #'rendered': rendered,
+                #})
+                #timed_sections.append(t.render(c))
+            #else:
+                #timed_sections.append(rendered)
 
-            if timecode:
-                # TODO: markup timecode
-                t = get_template('aacore/partials/timed_section.html')
-                c = Context({
-                    'timecode': timecode,
-                    'markdown': timecode + "\n" + "\n".join(lines),
-                    'rendered': rendered,
-                })
-                timed_sections.append(t.render(c))
-            else:
-                timed_sections.append(rendered)
+            #j += 1
 
-            j += 1
+        ## Renders the section content (determined by h1 headers)
+        ## Only articles, not source code form
+        ## 1. render django template tags
+        ## 2. converts to markdown
+        ## 3. mark_safe for next inclusion
+        ## 4. keeps rendered section in var rendered
 
-        # Renders the section content (determined by h1 headers)
-        # Only articles, not source code form
-        # 1. render django template tags
-        # 2. converts to markdown
-        # 3. mark_safe for next inclusion
-        # 4. keeps rendered section in var rendered
+        ## This is a trick to use of django filter in the pages
+        #t = Template("{% load filters aatags %}" + "\n".join(lines))
+        #c = Context({})
+        #rendered = mark_safe(md.convert(t.render(c)))
 
-        # This is a trick to use of django filter in the pages
-        t = Template("{% load filters aatags %}" + "\n".join(lines))
-        c = Context({})
-        rendered = mark_safe(md.convert(t.render(c)))
+        ## Adds URL to reconstruct the source
+        #if url:
+            #lines.insert(0, url)
 
-        # Adds URL to reconstruct the source
-        if url:
-            lines.insert(0, url)
+        #if lines and header:  # Avoids empty annotation boxes
+            ## Renders the annotation box
+            #t = get_template('aacore/partials/annotation.html')
+            #c = Context({
+                #'rendered': mark_safe("\n".join(timed_sections)),
+                #'target': url,
+                #'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
+                #'source': "\n".join(lines)
+            #})
+            #annotation = t.render(c)
 
-        if lines and header:  # Avoids empty annotation boxes
-            # Renders the annotation box
-            t = get_template('aacore/partials/annotation.html')
-            c = Context({
-                'rendered': mark_safe("\n".join(timed_sections)),
-                'target': url,
-                'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
-                'source': "\n".join(lines)
-            })
-            annotation = t.render(c)
+            #i += 1
 
-            i += 1
-
-            sections.append(annotation)
-        else:
-            sections.append(rendered)
+            #sections.append(annotation)
+        #else:
+            #sections.append(rendered)
 
     # Finally joins every section/annotation
-    context['content'] = mark_safe("".join(sections))
+    #context['content'] = mark_safe("".join(sections))
+    context['content'] = mark_safe(md.convert(page.content))
 
     # Extracts the geometry information from markdown metadata geometry key
     md.convert(page.content)
