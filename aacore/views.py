@@ -164,7 +164,7 @@ def page_detail (request, slug):
                     'left': d['left'],
                 }
         context['geometry'] = json.dumps(values)
-    except KeyError:
+    except (KeyError, AttributeError):
         pass
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
@@ -261,6 +261,32 @@ def page_edit_geometry (request, slug):
         page.content = new_content
         page.save()
 
+        # Geometry entry pattern, eg. "#myheader 300 400 50 50"
+        GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
+
+        try:
+            # Adds the geometry info to the context dictionnary so we can relayout using javascript.  
+            values = {}
+            for i in md.Meta['geometry']:
+                #tokens = i.split()
+                #values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
+
+                # Makes sure the entry is properly formatted
+                m = re.search(GEOMETRY_RE, i)
+
+                if m:
+                    d = m.groupdict()
+                    values['#' + d['id']] = {
+                        'width': d['width'],
+                        'height': d['height'],
+                        'top': d['top'],
+                        'left': d['left'],
+                    }
+            context['geometry'] = json.dumps(values)
+            return HttpResponse(json.dumps(values))
+        except KeyError:
+            pass
+
         return HttpResponse("ok")
     return HttpResponse("not ok")
 
@@ -273,11 +299,21 @@ def page_edit_section (request, slug, id):
     """
     name = dewikify(slug)
     page = Page.objects.get(name=name)
+
+    myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
+    md = markdown.Markdown(extensions=['extra', 'meta', myext])
+    md.convert(page.content)
+
     if request.method == "POST":
         content = request.POST.get('content', '')
-        i = 0
         new_content = []
-        for (url, header, lines) in parse_header_sections(page.content.splitlines()):
+
+        for i in md.Meta:
+            new_content.append(i + ": " + "\n    ".join(md.Meta[i]) + "\n")
+        new_content += "\n\n"
+
+        i = 0
+        for (url, header, lines) in parse_header_sections(md.lines):
             if int(id) == i:
                 new_content.append(content)
             else:
@@ -289,37 +325,77 @@ def page_edit_section (request, slug, id):
             i += 1
         page.content = "\n".join(new_content)
         page.save()
+
+        ### 
+        sections = []  # Collects all the rendered sections
+
+        i = 0
+        for (url, header, lines) in parse_header_sections(content.splitlines()):
+            # Puts back the header with the rest of the section content
+            if header:
+                lines.insert(0, header)
+
+            # Renders every times section
+            timed_sections = []
+
+            j = 0
+            for (timecode, lines) in parse_timed_sections(lines):
+                t = Template("{% load filters aatags %}" + "\n".join(lines))
+                c = Context({})
+                rendered = mark_safe(md.convert(t.render(c)))
+
+                if timecode:
+                    # TODO: markup timecode
+                    t = get_template('aacore/partials/timed_section.html')
+                    c = Context({
+                        'timecode': timecode,
+                        'markdown': timecode + "\n" + "\n".join(lines),
+                        'rendered': rendered,
+                    })
+                    timed_sections.append(t.render(c))
+                else:
+                    timed_sections.append(rendered)
+
+                j += 1
+
+            # Renders the section content (determined by h1 headers)
+            # Only articles, not source code form
+            # 1. render django template tags
+            # 2. converts to markdown
+            # 3. mark_safe for next inclusion
+            # 4. keeps rendered section in var rendered
+
+            # This is a trick to use of django filter in the pages
+            t = Template("{% load filters aatags %}" + "\n".join(lines))
+            c = Context({})
+            rendered = mark_safe(md.convert(t.render(c)))
+
+            # Adds URL to reconstruct the source
+            if url:
+                lines.insert(0, url)
+
+            if lines and header:  # Avoids empty annotation boxes
+                # Renders the annotation box
+                t = get_template('aacore/partials/annotation.html')
+                c = Context({
+                    'rendered': mark_safe("\n".join(timed_sections)),
+                    'target': url,
+                    'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
+                    'source': "\n".join(lines)
+                })
+                annotation = t.render(c)
+
+                i += 1
+
+                sections.append(annotation)
+            else:
+                sections.append(rendered)
+
+        # Finally joins every section/annotation
+        return HttpResponse(mark_safe("".join(sections)))
+
+
     return HttpResponse("ok")
-    #url = reverse('aa-page-detail', kwargs={'slug': slug})
-    #return redirect(url)
-
-
-    #context = {}
-    #name = dewikify(slug)
-    #try:
-        #page = Page.objects.get(name=name)
-        #context['page'] = page
-        #context['content'] = page.content
-        #context['id'] = page._id
-    #except Page.DoesNotExist:
-        #page = None
-    #if request.method == "POST":
-        #content = request.POST.get('content', '')
-        #if page:
-            #if content == "delete":
-                #page.delete()
-            #else:
-                #page.content = content 
-                #page.save()
-        #else:
-            #if content == "delete":
-                #pass
-            #else:
-                #page = Page(content=content, name=name)
-                #page.save()
-        #url = reverse('aa-page-detail', kwargs={'slug':slug})
-        #return redirect(url)
-    #return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
 
 def sniff (request):
     """
