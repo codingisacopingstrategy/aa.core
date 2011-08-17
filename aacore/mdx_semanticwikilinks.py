@@ -29,6 +29,12 @@ Define a custom URL builder:
     >>> md.convert('[[ Speaker :: Sherry Turkle | Second Self ]]')
     u'<p><span property="Speaker" value="Sherry Turkle">Second Self</span></p>'
 
+
+
+Todo:
+* Optional: function to wikify names
+* Optional: Default Namespace for rel
+
 '''
 
 import markdown
