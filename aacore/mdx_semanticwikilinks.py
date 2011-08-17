@@ -26,8 +26,8 @@ Define a custom URL builder:
     ...     return elt
     >>> md = markdown.Markdown(extensions=['semanticwikilinks'], 
     ...         extension_configs={'semanticwikilinks' : [('make_link', make_rdfa)]})
-    >>> md.convert('[[ Speaker :: Sherry Turkle | Ms. Turkle ]]')
-    u'<p><span property="Speaker" value="Sherry Turkle">Ms. Turkle</span></p>'
+    >>> md.convert('[[ Speaker :: Sherry Turkle | Second Self ]]')
+    u'<p><span property="Speaker" value="Sherry Turkle">Second Self</span></p>'
 
 '''
 
@@ -64,7 +64,7 @@ class WikiLinkExtension(markdown.Extension):
     
         # append to end of inline patterns
         pat = WikiLinkPattern(self.config, md)
-        md.inlinePatterns.add('wikilink', pat, "<not_strong")
+        md.inlinePatterns.add('semanticwikilink', pat, "<not_strong")
 
 class WikiLinkPattern(markdown.inlinepatterns.Pattern):
 
