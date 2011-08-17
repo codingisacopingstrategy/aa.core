@@ -27,7 +27,7 @@ Basic usage:
     ... Section 2
     ... """.strip()
     >>> html = markdown.markdown(src, ['addsections'])
-    >>> html
+    >>> html.replace("\\n", "")
     u'<section class="section1" typeof="aa:section"><h1>1</h1><p>Section 1</p><section class="section2" typeof="aa:section"><h2>1.1</h2><p>Subsection 1.1</p></section><section class="section2" typeof="aa:section"><h2>1.2</h2><p>Subsection 1.2</p><section class="section3" typeof="aa:section"><h3>1.2.1</h3><p>Hey 1.2.1 Special section</p></section><section class="section3" typeof="aa:section"><h3>1.2.2</h3><section class="section4" typeof="aa:section"><h4>1.2.2.1</h4></section></section></section></section><section class="section1" typeof="aa:section"><h1>2</h1><p>Section 2</p></section>'
 
 Divs instead of sections, custom class names:
@@ -56,7 +56,7 @@ import markdown, re
 from markdown import etree
 
 
-def add_sections (tree, tag, tagclass, typeof):
+def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
     def do(parent, n, tag, tagclass):
         tagname = "h%d" % n
         wrapper = None
@@ -70,6 +70,11 @@ def add_sections (tree, tag, tagclass, typeof):
             if m and tag_level == n: # child.tag == tagname:
                 # FOUND HEADER: START NEW WRAP
                 wrapper = etree.Element(tag)
+                if moveAttributes:
+                    for key, value in child.attrib.items():
+                        print key
+                        wrapper.set(key, value)
+                        del child.attrib[key]
                 if typeof:
                     wrapper.set("typeof", typeof)
                 if tagclass:
@@ -109,7 +114,7 @@ class AddSectionsExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
         ext = AddSectionsTreeprocessor(md)
         ext.config = self.config
-        md.treeprocessors.add("addsections", ext, "_begin")
+        md.treeprocessors.add("addsections", ext, "_end")
 
 def makeExtension(configs={}):
     return AddSectionsExtension(configs=configs)
