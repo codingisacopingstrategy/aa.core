@@ -11,7 +11,7 @@ Requires Python-Markdown 2.0+.
 Basic usage:
 
     >>> import markdown
-    >>> text = "{{dc:author :: Sherry Turkle | Turkle's}} {{dc:title::Second Self}} was an early book on the social aspects of computation."
+    >>> text = "%%dc:author :: Sherry Turkle | Turkle's%% %%dc:title::Second Self%% was an early book on the social aspects of computation."
     >>> html = markdown.markdown(text, ['semanticdata'])
     >>> html
     u'<p><span content="Sherry Turkle" property="dc:author">Turkle\\'s</span> <span content="Second Self" property="dc:title">Second Self</span> was an early book on the social aspects of computation.</p>'
@@ -22,11 +22,11 @@ import markdown
 import re
 
 pattern = r"""
-\{\{\s*
+\%\%\s*
     (?:(?P<property>[^\]#]+?) \s* ::) \s*
     (?P<value>.+?) \s*
     (?:\| \s* (?P<display>[^\]]+?) \s*)?
-\}\}
+\%\%
 """.strip()
 
 def make_elt (prop, value, display):
