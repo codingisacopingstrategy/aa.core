@@ -28,7 +28,7 @@ Basic usage:
     ... """.strip()
     >>> html = markdown.markdown(src, ['addsections'])
     >>> html
-    u'<section class="section1"><h1>1</h1><p>Section 1</p><section class="section2"><h2>1.1</h2><p>Subsection 1.1</p></section><section class="section2"><h2>1.2</h2><p>Subsection 1.2</p><section class="section3"><h3>1.2.1</h3><p>Hey 1.2.1 Special section</p></section><section class="section3"><h3>1.2.2</h3><section class="section4"><h4>1.2.2.1</h4></section></section></section></section><section class="section1"><h1>2</h1><p>Section 2</p></section>'
+    u'<section class="section1" typeof="aa:section"><h1>1</h1><p>Section 1</p><section class="section2" typeof="aa:section"><h2>1.1</h2><p>Subsection 1.1</p></section><section class="section2" typeof="aa:section"><h2>1.2</h2><p>Subsection 1.2</p><section class="section3" typeof="aa:section"><h3>1.2.1</h3><p>Hey 1.2.1 Special section</p></section><section class="section3" typeof="aa:section"><h3>1.2.2</h3><section class="section4" typeof="aa:section"><h4>1.2.2.1</h4></section></section></section></section><section class="section1" typeof="aa:section"><h1>2</h1><p>Section 2</p></section>'
 
 Divs instead of sections, custom class names:
 
@@ -40,7 +40,7 @@ Divs instead of sections, custom class names:
     ... """.strip()
     >>> html = markdown.markdown(src, extensions=['addsections(tag=div,class=s%(LEVEL)d)'])
     >>> html.replace("\\n", "")
-    u'<div class="s1"><h1>Introduction</h1></div><div class="s1"><h1>Body</h1><div class="s2"><h2>Subsection</h2></div></div><div class="s1"><h1>Bibliography</h1></div>'
+    u'<div class="s1" typeof="aa:section"><h1>Introduction</h1></div><div class="s1" typeof="aa:section"><h1>Body</h1><div class="s2" typeof="aa:section"><h2>Subsection</h2></div></div><div class="s1" typeof="aa:section"><h1>Bibliography</h1></div>'
 
 
 Known Issue: structures like:
@@ -56,7 +56,7 @@ import markdown, re
 from markdown import etree
 
 
-def add_sections (tree, tag, tagclass):
+def add_sections (tree, tag, tagclass, typeof):
     def do(parent, n, tag, tagclass):
         tagname = "h%d" % n
         wrapper = None
@@ -70,6 +70,8 @@ def add_sections (tree, tag, tagclass):
             if m and tag_level == n: # child.tag == tagname:
                 # FOUND HEADER: START NEW WRAP
                 wrapper = etree.Element(tag)
+                if typeof:
+                    wrapper.set("typeof", typeof)
                 if tagclass:
                     if '%(LEVEL)d' in tagclass:
                         tagclass = tagclass % {'LEVEL': n}
@@ -92,13 +94,14 @@ def add_sections (tree, tag, tagclass):
 
 class AddSectionsTreeprocessor(markdown.treeprocessors.Treeprocessor):
     def run(self, doc):
-        add_sections(doc, self.config.get("tag")[0], self.config.get("class")[0])
+        add_sections(doc, self.config.get("tag")[0], self.config.get("class")[0], self.config.get("typeof")[0])
 
 class AddSectionsExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
             'tag': ['section', 'tag name to use, default: section'],
-            'class': ['section%(LEVEL)d', 'class name, may include %(LEVEL)d to reference header-level (i.e. h1, h2)']
+            'class': ['section%(LEVEL)d', 'class name, may include %(LEVEL)d to reference header-level (i.e. h1, h2)'],
+            'typeof': ['aa:section', 'sets typeof attribute for rdfa']
         }
         for key, value in configs:
             self.setConfig(key, value)
