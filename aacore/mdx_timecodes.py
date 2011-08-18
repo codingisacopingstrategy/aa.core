@@ -56,10 +56,9 @@ class TimeCodesExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
         """ Add TimeCodesPreprocessor to the Markdown instance. """
 
-        md.preprocessors.add('section_edit_block', 
+        md.preprocessors.add('timecodes_block', 
                                  TimeCodesPreprocessor(md), 
                                  "_begin")
-
 
 
 class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
@@ -70,7 +69,7 @@ class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
         for line in lines:
             m = TIMECODE_RE.search(line)
             if m:
-                newline = u"## %%aa:start::" + m.group('start') + "%% -->"
+                newline = u"## %%aa:start::" + m.group('start') + "%% &rarr;"
                 if m.group('end'):
                     newline += u" %%aa:end::" + m.group('end') + "%%"
                 newlines.append(newline )
