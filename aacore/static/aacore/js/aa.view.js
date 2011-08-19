@@ -29,7 +29,7 @@ function init() {
 
     // Makes annotations draggable and resizable
     $("section.annotation").draggable({
-        handle:'p.handle',
+        handle:'nav',
         grid: [50, 50],
         zIndex: 2700,
         stop: post_geometry,
@@ -52,8 +52,8 @@ $(document).ready(function() {
             .hide();
     });
 
-    $("button.cancel").live("click", function() {
-        $this.parents("section")
+    $("input.cancel").live("click", function() {
+        $(this).parents("section")
             .find("form.source")
             .hide()
         .end()
@@ -61,7 +61,7 @@ $(document).ready(function() {
             .show();
     });
 
-    $("button.save").live("click", function(e) {
+    $("input.submit").live("click", function(e) {
         var $elt = $(this).parents("section");
         var content = $elt.find("textarea").val();
         var post_url = $elt.attr("data-post-url");

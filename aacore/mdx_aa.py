@@ -18,7 +18,7 @@ def get_aa_markdown ():
     return markdown.Markdown(extensions=[
         mdx_semanticwikilinks.makeExtension(),
         mdx_semanticdata.makeExtension(),
-        mdx_addsections.makeExtension(),
+        #mdx_addsections.makeExtension(),
         mdx_timecodes.makeExtension(),
         mdx_sectionedit.makeExtension(),
         ])

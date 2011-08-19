@@ -11,7 +11,6 @@ HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 
 def parse(text, level=1):
     prev_start = 0
-    prev_end = 0
     seen_section = False
     for match in re.finditer(HASH_HEADER_RE % level, text):
         yield seen_section, prev_start, match.start(), text[prev_start:match.start()]

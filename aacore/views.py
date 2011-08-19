@@ -72,101 +72,40 @@ def page_detail (request, slug):
 
     context['page'] = page
     md = get_aa_markdown()
-    #sections = []  # Collects all the rendered sections
-
-    #i = 0
-    #for (url, header, lines) in parse_header_sections(page.content.splitlines()):
-        ## Puts back the header with the rest of the section content
-        #if header:
-            #lines.insert(0, header)
-
-        ## Renders every times section
-        #timed_sections = []
-
-        #j = 0
-        #for (timecode, lines) in parse_timed_sections(lines):
-            #t = Template("{% load filters aatags %}" + "\n".join(lines))
-            #c = Context({})
-            #rendered = mark_safe(md.convert(t.render(c)))
-
-            #if timecode:
-                ## TODO: markup timecode
-                #t = get_template('aacore/partials/timed_section.html')
-                #c = Context({
-                    #'timecode': timecode,
-                    #'markdown': timecode + "\n" + "\n".join(lines),
-                    #'rendered': rendered,
-                #})
-                #timed_sections.append(t.render(c))
-            #else:
-                #timed_sections.append(rendered)
-
-            #j += 1
-
-        ## Renders the section content (determined by h1 headers)
-        ## Only articles, not source code form
-        ## 1. render django template tags
-        ## 2. converts to markdown
-        ## 3. mark_safe for next inclusion
-        ## 4. keeps rendered section in var rendered
-
-        ## This is a trick to use of django filter in the pages
-        #t = Template("{% load filters aatags %}" + "\n".join(lines))
-        #c = Context({})
-        #rendered = mark_safe(md.convert(t.render(c)))
-
-        ## Adds URL to reconstruct the source
-        #if url:
-            #lines.insert(0, url)
-
-        #if lines and header:  # Avoids empty annotation boxes
-            ## Renders the annotation box
-            #t = get_template('aacore/partials/annotation.html')
-            #c = Context({
-                #'rendered': mark_safe("\n".join(timed_sections)),
-                #'target': url,
-                #'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
-                #'source': "\n".join(lines)
-            #})
-            #annotation = t.render(c)
-
-            #i += 1
-
-            #sections.append(annotation)
-        #else:
-            #sections.append(rendered)
-
-    # Finally joins every section/annotation
-    #context['content'] = mark_safe("".join(sections))
-    context['content'] = mark_safe(md.convert(page.content))
+    rendered = md.convert(page.content)
+    print(rendered)
+    t = Template("{% load filters aatags %}" + rendered)
+    c = Context({})
+    context['content'] = mark_safe(t.render(c))
 
     # Extracts the geometry information from markdown metadata geometry key
-    md.convert(page.content)
+    #md.convert(page.content)
 
-    # Geometry entry pattern, eg. "#myheader 300 400 50 50"
-    GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
 
-    try:
-        # Adds the geometry info to the context dictionnary so we can relayout using javascript.  
-        values = {}
-        for i in md.Meta['geometry']:
-            #tokens = i.split()
-            #values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
+    ## Geometry entry pattern, eg. "#myheader 300 400 50 50"
+    #GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
 
-            # Makes sure the entry is properly formatted
-            m = re.search(GEOMETRY_RE, i)
+    #try:
+        ## Adds the geometry info to the context dictionnary so we can relayout using javascript.  
+        #values = {}
+        #for i in md.Meta['geometry']:
+            ##tokens = i.split()
+            ##values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
 
-            if m:
-                d = m.groupdict()
-                values['#' + d['id']] = {
-                    'width': d['width'],
-                    'height': d['height'],
-                    'top': d['top'],
-                    'left': d['left'],
-                }
-        context['geometry'] = json.dumps(values)
-    except (KeyError, AttributeError):
-        pass
+            ## Makes sure the entry is properly formatted
+            #m = re.search(GEOMETRY_RE, i)
+
+            #if m:
+                #d = m.groupdict()
+                #values['#' + d['id']] = {
+                    #'width': d['width'],
+                    #'height': d['height'],
+                    #'top': d['top'],
+                    #'left': d['left'],
+                #}
+        #context['geometry'] = json.dumps(values)
+    #except (KeyError, AttributeError):
+        #pass
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 

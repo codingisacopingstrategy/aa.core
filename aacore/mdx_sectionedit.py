@@ -16,6 +16,44 @@
 """
 
 import markdown, re
+from textwrap import dedent
+
+
+HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
+#HASH_HEADER_RE = re.compile(r'(^|\n)(?P<level>#{1,6})(?P<header>.*?)#*(\n|$)')
+#SETEXT_HEADER_RE = re.compile(r'^.*?\n[=-]{3,}', re.MULTILINE)
+
+HEADER_SECTION_FORM_TMPL = """\
+<form class="source">
+<textarea>%s</textarea>
+<p>
+<input type="button" class="cancel" value="cancel" />
+<input type="submit" class="submit" value="save" />
+</p>
+</form>
+"""
+
+HEADER_SECTION_TMPL = """\
+<section class="annotation">
+<nav><a href="#" class="edit">edit</a></nav>
+<article class="rendered">
+<div>
+%s
+</div>
+</article>
+%s
+</section>
+"""
+
+NON_HEADER_SECTION_TMPL = """\
+<section>
+<article class="rendered">
+
+%s
+
+</article>
+</section>
+"""
 
 
 class SectionEditExtension(markdown.Extension):
@@ -29,23 +67,32 @@ class SectionEditExtension(markdown.Extension):
 
 
 class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
-    
+   
+    def parse(self, text, level=1):
+        prev_start = 0
+        seen_section = False
+        for match in re.finditer(HASH_HEADER_RE % level, text):
+            yield seen_section, prev_start, match.start(), text[prev_start:match.start()]
+            seen_section = True
+            prev_start = match.start() 
+        yield seen_section, prev_start, len(text), text[prev_start:len(text)]
+
     def run(self, lines):
         """ Match and store Fenced Code Blocks in the HtmlStash. """
-        seen_section = False
-        text = []
-        section = []
-        for i, line in enumerate(lines):
-            if line.startswith("# ") or i == (len(lines) - 1):
-                if seen_section:
-                    source = "\n\n<form><textarea>%s</textarea></form>" % self._escape("\n".join(section))
-                    text.append(source)
-                    section = []
-                else:
-                    seen_section = True
-            text.append(line)
-            section.append(line)
-        return text
+
+        text = "\n".join(lines)
+        new_text = ""
+        for is_header, start, end, chunk in self.parse(text):
+            if is_header:
+                form_elt = HEADER_SECTION_FORM_TMPL % chunk
+                placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
+                print(placeholder)
+                new_text += HEADER_SECTION_TMPL % (chunk, placeholder)
+            else:
+                new_text += NON_HEADER_SECTION_TMPL % chunk
+
+        return new_text.split("\n")
+
 
     def _escape(self, txt):
         """ basic html escaping """
