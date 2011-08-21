@@ -28,7 +28,7 @@ function init() {
     }
 
     // Makes annotations draggable and resizable
-    $("section.annotation").draggable({
+    $("section.annotation1").draggable({
         handle:'nav',
         grid: [50, 50],
         zIndex: 2700,

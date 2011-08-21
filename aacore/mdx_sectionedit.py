@@ -23,7 +23,7 @@ HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 #HASH_HEADER_RE = re.compile(r'(^|\n)(?P<level>#{1,6})(?P<header>.*?)#*(\n|$)')
 #SETEXT_HEADER_RE = re.compile(r'^.*?\n[=-]{3,}', re.MULTILINE)
 
-HEADER_SECTION_FORM_TMPL = """\
+HEADER_SECTION_FORM_TMPL = """
 <form class="source">
 <textarea>%s</textarea>
 <p>
@@ -33,26 +33,17 @@ HEADER_SECTION_FORM_TMPL = """\
 </form>
 """
 
-HEADER_SECTION_TMPL = """\
-<section class="annotation">
-<nav><a href="#" class="edit">edit</a></nav>
-<article class="rendered">
-<div>
+HEADER_SECTION_TMPL = """
+<div class="article">
 %s
 </div>
-</article>
 %s
-</section>
 """
 
-NON_HEADER_SECTION_TMPL = """\
-<section>
-<article class="rendered">
-
+NON_HEADER_SECTION_TMPL = """
+<div class="article">
 %s
-
 </article>
-</section>
 """
 
 
@@ -86,7 +77,6 @@ class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
             if is_header:
                 form_elt = HEADER_SECTION_FORM_TMPL % chunk
                 placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
-                print(placeholder)
                 new_text += HEADER_SECTION_TMPL % (chunk, placeholder)
             else:
                 new_text += NON_HEADER_SECTION_TMPL % chunk
