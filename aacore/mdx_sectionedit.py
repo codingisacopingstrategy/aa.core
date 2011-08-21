@@ -27,25 +27,13 @@ HEADER_SECTION_FORM_TMPL = """
 <form class="source">
 <textarea>%s</textarea>
 <p>
+<input type="hidden" name="start" value="%s" />
+<input type="hidden" name="stop" value="%s" />
 <input type="button" class="cancel" value="cancel" />
 <input type="submit" class="submit" value="save" />
 </p>
 </form>
 """
-
-HEADER_SECTION_TMPL = """
-<div class="article">
-%s
-</div>
-%s
-"""
-
-NON_HEADER_SECTION_TMPL = """
-<div class="article">
-%s
-</article>
-"""
-
 
 class SectionEditExtension(markdown.Extension):
 
@@ -75,11 +63,12 @@ class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
         new_text = ""
         for is_header, start, end, chunk in self.parse(text):
             if is_header:
-                form_elt = HEADER_SECTION_FORM_TMPL % chunk
-                placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
-                new_text += HEADER_SECTION_TMPL % (chunk, placeholder)
+                form_elt = HEADER_SECTION_FORM_TMPL % (chunk, start, end)
+                #placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
+                #new_text += "\n%s\n%s\n" % (chunk, placeholder)
+                new_text += "\n%s\n%s\n" % (chunk, form_elt)
             else:
-                new_text += NON_HEADER_SECTION_TMPL % chunk
+                new_text += chunk
 
         return new_text.split("\n")
 
