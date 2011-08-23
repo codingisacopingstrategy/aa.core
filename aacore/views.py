@@ -73,7 +73,6 @@ def page_detail (request, slug):
     context['page'] = page
     md = get_aa_markdown()
     rendered = md.convert(page.content)
-    print(rendered)
     t = Template("{% load filters aatags %}" + rendered)
     c = Context({})
     context['content'] = mark_safe(t.render(c))

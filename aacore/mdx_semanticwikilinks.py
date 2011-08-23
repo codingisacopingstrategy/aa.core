@@ -32,7 +32,7 @@ Define a custom URL builder:
 
 
 Todo:
-* Optional: function to wikify names
+* Optional: function to wikify names (it is already possible to achieve this with the custom 'make_link' function)
 * Optional: Default Namespace for rel
 
 '''

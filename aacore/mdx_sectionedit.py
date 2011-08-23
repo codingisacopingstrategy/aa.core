@@ -49,26 +49,28 @@ class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
    
     def parse(self, text, level=1):
         prev_start = 0
-        seen_section = False
+        prev_end = 0
+        header = None
         for match in re.finditer(HASH_HEADER_RE % level, text):
-            yield seen_section, prev_start, match.start(), text[prev_start:match.start()]
-            seen_section = True
+            yield header, prev_start, match.start(), text[prev_end:match.start()]
+            header = text[match.start():match.end()]
             prev_start = match.start() 
-        yield seen_section, prev_start, len(text), text[prev_start:len(text)]
+            prev_end = match.end() 
+        yield header, prev_start, len(text), text[prev_end:len(text)]
 
     def run(self, lines):
         """ Match and store Fenced Code Blocks in the HtmlStash. """
 
         text = "\n".join(lines)
         new_text = ""
-        for is_header, start, end, chunk in self.parse(text):
-            if is_header:
-                form_elt = HEADER_SECTION_FORM_TMPL % (chunk, start, end)
+        for header, start, end, body in self.parse(text):
+            if header:
+                form_elt = HEADER_SECTION_FORM_TMPL % (header + body, start, end)
                 #placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
                 #new_text += "\n%s\n%s\n" % (chunk, placeholder)
-                new_text += "\n%s\n%s\n" % (chunk, form_elt)
+                new_text += "\n%s\n%s\n%s\n" % (header, form_elt, body)
             else:
-                new_text += chunk
+                new_text += body
 
         return new_text.split("\n")
 

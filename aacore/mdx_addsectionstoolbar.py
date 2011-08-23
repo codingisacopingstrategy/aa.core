@@ -7,6 +7,7 @@ from markdown import etree
 
 
 def add_sectionstoolbar (tree, tag, tagclass, typeof, moveAttributes=True):
+    print(etree.tostring(tree))
     def do(doc):
         children = list(doc)
         for i, child in enumerate(children):
