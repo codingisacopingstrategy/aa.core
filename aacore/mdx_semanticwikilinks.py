@@ -42,24 +42,25 @@ import re
 
 wikilink_pattern = r"""
 \[\[\s*
-    (?:(?P<rel>[^\]#]+?) \s* ::)? \s*
+    (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
     (?P<target>.+?) \s*
     (?:\| \s* (?P<label>[^\]]+?) \s*)?
 \]\]
 """.strip()
 
-def make_link (rel, target, label):
+def make_link (namespace, rel, target, label):
     a = markdown.etree.Element('a')
     a.set('href', target)
     a.text = label or target
     if rel:
-        a.set('rel', rel)
+        a.set('rel', namespace + ":" + rel)
     return a
 
 class WikiLinkExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
             'make_link' : [make_link, 'Callback to convert link parts into an HTML/etree element (<a></a>)'],
+            'default_namespace' : ['aa', 'Default namespace'],
         }
         # Override defaults with user settings
         for key, value in configs :
@@ -87,7 +88,8 @@ class WikiLinkPattern(markdown.inlinepatterns.Pattern):
         """ return etree """
         d = m.groupdict()
         fn = self.config['make_link'][0]
-        return fn(d.get("rel"), d.get("target"), d.get("label"))    
+        namespace = d.get("namespace") or self.config['default_namespace'][0]
+        return fn(namespace, d.get("rel"), d.get("target"), d.get("label"))    
 
 def makeExtension(configs={}) :
     return WikiLinkExtension(configs=configs)
