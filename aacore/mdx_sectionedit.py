@@ -42,11 +42,12 @@ HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 #SETEXT_HEADER_RE = re.compile(r'^.*?\n[=-]{3,}', re.MULTILINE)
 
 HEADER_SECTION_FORM_TMPL = """
-<form class="source">
+<form action="edit/" method="post" accept-charset="utf-8" class="source">{% csrf_token %}"""
+HEADER_SECTION_FORM_TMPL_2 = """
 <textarea>%s</textarea>
 <p>
 <input type="hidden" name="start" value="%s" />
-<input type="hidden" name="stop" value="%s" />
+<input type="hidden" name="end" value="%s" />
 <input type="button" class="cancel" value="cancel" />
 <input type="submit" class="submit" value="save" />
 </p>
@@ -84,7 +85,7 @@ class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
         new_text = ""
         for header, start, end, body in self.parse(text):
             if header:
-                form_elt = HEADER_SECTION_FORM_TMPL % (self._escape(header + body), start, end)
+                form_elt = HEADER_SECTION_FORM_TMPL + HEADER_SECTION_FORM_TMPL_2 % (self._escape(header + body), start, end)
                 placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
                 new_text += "\n%s\n%s\n%s\n" % (header, placeholder, body)
             else:

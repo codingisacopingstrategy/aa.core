@@ -32,46 +32,55 @@ function init() {
         handle:'nav',
         grid: [50, 50],
         zIndex: 2700,
-        stop: post_geometry,
+        //stop: post_geometry,
     }).resizable({
         grid: 50,
-        stop: post_geometry,
+        //stop: post_geometry,
     });
 }
 
 $(document).ready(function() {
     
     init();
+    window.init = init;
 
     $("a.edit").live("click", function() {
         $(this).parents("section")
-            .find("form.source")
+            .children()
+            .hide()
+        .end()
+            .find("nav")
             .show()
         .end()
-            .find("article.rendered")
-            .hide();
+            .find("form.source")
+            .show();
     });
 
     $("input.cancel").live("click", function() {
         $(this).parents("section")
-            .find("form.source")
-            .hide()
+            .children()
+            .show()
         .end()
-            .find("article.rendered")
-            .show();
+            .find("form.source")
+            .hide();
     });
 
     $("input.submit").live("click", function(e) {
+        e.preventDefault();
         var $elt = $(this).parents("section");
         var content = $elt.find("textarea").val();
-        var post_url = $elt.attr("data-post-url");
+        var post_url = $elt.find("form").attr("action");
+        var start = $elt.find("input[name='start']").val();
+        var end = $elt.find("input[name='end']").val();
 
         $.post(post_url, 
             {
                 content: content,
                 page: "{{ page }}",
+                start: start,
+                end: end,
             }, function(data) {
-                $elt.replaceWith(data);
+                $elt.replaceWith(data) && init();
         });
     });
 });
