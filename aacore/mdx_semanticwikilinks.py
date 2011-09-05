@@ -27,14 +27,18 @@ Define a custom URL builder:
     >>> md = markdown.Markdown(extensions=['semanticwikilinks'], 
     ...         extension_configs={'semanticwikilinks' : [('make_link', make_rdfa)]})
     >>> md.convert('[[ Speaker :: Sherry Turkle | Second Self ]]')
-    u'<p><span property="Speaker" value="Sherry Turkle">Second Self</span></p>'
+    u'<p><span property="aa:Speaker" value="Sherry Turkle">Second Self</span></p>'
 
+Change the default namespace ("aa"):
 
+    >>> md = markdown.Markdown(extensions=['semanticwikilinks'], 
+    ...         extension_configs={'semanticwikilinks' : [('namespace', 'mynamespace')]})
+    >>> md.convert('[[ Speaker :: Sherry Turkle | Second Self ]]')
+    u'<p><a href="Sherry Turkle" rel="mynamespace:Speaker">Second Self</a></p>'
 
 Todo:
-* Optional: function to wikify names (it is already possible to achieve this with the custom 'make_link' function)
-* Optional: Default Namespace for rel
 
+* Optional: function to wikify names (it is already possible to achieve this with the custom 'make_link' function)
 '''
 
 import markdown
@@ -48,19 +52,19 @@ wikilink_pattern = r"""
 \]\]
 """.strip()
 
-def make_link (namespace, rel, target, label):
+def make_link (rel, target, label):
     a = markdown.etree.Element('a')
     a.set('href', target)
     a.text = label or target
     if rel:
-        a.set('rel', namespace + ":" + rel)
+        a.set('rel', rel)
     return a
 
 class WikiLinkExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
             'make_link' : [make_link, 'Callback to convert link parts into an HTML/etree element (<a></a>)'],
-            'default_namespace' : ['aa', 'Default namespace'],
+            'namespace' : ['aa', 'Default namespace'],
         }
         # Override defaults with user settings
         for key, value in configs :
@@ -85,11 +89,14 @@ class WikiLinkPattern(markdown.inlinepatterns.Pattern):
         return self.compiled_re
   
     def handleMatch(self, m):
-        """ return etree """
+        """ Returns etree """
         d = m.groupdict()
         fn = self.config['make_link'][0]
-        namespace = d.get("namespace") or self.config['default_namespace'][0]
-        return fn(namespace, d.get("rel"), d.get("target"), d.get("label"))    
+        namespace = d.get("namespace") or self.config['namespace'][0]
+        rel = d.get("rel")
+        if rel:
+            rel = "%s:%s" % (namespace, d.get("rel"))
+        return fn(rel, d.get("target"), d.get("label"))
 
 def makeExtension(configs={}) :
     return WikiLinkExtension(configs=configs)

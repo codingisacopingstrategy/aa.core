@@ -17,13 +17,12 @@ import mdx_timecodes
 from .utils import wikify
 
 
-def make_link (namespace, rel, target, label):
-    print(namespace)
+def make_link (rel, target, label):
     a = markdown.etree.Element('a')
     a.set('href', '/pages/' + wikify(target))
     a.text = label or target
     if rel:
-        a.set('rel', namespace + ":" + rel)
+        a.set('rel', rel)
     return a
 
 
