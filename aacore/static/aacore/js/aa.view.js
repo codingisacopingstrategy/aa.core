@@ -6,22 +6,26 @@
 (function($) {
 
 var post_geometry = function(event, ui) {
-    // Saves the new geometry in the markdown source
+    /*
+     * Saves the new geometry in the markdown source
+     */
 
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
     var STYLE_ATTR_RE = /{@style=.*?}/; 
 
-    // Section variables 
-    var target = $(event.target);
-    var post_url = target.find("form").attr("action");
-    var source = target.find('textarea');
-    var value = source.val();
+    // Section related variables 
+    var $target = $(event.target);
+    var $form = $target.find('form');
+    var $textarea = $form.find('textarea');
+    var value = $textarea.val();
+    var start = parseInt($form.find('input[name="start"]').val());
+    var end = parseInt($form.find('input[name="end"]').val());
 
     // Post form variables
-    var start;
-    var end;
-    var content;
+    var new_start;  // start offset
+    var end;  // end offset
+    var content = "";  //
     var page = window.page;  // TODO: put window.page in its own namespace
 
     // Matches the annotation header
@@ -29,33 +33,39 @@ var post_geometry = function(event, ui) {
     if (header_match) {
         // Defines the substring to replace
         var style_match = STYLE_ATTR_RE.exec(header_match[0]);
-        var prev_start = parseInt(target.find('input[name="start"]').val()) - 1;
         if (style_match) {
-            start = prev_start;
-            end = start + style_match[0].length;
+            new_start = start + style_match.index;
+            end = new_start + style_match[0].length;
         } else {
-            start = prev_start + header_match[1].length + header_match[2].length;
-            end = start;
+            new_start = start + header_match.slice(1,3).join('').length;
+            end = new_start;
+            content += " ";  // Adds one space for readability
         };
         // Defines the new position attributes
-        content = "{@style=top: " + ui.position.top + "px; left: " + ui.position.left + "px; width: " + target.width() + "px; height: " + target.height() + "px;}";
+        content += "{@style=top: " + ui.position.top + "px; left: " + ui.position.left + "px; width: " + $target.width() + "px; height: " + $target.height() + "px;}";
         // Updates the content of the annotation
-        $.post(post_url,
+        var c = style_match ? style_match[0].length : 0;
+        $.post($form.attr('action'),
             {
                 content: content,
                 page: page, 
-                start: start,
+                start: new_start,
                 end: end,
             }, function(data) {
                 // Replaces the markdown source with the new value.
-                source.val(value.substring(0, start) + content + value.substring(end, value.length));
-                //var delta = value.length - source.val().length;
-                //$('input[name="start"],input[name="end"]').each(function() {
-                    //var val = parseInt($(this).val());
-                    //if (value !== 0) {
-                        //$(this).val(val - delta);
-                    //};
-                //})
+                var rel_start = new_start - start;
+                var before = value.substring(0, rel_start);
+                var after = value.substring(rel_start + c, rel_start + c + value.length)
+                $textarea.val(before + content + after);
+                //$textarea.val(value.substring(0, new_start) + content + value.substring(end, value.length));
+                var delta = value.length - $textarea.val().length;
+                var found = null;
+                $('input[name="start"],input[name="end"]').each(function() {
+                    var val = parseInt($(this).val());
+                    if (value !== 0) {
+                        $(this).val(val - delta);
+                    };
+                })
                 // TODO: Compute the new HTML
         });
     };
