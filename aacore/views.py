@@ -145,7 +145,7 @@ def page_edit_geometry (request, slug):
     """
     A view to set/update information about the geometry of a page annotation.
     Persistance is done in the markdown source itself thanks to the metadata
-    information, so no database is involded.
+    information, so no database is involved.
 
     method
         :POST
