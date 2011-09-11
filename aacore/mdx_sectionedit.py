@@ -33,6 +33,7 @@ Dependencies:
 
 import markdown, re
 from textwrap import dedent
+from django.template import Context, Template
 
 
 # TODO: Level 2 header support
@@ -42,56 +43,78 @@ HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 #SETEXT_HEADER_RE = re.compile(r'^.*?\n[=-]{3,}', re.MULTILINE)
 
 HEADER_SECTION_FORM_TMPL = """
-<form class="source">
+<form action="edit/" method="post" accept-charset="utf-8" class="source">%s
 <textarea>%s</textarea>
 <p>
 <input type="hidden" name="start" value="%s" />
-<input type="hidden" name="stop" value="%s" />
+<input type="hidden" name="end" value="%s" />
 <input type="button" class="cancel" value="cancel" />
 <input type="submit" class="submit" value="save" />
 </p>
 </form>
 """
 
+def doformat(self, header, start, end, content):
+    print(header, start, end, content)
+    print("------")
+    if header:
+        t = Template("{% csrf_token %}")
+        c = self.config.get("context")[0]
+        csrf_token =  t.render(c)
+        form_elt = HEADER_SECTION_FORM_TMPL % (csrf_token, self._escape(content), start, end)
+        placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
+        return "\n%s\n%s\n" % (content, placeholder)
+    else:
+        return content
+
+
 class SectionEditExtension(markdown.Extension):
+    def __init__(self, configs={}):
+        self.config = {
+            'context': [Context({}), 'Rendering context instance'],
+            'format': [doformat, 'Formating function'],
+        }
+        for key, value in configs:
+            self.setConfig(key, value)
 
     def extendMarkdown(self, md, md_globals):
         """ Add SectionEditPreprocessor to the Markdown instance. """
 
-        md.preprocessors.add('section_edit_block', 
-                                 SectionEditPreprocessor(md), 
-                                 "_begin")
+        ext = SectionEditPreprocessor(md)
+        ext.config = self.config
+        md.preprocessors.add('section_edit_block', ext, "_begin")
 
 
 class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
-   
+
     def parse(self, text, level=1):
-        """ Parses header (implicit) sections """
+        """ Parses header (implicit) sections 
+        Yields:
+            1. The header or None
+            2. The start offset of the section
+            3. The end offset of the section
+            4. The content of the section
+        """
         prev_start = 0
         prev_end = 0
         header = None
         for match in re.finditer(HASH_HEADER_RE % level, text):
-            yield header, prev_start, match.start(), text[prev_end:match.start()]
+            yield (header, prev_start, match.start(), text[prev_start:match.start()])
             header = text[match.start():match.end()]
             prev_start = match.start() 
             prev_end = match.end() 
-        yield header, prev_start, len(text), text[prev_end:len(text)]
+        yield (header, prev_start, len(text), text[prev_start:len(text)])
 
     def run(self, lines):
         """ Stores source code in form elements """
 
         text = "\n".join(lines)
         new_text = ""
-        for header, start, end, body in self.parse(text):
-            if header:
-                form_elt = HEADER_SECTION_FORM_TMPL % (self._escape(header + body), start, end)
-                placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
-                new_text += "\n%s\n%s\n%s\n" % (header, placeholder, body)
-            else:
-                new_text += body
+        for header, start, end, content in self.parse(text):
+            fun = self.config.get("format")[0]
+            new_text += fun(self, header, start, end, content)
 
         return new_text.split("\n")
-
 
     def _escape(self, txt):
         """ basic html escaping """
@@ -102,8 +125,8 @@ class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
         return txt
 
 
-def makeExtension(configs=None):
-    return SectionEditExtension()
+def makeExtension(configs={}):
+    return SectionEditExtension(configs=configs)
 
 
 if __name__ == "__main__":

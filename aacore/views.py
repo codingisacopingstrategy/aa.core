@@ -71,11 +71,12 @@ def page_detail (request, slug):
         return redirect(url) 
 
     context['page'] = page
-    md = get_aa_markdown()
+    md = get_aa_markdown(context=RequestContext(request))
     rendered = md.convert(page.content)
-    t = Template("{% load filters aatags %}" + rendered)
-    c = Context({})
-    context['content'] = mark_safe(t.render(c))
+    #t = Template("{% load filters aatags %}" + rendered)
+    #c = RequestContext(request)
+    #context['content'] = mark_safe(t.render(c))
+    context['content'] = mark_safe(rendered)
 
     # Extracts the geometry information from markdown metadata geometry key
     #md.convert(page.content)
@@ -125,7 +126,20 @@ def page_edit (request, slug):
         page = None
     if request.method == "POST":
         content = request.POST.get('content', '')
-        if page:
+        start = request.POST.get('start')
+        end = request.POST.get('end')
+        if start and end:  # section edit
+            start = int(start)
+            end = int(end)
+            new_content = page.content[:start] + content + page.content[end:]
+            page.content = new_content
+            page.save()
+            md = get_aa_markdown()
+            rendered = md.convert(content)
+            t = Template("{% load filters aatags %}" + rendered)
+            c = RequestContext(request)
+            return HttpResponse(mark_safe(t.render(c)))
+        elif page:
             if content == "delete":
                 page.delete()
             else:

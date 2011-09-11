@@ -14,28 +14,33 @@ import mdx_sectionedit
 import mdx_addsections
 import mdx_addsectionstoolbar
 import mdx_timecodes
+import mdx_django_template
 from .utils import wikify
 
 
-def make_link (namespace, rel, target, label):
-    print(namespace)
+def make_link (rel, target, label):
     a = markdown.etree.Element('a')
     a.set('href', '/pages/' + wikify(target))
     a.text = label or target
     if rel:
-        a.set('rel', namespace + ":" + rel)
+        a.set('rel', rel)
     return a
 
 
-def get_aa_markdown ():
+def get_aa_markdown (context=None):
+    if context:
+        djtmpl_cfg = [('context', context)]
+    else:
+        djtmpl_cfg = []
     return markdown.Markdown(extensions=[
             "extra",
             mdx_semanticwikilinks.makeExtension(configs=[('make_link', make_link)]),
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
-            mdx_sectionedit.makeExtension(),
+            mdx_sectionedit.makeExtension(djtmpl_cfg),
             mdx_addsections.makeExtension(configs=[('class','annotation%(LEVEL)d'),]),
             mdx_addsectionstoolbar.makeExtension(),
+            mdx_django_template.makeExtension(configs=djtmpl_cfg),
             ],
         ) 
 
