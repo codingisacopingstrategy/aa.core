@@ -71,11 +71,12 @@ def page_detail (request, slug):
         return redirect(url) 
 
     context['page'] = page
-    md = get_aa_markdown()
+    md = get_aa_markdown(context=RequestContext(request))
     rendered = md.convert(page.content)
-    t = Template("{% load filters aatags %}" + rendered)
-    c = RequestContext(request)
-    context['content'] = mark_safe(t.render(c))
+    #t = Template("{% load filters aatags %}" + rendered)
+    #c = RequestContext(request)
+    #context['content'] = mark_safe(t.render(c))
+    context['content'] = mark_safe(rendered)
 
     # Extracts the geometry information from markdown metadata geometry key
     #md.convert(page.content)
