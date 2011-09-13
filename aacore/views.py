@@ -109,6 +109,8 @@ def page_detail (request, slug):
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
+from mdx_sectionedit_lite import sectionalize, sectionalize_replace
+
 def page_edit (request, slug):
     """
     Page edition view
@@ -118,21 +120,28 @@ def page_edit (request, slug):
     """
     context = {}
     name = dewikify(slug)
+    section = request.REQUEST.get('section')
+    if section:
+        section=int(section)
     try:
         page = Page.objects.get(name=name)
         context['page'] = page
-        context['content'] = page.content
+        if section != None:
+            sections = sectionalize(page.content)
+            sectiondict = sections[section-1]
+            context['content'] = sectiondict['header'] + sectiondict['body']
+            context['section'] = section
+        else:
+            context['content'] = page.content
     except Page.DoesNotExist:
         page = None
+
     if request.method == "POST":
         content = request.POST.get('content', '')
-        start = request.POST.get('start')
-        end = request.POST.get('end')
-        if start and end:  # section edit
-            start = int(start)
-            end = int(end)
-            new_content = page.content[:start] + content + page.content[end:]
-            page.content = new_content
+        # start = request.POST.get('start')
+        # end = request.POST.get('end')
+        if section != None:  # section edit
+            page.content = sectionalize_replace(page.content, (section-1), content.rstrip() + "\n")
             page.save()
             md = get_aa_markdown()
             rendered = md.convert(content)
