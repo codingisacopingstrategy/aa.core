@@ -32,9 +32,10 @@ from plugins import sniffer
 from models import *
 from rdfutils import *
 from utils import *
-from mdx_aa import get_aa_markdown
+from mdx_aa import get_aa_markdown, get_aa_markdown_ajax
 from mdx_fenced_style import FencedStyleExtension 
 from mdx_timecodes import TimeCodesExtension
+from mdx_sectionedit_lite import sectionalize, sectionalize_replace
 
 
 def page_list (request):
@@ -109,8 +110,6 @@ def page_detail (request, slug):
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
-from mdx_sectionedit_lite import sectionalize, sectionalize_replace
-
 def page_edit (request, slug):
     """
     Page edition view
@@ -120,49 +119,62 @@ def page_edit (request, slug):
     """
     context = {}
     name = dewikify(slug)
-    section = request.REQUEST.get('section')
-    if section:
-        section=int(section)
+
+    #import pdb; pdb.set_trace()
+    section = int(request.REQUEST.get('section', 0))
+    is_ajax = request.REQUEST.get('type') == 'ajax'
+
     try:
         page = Page.objects.get(name=name)
-        context['page'] = page
-        if section != None:
-            sections = sectionalize(page.content)
-            sectiondict = sections[section-1]
-            context['content'] = sectiondict['header'] + sectiondict['body']
-            context['section'] = section
-        else:
-            context['content'] = page.content
     except Page.DoesNotExist:
         page = None
 
-    if request.method == "POST":
-        content = request.POST.get('content', '')
-        # start = request.POST.get('start')
-        # end = request.POST.get('end')
-        if section != None:  # section edit
-            page.content = sectionalize_replace(page.content, (section-1), content.rstrip() + "\n")
-            page.save()
-            md = get_aa_markdown()
-            rendered = md.convert(content)
-            t = Template("{% load filters aatags %}" + rendered)
-            c = RequestContext(request)
-            return HttpResponse(mark_safe(t.render(c)))
-        elif page:
-            if content == "delete":
-                page.delete()
+    # TODO: Use django form?
+    # Gets the edit form
+    if request.method == "GET":
+        if page:
+            context['page'] = page
+            if section:
+                sections = sectionalize(page.content)
+                sectiondict = sections[section - 1]
+                context['content'] = sectiondict['header'] + sectiondict['body']
+                context['section'] = section
             else:
-                page.content = content 
+                context['content'] = page.content
+            if is_ajax:
+                return HttpResponse(context['content'])
+        return render_to_response("aacore/edit.html", context, \
+                context_instance=RequestContext(request))
+
+    # Posts the edit form
+    elif request.method == "POST":
+        content = request.POST.get('content', '')
+        content = convert_line_endings(content, 0)  # Normalizes EOL
+
+        if page:
+            if section:  # section edit
+                page.content = sectionalize_replace(page.content, (section - 1), content + "\n")
                 page.save()
+            else:
+                if content == "delete":
+                    page.delete()
+                else:
+                    page.content = content
+                    page.save()
         else:
             if content == "delete":
                 pass
             else:
                 page = Page(content=content, name=name)
                 page.save()
-        url = reverse('aa-page-detail', kwargs={'slug':slug})
+
+        if is_ajax:
+            md = get_aa_markdown_ajax(context=RequestContext(request))
+            rendered = md.convert(content)
+            return HttpResponse(mark_safe(rendered))
+        #else:
+        url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
-    return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
 
 def page_edit_geometry (request, slug):
     """

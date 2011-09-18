@@ -97,9 +97,11 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
     for i in range(1, 7):
         do(tree, i, tag, tagclass)
 
+
 class AddSectionsTreeprocessor(markdown.treeprocessors.Treeprocessor):
     def run(self, doc):
         add_sections(doc, self.config.get("tag")[0], self.config.get("class")[0], self.config.get("typeof")[0])
+
 
 class AddSectionsExtension(markdown.Extension):
     def __init__(self, configs):
@@ -115,6 +117,7 @@ class AddSectionsExtension(markdown.Extension):
         ext = AddSectionsTreeprocessor(md)
         ext.config = self.config
         md.treeprocessors.add("addsections", ext, "_end")
+
 
 def makeExtension(configs={}):
     return AddSectionsExtension(configs=configs)

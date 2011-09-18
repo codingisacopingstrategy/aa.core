@@ -91,10 +91,10 @@ pre {
 form.source {
     display: none;
 }
-textarea {
-    width: 100%;
-    height: 200px;
-}
+/*textarea {*/
+    /*width: 100%;*/
+    /*height: 200px;*/
+/*}*/
 nav#left {
     z-index: 9999;
 }
@@ -127,30 +127,41 @@ section.annotation1 h2, p {
 }
 
 /*section.annotation1 nav {*/
-    /*height: 18px;*/
-    /*width: 100%;*/
-    /*position: absolute;*/
-    /*z-index: 99999999;*/
-    /*top: -18px;*/
+    /*display: none;*/
+/*}*/
+/*section.annotation1:hover nav {*/
+    /*display: block ;*/
 /*}*/
 
-section.annotation1 div.wrapper {
-    width: 100%;
+section.annotation1 > div.wrapper:hover {
+    overflow-x: scroll;
+}
+section.annotation1 > div.wrapper {
+    overflow-x: scroll;
+    /*width: 100%;*/
     height: 100%;
-    overflow: auto;
     box-sizing: content-box;
     -moz-box-sizing: content-box;
     -ms-box-sizing: content-box;
     -webkit-box-sizing: content-box;
 }
-section.annotation1 div.wrapper div {
+section.annotation1 > div.wrapper {
     padding: 10px;
 }
+/*section.annotation1 div.wrapper > div.wrapper {*/
+    /*padding: 0px;*/
+/*}*/
 section.annotation1 div.wrapper textarea {
     border: 0px solid black;
     border-bottom: 1px solid black;
     padding: 0;
     margin: 0;
+}
+div.wrapper {
+    /*background-color: red;*/
+}
+div.wrapper:hover {
+    /*background-color: yellow;*/
 }
 h1 { 
     text-decoration: underline;

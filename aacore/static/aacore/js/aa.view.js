@@ -101,48 +101,74 @@ $(document).ready(function() {
     init();
     window.init = init;
 
-    $("a.edit").live("click", function() {
-        $(this).parents("section")
-            .find("div.wrapper")
-                .children()
-                .hide()
-            .end()
-        .end()
-            .find("nav")
-            .show()
-        .end()
-            .find("form.source")
-            .show();
+    $('section[class^="annotation"]')
+        .find('nav')
+        .append(' <a class="delete" href="#">delete</a>');
+
+    $('a.delete').live("click", function(e) {
+        if (confirm("Are you sure?")) {
+            e.preventDefault();
+            var $elt = $(this).parents("section");
+            $.post("edit/?section=" + $elt.attr("data-section"), 
+                {
+                    content: "",
+                    page: window.page,
+                }, function(data) {
+                    $elt.remove();
+                    window.location.reload()
+            });
+        };
+
     });
 
-    $("input.cancel").live("click", function() {
-        $(this).parents("section")
-            .find("div.wrapper")
-                .children()
-                .show()
-            .end()
-        .end()
-            .find("form.source")
-            .hide();
+
+    $('div.wrapper').live('dblclick', function(e) {
+        e.stopPropagation();
+        $('div.wrapper').editable('').editable('destroy');
+        $(this).editable('edit/', { 
+             loadurl   : 'edit/',
+             //id        : 'section',
+             name      : 'content',
+             submitdata  : function(value, settings) {
+                 var section = $(this).parent('section').attr("data-section");
+                 return {
+                     section: section,
+                     type: 'ajax',
+                 }
+             },
+             loaddata  : function(value, settings) {
+                 var section = $(this).parent('section').attr("data-section");
+                 return {
+                     section: section,
+                     type: 'ajax',
+                 }
+             },
+             rows      : 6,
+             width     : '100%',
+             type      : 'textarea',
+             cancel    : 'Cancel',
+             submit    : 'OK',
+             indicator : 'Saving changes',
+             tooltip   : "Doubleclick to edit...",
+             onblur    : 'ignore',
+             event     : "edit",
+             style     : 'inherit',
+             callback : function(value, settings) {
+                 if (value == "") {
+                    $(this).parent('section').remove();
+                 }
+                 console.log(value);
+                 $('section[class^="annotation"]').each(function(index) {
+                    $(this).attr('data-section', index + 1);
+                 });
+             }
+         }).trigger('edit');
     });
 
-    $("input.submit").live("click", function(e) {
+    $("a.edit").live("click", function(e) {
         e.preventDefault();
-        var $elt = $(this).parents("section");
-        var content = $elt.find("textarea").val();
-        var post_url = $elt.find("form").attr("action");
-        var start = $elt.find("input[name='start']").val();
-        var end = $elt.find("input[name='end']").val();
-
-        $.post(post_url, 
-            {
-                content: content,
-                page: window.page,
-                start: start,
-                end: end,
-            }, function(data) {
-                $elt.replaceWith(data) && init();
-        });
+        console.log($(this).closest('section').find('div.wrapper'));
+        $(this).closest('section').find('div.wrapper').trigger('dblclick');
     });
 });
 })(jQuery);
