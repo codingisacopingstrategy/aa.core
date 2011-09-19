@@ -5,6 +5,52 @@ $.widget("ui.aaplaylist", {
         option1: "defaultValue",
         hidden: true,
     },
+    _post_geometry: function() {
+        // RegExp
+        var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
+        var STYLE_ATTR_RE = /{@style=.*?}/; 
+        var start;
+        var end;
+        var content = "";
+
+        var style = "{@style=" + $.trim($(this).attr('style')) + "}";
+
+        var section = $(this).attr("data-section");
+        $.get("edit/", {
+            section: section,
+            type: 'ajax', 
+        }, function(data) {
+            // Searches for Header
+            var header_match = HASH_HEADER_RE.exec(data);
+            if (header_match) {
+                // Defines the substring to replace
+                var style_match = STYLE_ATTR_RE.exec(header_match[0]);
+                if (style_match) {
+                    start = header_match.index + style_match.index;
+                    end = start + style_match[0].length;
+                } else {
+                    start = header_match.slice(1,3).join('').length;
+                    end = start;
+                };
+                var before = data.substring(0, start);
+                var after = data.substring(end, data.length)
+                content = before + style + after;
+                console.log(content);
+                
+                $.post("edit/", {
+                    content: content,
+                    section: section,
+                    type: 'ajax', 
+                });
+            }
+        });
+        //$.post(action_url, {
+            //content: $textarea.val() + "\n",
+            //page: page, 
+            //start: start,
+            //end: end,
+        //});
+    },
     _create: function() {
         // creation code for mywidget
         // can use this.options
@@ -14,10 +60,10 @@ $.widget("ui.aaplaylist", {
                 handle:'nav',
                 grid: [50, 50],
                 //zIndex: 2700,
-                //stop: post_geometry,
+                stop: this._post_geometry,
             }).resizable({
                 grid: 50,
-                //stop: post_geometry,
+                stop: this._post_geometry,
             });
     },
     _doSomething: function() {
