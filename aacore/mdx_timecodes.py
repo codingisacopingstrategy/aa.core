@@ -51,6 +51,28 @@ TIMECODE_RE = re.compile(
 )
 
 
+def replace_timecodes(lines):
+    """docstring for replace_timecodes"""
+    param_type = type(lines)
+    if param_type == "str":
+        lines = lines.split('\n')
+    newlines = []
+    for line in lines:
+        m = TIMECODE_RE.search(line)
+        if m:
+            newline = u"## %%aa:start::" + m.group('start') + "%% &rarr;"
+            if m.group('end'):
+                newline += u" %%aa:end::" + m.group('end') + "%%"
+            newlines.append(newline )
+        else:
+            newlines.append(line)
+
+    if param_type == "str":
+        return '\n'.join(newlines)
+    else:
+        return newlines
+
+
 class TimeCodesExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):
@@ -65,25 +87,7 @@ class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
     
     def run(self, lines):
         """ Match and store Fenced Code Blocks in the HtmlStash. """
-        newlines = []
-        for line in lines:
-            m = TIMECODE_RE.search(line)
-            if m:
-                newline = u"## %%aa:start::" + m.group('start') + "%% &rarr;"
-                if m.group('end'):
-                    newline += u" %%aa:end::" + m.group('end') + "%%"
-                newlines.append(newline )
-            else:
-                newlines.append(line)
-        return newlines
-
-    def _escape(self, txt):
-        """ basic html escaping """
-        txt = txt.replace('&', '&amp;')
-        txt = txt.replace('<', '&lt;')
-        txt = txt.replace('>', '&gt;')
-        txt = txt.replace('"', '&quot;')
-        return txt
+        return replace_timecodes(lines)
 
 
 def makeExtension(configs=None):

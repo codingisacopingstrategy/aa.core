@@ -169,7 +169,7 @@ def page_edit (request, slug):
                 page.save()
 
         if is_ajax:
-            md = get_aa_markdown_ajax(context=RequestContext(request))
+            md = get_aa_markdown(context=RequestContext(request))
             rendered = md.convert(content)
             return HttpResponse(mark_safe(rendered))
         #else:

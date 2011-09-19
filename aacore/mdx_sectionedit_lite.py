@@ -201,7 +201,7 @@ class SectionEditExtension(markdown.Extension):
 
         ext = SectionEditPreprocessor(md)
         ext.config = self.config
-        md.preprocessors.add('section_edit_block', ext, "_begin")
+        md.preprocessors.add('section_edit_block', ext, ">timecodes_block")
 
 
 class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
