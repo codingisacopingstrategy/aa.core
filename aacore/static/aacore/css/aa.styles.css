@@ -95,7 +95,8 @@ form.source {
     /*width: 100%;*/
     /*height: 200px;*/
 /*}*/
-nav#left {
+nav#west-pane,
+nav#east-pane {
     z-index: 9999;
 }
 section {
