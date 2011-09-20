@@ -85,8 +85,8 @@ $.widget("ui.aaplaylist", {
 });
 
 $('section').live('dblclick', function(e) {
-    e.stopPropagation();
-    $('section').editable('destroy');
+    e.stopImmediatePropagation();
+    //$('section').editable('destroy');
     $(this).editable('edit/', { 
          loadurl   : 'edit/',
          //id        : 'section',
@@ -108,7 +108,7 @@ $('section').live('dblclick', function(e) {
          rows      : 6,
          width     : '100%',
          type      : 'textarea',
-         //cancel    : 'Cancel',
+         cancel    : 'Cancel',
          submit    : 'OK',
          indicator : 'Saving changes',
          tooltip   : "Doubleclick to edit...",
