@@ -4,7 +4,7 @@
 SemanticData Extension for Python-Markdown
 ======================================
 
-Converts {{property :: value | display}}, where display is optional. 
+Converts %%property :: value | display%%, where display is optional. 
 Customizable with make_metadata option as to what the actual element is.
 Requires Python-Markdown 2.0+.
 
