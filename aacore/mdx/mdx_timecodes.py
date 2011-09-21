@@ -1,4 +1,5 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
 
 """
     Active Archives timecode to (timed) section preprocessor
@@ -46,10 +47,10 @@ TIMECODE_RE = re.compile(
     \s* --> \s*
     (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
     \s*
+    (?P<otherstuff>.+)
     $""",
     re.X | re.M
 )
-
 
 def replace_timecodes(lines):
     """docstring for replace_timecodes"""
@@ -60,9 +61,16 @@ def replace_timecodes(lines):
     for line in lines:
         m = TIMECODE_RE.search(line)
         if m:
-            newline = u"## %%aa:start::" + m.group('start') + "%% &rarr;"
-            if m.group('end'):
-                newline += u" %%aa:end::" + m.group('end') + "%%"
+            newline = u"## "
+            start = m.group('start')
+            newline += "{@data-start=" + start + "}"
+            newline += "%%aa:start::" + m.group('start') + "%% &rarr;"
+            end = m.group('end')
+            if end:
+                newline += "{@data-end=" + end + "}"
+                newline += u" %%aa:end::" + end + "%%"
+            if m.group('otherstuff'):
+                newline += m.group('otherstuff')
             newlines.append(newline )
         else:
             newlines.append(line)
@@ -95,5 +103,17 @@ def makeExtension(configs=None):
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#    import doctest
+#    doctest.testmod()
+
+    text = """
+00:03:21 --> 00:45:56 Stuff!{@data-section=1}
+Some text
+""".strip()
+ 
+    print markdown.markdown(text, ['timecodes', 'semanticdata'])
+#<h2>%%aa:start::00:03:21%% &rarr; %%aa:end::00:45:56%%</h2>
+#.. <p>Some text</p>
+
+
+
