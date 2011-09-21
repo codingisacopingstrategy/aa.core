@@ -74,7 +74,7 @@ class LinkForm:
 # (1) RESOLVE REL (namespace:name)
 # (2) LOOKUP THE REL TO GET ITS RELTYPE AND CODE ACCORDINGLY
 
-def render_html (match):
+def render_html(match):
     """
     Render the link in HTML
     """

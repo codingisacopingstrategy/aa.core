@@ -16,7 +16,7 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-import html5lib, RDF, re
+import RDF
 
 from django.shortcuts import (render_to_response, redirect)
 from django.http import HttpResponse
@@ -33,7 +33,7 @@ from mdx import get_markdown
 from mdx.mdx_sectionedit_lite import (sectionalize, sectionalize_replace)
 
 
-def page_detail (request, slug):
+def page_detail(request, slug):
     """
     Displays a wiki page :model:`aacore.Page`.
 
@@ -56,20 +56,20 @@ def page_detail (request, slug):
         page = Page.objects.get(name=name)
     except Page.DoesNotExist:
         # Redirects to the edit page
-        url = reverse('aa-page-edit', kwargs={'slug':slug})
-        return redirect(url) 
+        url = reverse('aa-page-edit', kwargs={'slug': slug})
+        return redirect(url)
 
     context['page'] = page
-    md = get_markdown(context=RequestContext(request))
+    md = get_markdown()
     rendered = md.convert(page.content)
-    #t = Template("{% load filters aatags %}" + rendered)
-    #c = RequestContext(request)
-    #context['content'] = mark_safe(t.render(c))
-    context['content'] = mark_safe(rendered)
+    t = Template("{% load filters aatags %}" + rendered)
+    c = RequestContext(request)
+    context['content'] = mark_safe(t.render(c))
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
-def page_edit (request, slug):
+
+def page_edit(request, slug):
     """
     Page edition view
 
@@ -134,7 +134,8 @@ def page_edit (request, slug):
         url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
 
-def sniff (request):
+
+def sniff(request):
     """
     Main URL sniffer view, collects all annotations from the sniffer plugins and displays them in a single page.
     Options: 'url' parameter
@@ -146,22 +147,26 @@ def sniff (request):
         data, annotations = sniffer.sniff(url)
         context['original_url'] = url
         context['data'] = data
-        context['annotations'] = annotations    
+        context['annotations'] = annotations
         context['url'] = data.url
     return render_to_response("aacore/sniff.html", context, context_instance=RequestContext(request))
 
+
 ##### RDF VIEWS #################
-def rdfdump (request):
+
+
+def rdfdump(request):
     """ debug view to see the contents of the RDF store (in turtle/text format) """
     model = get_model()
     ser = RDF.Serializer(name="turtle")
     return HttpResponse(ser.serialize_model_to_string(model), mimetype="text/plain")
 
-def sandbox (request):
+
+def sandbox(request):
     """
     Sample page to test wikitext / embed processing. Unlike a real wiki
     sandbox, this page is always ephemeral (nothing is saved)
-    Options: 
+    Options:
     This view does not alter the database / create new resources (?)
     """
     context = {}
@@ -176,7 +181,8 @@ def sandbox (request):
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
 
-def _import (request):
+
+def _import(request):
     """
     Import view
     """
@@ -193,7 +199,6 @@ def _import (request):
         if submit == "import":
             for importurl in request.REQUEST.getlist("importurl"):
                 (res, created) = Resource.objects.get_or_create(url=importurl)
-            return HttpResponse ("ok")
-            
-    return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
+            return HttpResponse("ok")
 
+    return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))

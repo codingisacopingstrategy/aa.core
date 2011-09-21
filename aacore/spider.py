@@ -7,7 +7,7 @@ import urllib2, urlparse, lxml, lxml.cssselect, html5lib
 from settings import USER_AGENT
 
 
-def spider (url, levels=1):
+def spider(url, levels=1):
     """
     Spiders the given url and returns a dictionnary containing all its links
     and images. Takes an optional depth as sucond argument (not implemented yet).
