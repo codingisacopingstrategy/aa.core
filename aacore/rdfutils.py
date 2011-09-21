@@ -27,7 +27,7 @@ from settings import *
 # if model is None: raise Exception("new RDF.model failed")
 
 
-def put_url (theuri):
+def put_url(theuri):
     """
     docstring please :)
     """
@@ -48,7 +48,7 @@ def put_url (theuri):
     # model.sync()  # not sure if this is necessary
 
 
-def get_model ():
+def get_model():
     """
     docstring please :)
     """

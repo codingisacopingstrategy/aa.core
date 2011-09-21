@@ -33,7 +33,7 @@ class NotModifiedHandler(urllib2.BaseHandler):
         return addinfourl
 
 
-def splitContentType (t):
+def splitContentType(t):
     m = splitContentType.pat.match(t)
     if m:
         d = m.groupdict()
@@ -44,7 +44,7 @@ def splitContentType (t):
 splitContentType.pat = re.compile(r"""\s*(?P<mimetype>[\w+_-]+/[\w+_-]+)\s*(?:;\s*charset=(?P<charset>[\w-]*)\s*)?""")
 
 
-def conditional_get (url, last_modified=None, etag=None):
+def conditional_get(url, last_modified=None, etag=None):
     """
     Uses optional last_modified and/or etag to do a "conditional get" of the given url.
     (when neither is given, results in a regular get)
@@ -69,7 +69,7 @@ class ResourceOpener():
         self.original_url = url
         self.info = {}
 
-    def get (self, last_modified=None, etag=None):
+    def get(self, last_modified=None, etag=None):
         f = conditional_get(self.original_url, last_modified, etag)
         self.file = f
         self.url = f.geturl()
@@ -107,7 +107,7 @@ class ResourceOpener():
 
         return self.status
 
-    def writeToFile (self, outfile, verbose=False):
+    def writeToFile(self, outfile, verbose=False):
         try:
             request = urllib2.Request(self.url)
             request.add_header("User-Agent", USER_AGENT)

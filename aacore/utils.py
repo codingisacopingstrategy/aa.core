@@ -3,7 +3,7 @@ import re
 import string
 
 
-def wikify (name):
+def wikify(name):
     """
     Turns a "raw" name into a URL wiki name (aka slug)
     Requires: name may be unicode, str
@@ -25,7 +25,7 @@ def wikify (name):
     return name
 
 
-def dewikify (name):
+def dewikify(name):
     """
     Turns URL name/slug into a proper name (reverse of wikify).
     Requires: name may be unicode, str

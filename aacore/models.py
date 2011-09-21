@@ -34,7 +34,7 @@ class AAWait (Exception):
     special "task-tracking" URL that can be used to poll until task is done.
     (Returns a JSON object with a "done" boolean value.)
     """
-    def __init__ (self, url):
+    def __init__(self, url):
         self.url = url
 
 
@@ -59,23 +59,25 @@ class Resource (models.Model):
     status = models.CharField(max_length=255, choices=RESOURCE_STATUS, default="default")
     _type = models.CharField(max_length=255, choices=RESOURCE_TYPES, blank=True)
 
-    def getLocalFile (self):
+    def getLocalFile(self):
         """
         Returns: an absolute path to a local file (if available)
         Throws: AAWait when local file is not (yet) available
         """
         pass
 
-    def getMetadata (self):
+    def getMetadata(self):
         """
         Returns: a dictionary of key-value pairs (where keys are RDF style URLs)
         Throws: AAWait when not yet available.
         """
         pass
 
+
 ############################
-# PAGES 
+# PAGES
 ############################
+
 
 class Page(models.Model):
     """
@@ -90,7 +92,7 @@ class Page(models.Model):
         return ("aa-page-detail", (), {'slug': wikify(self.name)})
 
     def __unicode__(self):
-        return self.name 
+        return self.name
 
 
 ############################
@@ -117,7 +119,7 @@ class RelationshipNamespace (models.Model):
     name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
 
-    def __unicode__ (self):
+    def __unicode__(self):
         return self.name
 
 
@@ -139,5 +141,5 @@ class Relationship (models.Model):
     def compacturl(self):
         return aacore.templatetags.aatags.compactnamespace(self.url)
 
-    def __unicode__ (self):
+    def __unicode__(self):
         return self.url

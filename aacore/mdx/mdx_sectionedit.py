@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
     
 
-#    html = markdown.markdown(text, ['sectionedit_lite'])
+#    html = markdown.markdown(text, ['sectionedit'])
 #    print html
 
 
