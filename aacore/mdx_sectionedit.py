@@ -33,7 +33,7 @@ Dependencies:
 
 import markdown, re
 from textwrap import dedent
-from django.template import Context, Template
+# from django.template import Context, Template
 
 
 # TODO: Level 2 header support
@@ -42,8 +42,20 @@ HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 #HASH_HEADER_RE = re.compile(r'(^|\n)(?P<level>#{1,6})(?P<header>.*?)#*(\n|$)')
 #SETEXT_HEADER_RE = re.compile(r'^.*?\n[=-]{3,}', re.MULTILINE)
 
+#HEADER_SECTION_FORM_TMPL = """
+#<form action="edit/" method="post" accept-charset="utf-8" class="source">
+#<textarea>%s</textarea>
+#<p>
+#<input type="hidden" name="start" value="%s" />
+#<input type="hidden" name="end" value="%s" />
+#<input type="button" class="cancel" value="cancel" />
+#<input type="submit" class="submit" value="save" />
+#</p>
+#</form>
+#"""
+
 HEADER_SECTION_FORM_TMPL = """
-<form action="edit/" method="post" accept-charset="utf-8" class="source">%s
+<form action="edit/" method="post" accept-charset="utf-8" class="source">
 <textarea>%s</textarea>
 <p>
 <input type="hidden" name="start" value="%s" />
@@ -55,23 +67,24 @@ HEADER_SECTION_FORM_TMPL = """
 """
 
 def doformat(self, header, start, end, content):
-    print(header, start, end, content)
-    print("------")
+    # print(header, start, end, content)
+    # print("------")
     if header:
-        t = Template("{% csrf_token %}")
-        c = self.config.get("context")[0]
-        csrf_token =  t.render(c)
-        form_elt = HEADER_SECTION_FORM_TMPL % (csrf_token, self._escape(content), start, end)
+        # t = Template("{% csrf_token %}")
+        # c = self.config.get("context")[0]
+        # csrf_token =  t.render(c)
+        # form_elt = HEADER_SECTION_FORM_TMPL % (csrf_token, self._escape(content), start, end)
+        form_elt = HEADER_SECTION_FORM_TMPL % (self._escape(content), start, end)
         placeholder = self.markdown.htmlStash.store(form_elt, safe=True)
         return "\n%s\n%s\n" % (content, placeholder)
     else:
         return content
 
-
 class SectionEditExtension(markdown.Extension):
     def __init__(self, configs={}):
         self.config = {
-            'context': [Context({}), 'Rendering context instance'],
+            'context': [None, 'context'],
+#            'context': [Context({}), 'Rendering context instance'],
             'format': [doformat, 'Formating function'],
         }
         for key, value in configs:
