@@ -3,7 +3,7 @@ $(document).ready(function() {
     $("section.annotation1 div.wrapper").autoscrollable();
 
     $("video").each(function(){
-        var url = $("[src]:first", this).attr('src');
+        var url = $(this).attr('src') || $("[src]:first", this).attr('src');
         $(this).timeline({
             show: function (elt) {
                 $(elt).closest('section.annotation1').find('div.wrapper').autoscrollable("scrollto", elt);

@@ -42,8 +42,7 @@ def embed (value, arg):
     if arg is None or arg not in ['html5']:
         arg = html5
     if arg == "html5":
-        return """<video width="320" height="240" controls="controls">
-        <source src="%s" type="video/ogg" />
+        return """<video width="320" height="240" controls="controls" src="%s" type="video/ogg" />
         Your browser does not support the video tag.
         </video>""" % value
     else:
