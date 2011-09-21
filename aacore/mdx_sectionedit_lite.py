@@ -1,22 +1,68 @@
+"""
+"""
+
 import markdown, re
+
 
 HASH_HEADER_RE = r'(^|\n)(?P<level>#{%s})[^#](?P<header>.*?)#*(\n|$)'
 
-def split_re (pat, text, returnLeading=False):
+
+def split_re (pattern, text, returnLeading=False):
+    """
+    Splits a text according to the given pattern.
+    returns a generator of tuples of 4 values
+    >>> text = '''
+    ... # 1
+    ... Section 1
+    ... ## 1.1
+    ... Subsection 1.1
+    ... ## 1.2
+    ... Subsection 1.2
+    ... ### 1.2.1
+    ... Hey 1.2.1 Special section
+    ... ### 1.2.2
+    ... #### 1.2.2.1
+    ... # 2
+    ... Section 2
+    ... '''
+    >>> pattern = re.compile(HASH_HEADER_RE % 1, re.I | re.M)
+    >>> for (header, body, start, end) in split_re(pattern, text):
+    ...     print("%s --> %s" % (start, end))
+    ...     print(header + body)
+    0 --> 117
+    <BLANKLINE>
+    # 1
+    Section 1
+    ## 1.1
+    Subsection 1.1
+    ## 1.2
+    Subsection 1.2
+    ### 1.2.1
+    Hey 1.2.1 Special section
+    ### 1.2.2
+    #### 1.2.2.1
+    117 --> 132
+    <BLANKLINE>
+    # 2
+    Section 2
+    <BLANKLINE>
+    """
     cur = None
-    h = None
+    header = None
     start = None
-    for m in pat.finditer(text):
+    for match in pattern.finditer(text):
         if cur != None:
-            yield (h, text[cur:m.start()], start, m.start())
-        start = m.start()
+            yield (header, text[cur:match.start()], start, match.start())
+        start = match.start()
         if returnLeading and cur == None and start > 0:
-            # yield the text leading up to the first match as a leading section (with blank for matching header)
+            # yields the text leading up to the first match as a leading section
+            # (with blank for matching header)
             yield ('', text[:start], 0, start)
-        h = text[m.start():m.end()]
-        cur = m.end() 
+        header = text[match.start():match.end()]
+        cur = match.end() 
     if cur != None:
-        yield (h, text[cur:], start, len(text))
+        yield (header, text[cur:], start, len(text))
+
 
 def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     '''
@@ -41,51 +87,88 @@ def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     ... # 2
     ... Section 2
     ... """
-    >>> for (i, (h, t)) in enumerate(sectionalize(text)):
-    ...     print "=== SECTION %d ===" % (i+1)
-    ...     if h: print h.strip()
-    ...     if t: print t.strip()
+    >>> import json
+    >>> for (i, section) in enumerate(sectionalize(text)):
+    ...     print json.dumps(section, sort_keys=True, indent=4)
+    {
+        "body": "Section 1\\n## 1.1\\nSubsection 1.1\\n## 1.2\\nSubsection 1.2\\n### 1.2.1\\nHey 1.2.1 Special section\\n### 1.2.2\\n#### 1.2.2.1", 
+        "depth": 1, 
+        "end": 117, 
+        "header": "\\n# 1\\n", 
+        "sectionnumber": 1, 
+        "start": 0
+    }
+    {
+        "body": "Subsection 1.1", 
+        "depth": 2, 
+        "end": 36, 
+        "header": "\\n## 1.1\\n", 
+        "sectionnumber": 2, 
+        "start": 14
+    }
+    {
+        "body": "Subsection 1.2\\n### 1.2.1\\nHey 1.2.1 Special section\\n### 1.2.2\\n#### 1.2.2.1", 
+        "depth": 2, 
+        "end": 117, 
+        "header": "\\n## 1.2\\n", 
+        "sectionnumber": 3, 
+        "start": 36
+    }
+    {
+        "body": "Hey 1.2.1 Special section", 
+        "depth": 3, 
+        "end": 94, 
+        "header": "\\n### 1.2.1\\n", 
+        "sectionnumber": 4, 
+        "start": 58
+    }
+    {
+        "body": "#### 1.2.2.1", 
+        "depth": 3, 
+        "end": 117, 
+        "header": "\\n### 1.2.2\\n", 
+        "sectionnumber": 5, 
+        "start": 94
+    }
+    {
+        "body": "", 
+        "depth": 4, 
+        "end": 117, 
+        "header": "#### 1.2.2.1", 
+        "sectionnumber": 6, 
+        "start": 105
+    }
+    {
+        "body": "Section 2\\n", 
+        "depth": 1, 
+        "end": 132, 
+        "header": "\\n# 2\\n", 
+        "sectionnumber": 7, 
+        "start": 117
+    }
+    >>> text = """# Section 1 {@about="some ressource"}
+    ... Some content
+    ... # Section 2 {@about="some other ressource"}
+    ... Some more content
+    ... """
+    >>> text = """# blka {@about="http://url/of/th/ressource"} {@style=top: 200px; left: 450px; width: 300px; height: 400px;} kjhdskqjh
     ... 
-    === SECTION 1 ===
-    # 1
-    Section 1
-    ## 1.1
-    Subsection 1.1
-    ## 1.2
-    Subsection 1.2
-    ### 1.2.1
-    Hey 1.2.1 Special section
-    ### 1.2.2
-    #### 1.2.2.1
-    === SECTION 2 ===
-    ## 1.1
-    Subsection 1.1
-    === SECTION 3 ===
-    ## 1.2
-    Subsection 1.2
-    ### 1.2.1
-    Hey 1.2.1 Special section
-    ### 1.2.2
-    #### 1.2.2.1
-    === SECTION 4 ===
-    ### 1.2.1
-    Hey 1.2.1 Special section
-    === SECTION 5 ===
-    ### 1.2.2
-    #### 1.2.2.1
-    === SECTION 6 ===
-    #### 1.2.2.1
-    === SECTION 7 ===
-    # 2
-    Section 2
+    ... {% page_list %}
+    ... 
+    ... # bal {@about="http://url/of/th/ressource"} {@style=top: 50px; left: 50px; width: 300px; height: 400px;}
+    ... 
+    ... test bla
+    ... """
+    >>> for (i, section) in enumerate(sectionalize(text)):
+    ...     print json.dumps(section, sort_keys=True, indent=4)
     '''
+    pattern = re.compile(HASH_HEADER_RE % depth, re.I | re.M)
 
+    sectionnumber = 0
     if sections == None:
         sections = []
-    pat = re.compile(HASH_HEADER_RE % depth, re.I | re.M)
-    sectionnumber = 0
-    for header, body, start, end in split_re(pat, wikitext):
-        # print "===== SECTION %d =====" % (sectionindex + 1)
+
+    for header, body, start, end in split_re(pattern, wikitext):
         section = {}
         section['sectionnumber'] = len(sections) + 1
         section['start'] = textstart + start
@@ -94,16 +177,17 @@ def sectionalize (wikitext, depth=1, sections=None, textstart=0):
         section['body'] = body
         section['depth'] = depth        
         sections.append(section)
-        if depth<10 and body:
-            sectionalize(body, depth+1, sections, textstart + len(header) + start)
-        # print text.strip()
+        if depth < 10 and body:
+            sectionalize(body, depth + 1, sections, textstart + len(header) + start)
     return sections
+
 
 def sectionalize_replace (originaltext, sectionnumber, sectiontext):
     sections = sectionalize(originaltext)
     pre = originaltext[:sections[sectionnumber]['start']]
     post = originaltext[sections[sectionnumber]['end']:]
     return pre + sectiontext + post
+
 
 class SectionEditExtension(markdown.Extension):
     def __init__(self, configs={}):
@@ -117,38 +201,42 @@ class SectionEditExtension(markdown.Extension):
 
         ext = SectionEditPreprocessor(md)
         ext.config = self.config
-        md.preprocessors.add('section_edit_block', ext, "_begin")
+        md.preprocessors.add('section_edit_block', ext, ">timecodes_block")
+
 
 class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
     def run(self, lines):
         """ Adds section numbers to sections """
         newlines = []
-        pat = re.compile(HASH_HEADER_RE % "1,10", re.I | re.M)
+        pattern = re.compile(HASH_HEADER_RE % "1,10", re.I | re.M)
         i = 0
         for line in lines:
-            if pat.match(line):
+            if pattern.match(line):
                 newlines.append(line.rstrip() + " {@data-section=%d}" % (i+1))
                 i += 1
             else:
                 newlines.append(line)
         return newlines
 
+
 def makeExtension(configs={}):
     return SectionEditExtension(configs=configs)
 
+
 if __name__ == "__main__":
-#    import doctest
-#    doctest.testmod()
+    import doctest
+    doctest.testmod()
 
-    text = """
-# One
-Hello
-# Two
-
-Second section, testing
-# Three
-
-""".strip()
+    from textwrap import dedent
+    text = dedent("""
+        # One
+        Hello
+        # Two
+        
+        Second section, testing
+        # Three
+        
+        """.strip())
 
 #    text = "1|2|3|4"
 #    print text

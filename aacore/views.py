@@ -16,14 +16,11 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-import html5lib, lxml, lxml.cssselect, RDF, re, urllib2, urlparse, markdown
-try: import simplejson as json
-except ImportError: import json
+import html5lib, RDF, re
 
-from django.shortcuts import (render_to_response, get_object_or_404, redirect)
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import (render_to_response, redirect)
+from django.http import HttpResponse
 from django.template import RequestContext, Template, Context
-from django.template.loader import get_template 
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
@@ -33,16 +30,8 @@ from models import *
 from rdfutils import *
 from utils import *
 from mdx_aa import get_aa_markdown
-from mdx_fenced_style import FencedStyleExtension 
-from mdx_timecodes import TimeCodesExtension
+from mdx_sectionedit_lite import sectionalize, sectionalize_replace
 
-
-def page_list (request):
-    """
-    A listing of All Pages (like MediaWiki Special:AllPages)
-    """
-    context = {}
-    return render_to_response("aacore/page_list.html", context, context_instance=RequestContext(request))
 
 def page_detail (request, slug):
     """
@@ -78,38 +67,7 @@ def page_detail (request, slug):
     #context['content'] = mark_safe(t.render(c))
     context['content'] = mark_safe(rendered)
 
-    # Extracts the geometry information from markdown metadata geometry key
-    #md.convert(page.content)
-
-
-    ## Geometry entry pattern, eg. "#myheader 300 400 50 50"
-    #GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
-
-    #try:
-        ## Adds the geometry info to the context dictionnary so we can relayout using javascript.  
-        #values = {}
-        #for i in md.Meta['geometry']:
-            ##tokens = i.split()
-            ##values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
-
-            ## Makes sure the entry is properly formatted
-            #m = re.search(GEOMETRY_RE, i)
-
-            #if m:
-                #d = m.groupdict()
-                #values['#' + d['id']] = {
-                    #'width': d['width'],
-                    #'height': d['height'],
-                    #'top': d['top'],
-                    #'left': d['left'],
-                #}
-        #context['geometry'] = json.dumps(values)
-    #except (KeyError, AttributeError):
-        #pass
-
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
-
-from mdx_sectionedit_lite import sectionalize, sectionalize_replace
 
 def page_edit (request, slug):
     """
@@ -120,244 +78,61 @@ def page_edit (request, slug):
     """
     context = {}
     name = dewikify(slug)
-    section = request.REQUEST.get('section')
-    if section:
-        section=int(section)
+
+    section = int(request.REQUEST.get('section', 0))
+    is_ajax = request.REQUEST.get('type') == 'ajax'
+
     try:
         page = Page.objects.get(name=name)
-        context['page'] = page
-        if section != None:
-            sections = sectionalize(page.content)
-            sectiondict = sections[section-1]
-            context['content'] = sectiondict['header'] + sectiondict['body']
-            context['section'] = section
-        else:
-            context['content'] = page.content
     except Page.DoesNotExist:
         page = None
 
-    if request.method == "POST":
-        content = request.POST.get('content', '')
-        # start = request.POST.get('start')
-        # end = request.POST.get('end')
-        if section != None:  # section edit
-            page.content = sectionalize_replace(page.content, (section-1), content.rstrip() + "\n")
-            page.save()
-            md = get_aa_markdown()
-            rendered = md.convert(content)
-            t = Template("{% load filters aatags %}" + rendered)
-            c = RequestContext(request)
-            return HttpResponse(mark_safe(t.render(c)))
-        elif page:
-            if content == "delete":
-                page.delete()
+    # TODO: Use django form?
+    # Gets the edit form
+    if request.method == "GET":
+        if page:
+            context['page'] = page
+            if section:
+                sections = sectionalize(page.content)
+                sectiondict = sections[section - 1]
+                context['content'] = sectiondict['header'] + sectiondict['body']
+                context['section'] = section
             else:
-                page.content = content 
+                context['content'] = page.content
+            if is_ajax:
+                return HttpResponse(context['content'])
+        return render_to_response("aacore/edit.html", context, \
+                context_instance=RequestContext(request))
+
+    # Posts the edit form
+    elif request.method == "POST":
+        content = request.POST.get('content', '')
+        content = convert_line_endings(content, 0)  # Normalizes EOL
+
+        if page:
+            if section:  # section edit
+                page.content = sectionalize_replace(page.content, (section - 1), content + "\n")
                 page.save()
+            else:
+                if content == "delete":
+                    page.delete()
+                else:
+                    page.content = content
+                    page.save()
         else:
             if content == "delete":
                 pass
             else:
                 page = Page(content=content, name=name)
                 page.save()
-        url = reverse('aa-page-detail', kwargs={'slug':slug})
+
+        if is_ajax:
+            md = get_aa_markdown(context=RequestContext(request))
+            rendered = md.convert(content)
+            return HttpResponse(mark_safe(rendered))
+        #else:
+        url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
-    return render_to_response("aacore/edit.html", context, context_instance=RequestContext(request))
-
-def page_edit_geometry (request, slug):
-    """
-    A view to set/update information about the geometry of a page annotation.
-    Persistance is done in the markdown source itself thanks to the metadata
-    information, so no database is involved.
-
-    method
-        :POST
-    data
-        :_id <str> eg. "#my_header"
-        :width <str> eg. "200"
-        :height <str> eg. "300"
-        :top <str> eg. "50"
-        :left <str> eg. "500"
-        
-        to be implemented:
-        :z-index <str> eg.  "1078"
-    """
-    context = {}
-    name = dewikify(slug)
-    page = Page.objects.get(name=name)
-
-    if request.method == "POST":
-        # Parses the content of the page
-        myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
-        md = markdown.Markdown(extensions=['extra', 'meta', myext])
-        md.convert(page.content)
-
-        new_content = ""  #
-
-        # Retrieves POST data
-        _id = request.POST.get('id', '')
-        width = request.POST.get('width', '0')
-        height = request.POST.get('height', 0)
-        top = request.POST.get('top', 0)
-        left = request.POST.get('left', 0)
-
-        try:
-            match = None
-            # Updates the geometry key if older information about the element is present
-            for i in xrange(len(md.Meta['geometry'])):
-                if md.Meta['geometry'][i].split()[0] == _id:
-                    md.Meta['geometry'][i] = "%s %s %s %s %s" % (_id, width, height, top, left)
-                    match = True
-
-            # Appends the element geometry information if it wasn't there yet
-            if not match:
-                md.Meta['geometry'].append("%s %s %s %s %s" % (_id, width, height, top, left))
-        except KeyError:  # md.Meta['geometry'] doesn't exist yet
-            md.Meta['geometry'] = []
-            md.Meta['geometry'].append("%s %s %s %s %s" % (_id, width, height, top, left))
-
-        # Rebuilds the markdown source with new the updated metadata
-        for i in md.Meta:
-            new_content += i + ": " + "\n    ".join(md.Meta[i]) + "\n"
-        new_content += "\n\n" + "\n".join(md.lines)
-        page.content = new_content
-        page.save()
-
-        # Geometry entry pattern, eg. "#myheader 300 400 50 50"
-        GEOMETRY_RE = r'(?P<id>-?[_a-zA-Z]+[_a-zA-Z0-9-]*)\s(?P<width>\d+)\s(?P<height>\d+)\s(?P<top>\d+)\s(?P<left>\d+)'
-
-        try:
-            # Adds the geometry info to the context dictionnary so we can relayout using javascript.  
-            values = {}
-            for i in md.Meta['geometry']:
-                #tokens = i.split()
-                #values["#" + str(tokens[0])] = map(lambda x: int(x), tokens[1:])
-
-                # Makes sure the entry is properly formatted
-                m = re.search(GEOMETRY_RE, i)
-
-                if m:
-                    d = m.groupdict()
-                    values['#' + d['id']] = {
-                        'width': d['width'],
-                        'height': d['height'],
-                        'top': d['top'],
-                        'left': d['left'],
-                    }
-            context['geometry'] = json.dumps(values)
-            return HttpResponse(json.dumps(values))
-        except KeyError:
-            pass
-
-        return HttpResponse("ok")
-    return HttpResponse("not ok")
-
-def page_edit_section (request, slug, id):
-    """
-    Annotation edition view
-
-    template
-        :template:`aacore/edit.html`
-    """
-    name = dewikify(slug)
-    page = Page.objects.get(name=name)
-
-    myext = FencedStyleExtension()  # Adds a markup to wrap content with a div of a given class
-    md = markdown.Markdown(extensions=['extra', 'meta', myext])
-    md.convert(page.content)
-
-    if request.method == "POST":
-        content = request.POST.get('content', '')
-        new_content = []
-
-        for i in md.Meta:
-            new_content.append(i + ": " + "\n    ".join(md.Meta[i]) + "\n")
-        new_content += "\n\n"
-
-        i = 0
-        for (url, header, lines) in parse_header_sections(md.lines):
-            if int(id) == i:
-                new_content.append(content)
-            else:
-                if header:
-                    lines.insert(0, header)
-                if url:
-                    lines.insert(0, url)
-                new_content.append("\n".join(lines))
-            i += 1
-        page.content = "\n".join(new_content)
-        page.save()
-
-        ### 
-        sections = []  # Collects all the rendered sections
-
-        i = 0
-        for (url, header, lines) in parse_header_sections(content.splitlines()):
-            # Puts back the header with the rest of the section content
-            if header:
-                lines.insert(0, header)
-
-            # Renders every times section
-            timed_sections = []
-
-            j = 0
-            for (timecode, lines) in parse_timed_sections(lines):
-                t = Template("{% load filters aatags %}" + "\n".join(lines))
-                c = Context({})
-                rendered = mark_safe(md.convert(t.render(c)))
-
-                if timecode:
-                    # TODO: markup timecode
-                    t = get_template('aacore/partials/timed_section.html')
-                    c = Context({
-                        'timecode': timecode,
-                        'markdown': timecode + "\n" + "\n".join(lines),
-                        'rendered': rendered,
-                    })
-                    timed_sections.append(t.render(c))
-                else:
-                    timed_sections.append(rendered)
-
-                j += 1
-
-            # Renders the section content (determined by h1 headers)
-            # Only articles, not source code form
-            # 1. render django template tags
-            # 2. converts to markdown
-            # 3. mark_safe for next inclusion
-            # 4. keeps rendered section in var rendered
-
-            # This is a trick to use of django filter in the pages
-            t = Template("{% load filters aatags %}" + "\n".join(lines))
-            c = Context({})
-            rendered = mark_safe(md.convert(t.render(c)))
-
-            # Adds URL to reconstruct the source
-            if url:
-                lines.insert(0, url)
-
-            if lines and header:  # Avoids empty annotation boxes
-                # Renders the annotation box
-                t = get_template('aacore/partials/annotation.html')
-                c = Context({
-                    'rendered': mark_safe("\n".join(timed_sections)),
-                    'target': url,
-                    'post_url': reverse('aa-page-edit-section', kwargs={'slug': slug, 'id': i}),
-                    'source': "\n".join(lines)
-                })
-                annotation = t.render(c)
-
-                i += 1
-
-                sections.append(annotation)
-            else:
-                sections.append(rendered)
-
-        # Finally joins every section/annotation
-        return HttpResponse(mark_safe("".join(sections)))
-
-
-    return HttpResponse("ok")
 
 def sniff (request):
     """

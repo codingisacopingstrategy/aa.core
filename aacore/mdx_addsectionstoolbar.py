@@ -2,6 +2,7 @@
 
 '''
 '''
+
 import markdown, re
 from markdown import etree
 
@@ -10,19 +11,23 @@ def add_sectionstoolbar (tree, tag, tagclass, typeof, moveAttributes=True):
     def do(doc):
         children = list(doc)
         for i, child in enumerate(children):
-            if child.tag == "section" and "annotation1" in child.attrib.get('class'):
+            if child.tag == "section" \
+                    and "annotation" in child.attrib.get('class')\
+                    and child.attrib.get('data-section'):
                 wrapper = etree.Element('div')
                 wrapper.set("class", 'wrapper')
                 for elt in list(child):
                     child.remove(elt)
                     wrapper.append(elt)
-                a = etree.Element('a')
-                a.set("class", 'edit')
-                a.set("href", '#')
-                a.text = "edit"
-                nav = etree.Element('nav')
-                nav.append(a)
-                child.append(nav)
+                if "annotation1" in child.attrib.get('class'):
+                    a = etree.Element('a')
+                    a.set("class", 'edit')
+                    section = child.attrib.get('data-section')
+                    a.set("href", 'edit/?section=%s' % section)
+                    a.text = "edit"
+                    nav = etree.Element('nav')
+                    nav.append(a)
+                    child.append(nav)
                 child.append(wrapper)
             do(child)
     do(tree)
@@ -50,44 +55,7 @@ def makeExtension(configs={}):
     return AddSectionsToolbarExtension(configs=configs)
 
 
-text = """
-<section>
-    <h1>test</h1>
-    <p>some text</p>
-    <section>
-        <h2>level 2 header</h2>
-        <p>some more text</p>
-    </section>
-</section>
-"""
-
 if __name__ == "__main__":
-    #import doctest
-    #doctest.testmod()
-    doc = etree.fromstring(text)
-
-    def do(doc):
-        children = list(doc)
-        for i, child in enumerate(children):
-            print(i)
-            print(child)
-            m = re.search(r"h(\d+)", child.tag)
-            if m:
-                tag_level = int(m.group(1))
-                a = etree.Element('a')
-                a.set("class", 'edit')
-                nav = etree.Element('nav')
-                nav.append(a)
-                c = child
-                doc.remove(child)
-                doc.insert(i, c)
-                doc.insert(i, nav)
-            do(child)
-
-#TODO: to wrap all children and remove form and reinsert it after
-
-
-    do(doc)
-    print(etree.tostring(doc))
-
+    import doctest
+    doctest.testmod()
 
