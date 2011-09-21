@@ -129,7 +129,9 @@ def page_edit(request, slug):
         if is_ajax:
             md = get_markdown()
             rendered = md.convert(content)
-            return HttpResponse(mark_safe(rendered))
+            t = Template("{% load filters aatags %}" + rendered)
+            c = RequestContext(request)
+            return HttpResponse(mark_safe(t.render(c)))
         #else:
         url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
