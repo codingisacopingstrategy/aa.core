@@ -175,3 +175,6 @@ nav#west-pane {
 nav#west-pane pre code {
     
 }
+.active {
+    background: yellow;
+}
