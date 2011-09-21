@@ -11,7 +11,7 @@ Requires Python-Markdown 2.0+.
 import markdown
 import mdx_semanticwikilinks
 import mdx_semanticdata
-import mdx_sectionedit_lite
+import mdx_sectionedit
 import mdx_addsections
 import mdx_addsectionstoolbar
 import mdx_timecodes
@@ -41,7 +41,7 @@ def get_markdown():
             mdx_semanticwikilinks.makeExtension(configs=[('make_link', make_link)]),
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
-            mdx_sectionedit_lite.makeExtension(),
+            mdx_sectionedit.makeExtension(),
             mdx_addsections.makeExtension(configs=[('class','annotation%(LEVEL)d'),]),
             mdx_addsectionstoolbar.makeExtension(),
             ],

@@ -30,7 +30,7 @@ from models import *
 from rdfutils import get_model
 from utils import (dewikify, convert_line_endings)
 from mdx import get_markdown
-from mdx.mdx_sectionedit_lite import (sectionalize, sectionalize_replace)
+from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 
 
 def page_detail(request, slug):
