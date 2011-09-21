@@ -1,0 +1,1 @@
+aacore/static/aacore/js/
