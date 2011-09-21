@@ -19,8 +19,8 @@
 import os, sys, re, subprocess # import Popen, PIPE, STDOUT
 
 from aacore.settings import FFMPEG
-import sniffer, aacore.wikilinks
-
+import sniffer
+from aacore.mdx import get_markdown
 
 class FFMpegSniffer (sniffer.Sniffer):
     @classmethod
@@ -30,7 +30,8 @@ class FFMpegSniffer (sniffer.Sniffer):
         #if data['content_type'] is not in ["video/mpeg"]:
             #return None
         out = system_stdin_stderr(FFMPEG + ' -i "%s"' % url)
-        return "<pre>%s</pre>" % aacore.wikilinks.markup(markup(out))
+        md = get_markdown()
+        return "<pre>%s</pre>" % md.convert(markup(out))
 
 def system_stdin_stderr (cmd, readlimitbytes=4000):
     p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)

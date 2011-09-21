@@ -19,7 +19,8 @@
 import os, sys, re, subprocess # import Popen, PIPE, STDOUT
 
 from aacore.settings import IDENTIFY
-import sniffer, aacore.wikilinks
+import sniffer
+from aacore.mdx import get_markdown
 
 
 class IdentifySniffer (sniffer.Sniffer):
@@ -28,8 +29,8 @@ class IdentifySniffer (sniffer.Sniffer):
         #if not data['content_type'].startswith('image/'):
             #return None
         out = system_stdin_stderr(IDENTIFY + ' -verbose "%s"' % url)
-        #return "<pre>%s</pre>" % markup(out)
-        return "<pre>%s</pre>" % aacore.wikilinks.markup(markup(out))
+        md = get_markdown()
+        return "<pre>%s</pre>" % md.convert(markup(out))
 
 def system_stdin_stderr (cmd, readlimitbytes=4000):
     p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
@@ -54,57 +55,6 @@ def streamInfoGetVideoSize (sinfo):
                 return map(lambda x: int(x), ret)
     return (-1, -1)
 
-def getStreamInfo (path):
-    ret = {}
-    results = system_stdin_stderr('-i "%s"' % path)
-    duration = 0
-    
-    for line in results.splitlines():
-        line = line.strip().lower()
-
-        results = re.search("duration:\s*(\d\d):(\d\d):(\d\d)\.(\d+)?", line, re.IGNORECASE)
-        if results:
-            results = results.groups()
-            duration = (int(results[0]) * 60 * 60) + (int(results[1]) * 60) + int(results[2])
-            if len(results) > 3:
-                duration = float(str(duration)+"."+results[3])
-            else:
-                duration = float(duration)
-
-        results = re.search(r"stream #(\d+)\.(\d+).*(audio|video): (.*)", line, re.IGNORECASE)
-        if results:
-            results = results.groups()
-            stream_num = int(results[1])
-            type = results[2]
-            info = results[3]
-            ret[type] = info
-            
-    # FURTHER EXTRACT DATA
-    # DURATION
-    if (duration > 0.0): ret['duration'] = duration
-    
-    # VIDEO
-    if ret.has_key('video'):
-        # SIZE (width, height)
-        sizepat = r"(\d+)x(\d+),?\s*"
-        r = re.search(sizepat, ret['video'])
-        if r:
-            ret['width'] = int(r.group(1))
-            ret['height'] = int(r.group(2))
-        # remove the size from the video info string
-        ret['video'] = re.sub(sizepat, "", ret['video'])
-    
-        # FRAMERATE (fps)
-        fpspat = r"(\d+(\.\d+)?)\s*fps(\(.*\))?\s*"
-        r = re.search(fpspat, ret['video'])
-        if r:
-            ret['fps'] = float(r.group(1))
-        # remove the size from the video info string
-        ret['video'] = re.sub(fpspat, "", ret['video'])
-        # cleanup
-        ret['video'] = ret['video'].strip(" ,")
-
-    return ret
 
 def markup (text):
     size_match = re.search(r"Geometry:\ (?P<width>\d+)x(?P<height>\d+)", text, flags=re.X|re.I)
