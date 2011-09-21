@@ -167,3 +167,11 @@ div.wrapper:hover {
 h1 { 
     text-decoration: underline;
 }
+
+nav#west-pane {
+    font-weight: normal
+    
+}
+nav#west-pane pre code {
+    
+}

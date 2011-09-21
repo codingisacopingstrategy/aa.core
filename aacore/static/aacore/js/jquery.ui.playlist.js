@@ -44,12 +44,6 @@ $.widget("ui.aaplaylist", {
                 });
             }
         });
-        //$.post(action_url, {
-            //content: $textarea.val() + "\n",
-            //page: page, 
-            //start: start,
-            //end: end,
-        //});
     },
     _create: function() {
         // creation code for mywidget
@@ -66,17 +60,6 @@ $.widget("ui.aaplaylist", {
                 stop: this._post_geometry,
             });
     },
-    _doSomething: function() {
-        // internal functions should be named with a leading underscore
-        // manipulate the widget
-    },
-    value: function() {
-        // calculate some value and return it
-        return this._calculate();
-    },
-    length: function() {
-        return this._someOtherValue();
-    },
     destroy: function() {
         //this.element.find('nav').remove();
         $.Widget.prototype.destroy.apply(this, arguments); // default destroy
@@ -86,7 +69,6 @@ $.widget("ui.aaplaylist", {
 
 $('section').live('dblclick', function(e) {
     e.stopImmediatePropagation();
-    //$('section').editable('destroy');
     $(this).editable('edit/', { 
          loadurl   : 'edit/',
          //id        : 'section',
@@ -134,20 +116,4 @@ $("a.edit").live("click", function(e) {
         .find('div.wrapper')
         .trigger('dblclick');
 });
-
-//$('a.delete').live("click", function(e) {
-    //if (confirm("Are you sure?")) {
-        //e.preventDefault();
-        //var $elt = $(this).parents("section");
-        //$.post("edit/?section=" + $elt.attr("data-section"), 
-            //{
-                //content: "",
-                //page: window.page,
-            //}, function(data) {
-                //$elt.remove();
-                //window.location.reload()
-        //});
-    //};
-
-//});
 })(jQuery);

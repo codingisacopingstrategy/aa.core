@@ -20,17 +20,17 @@ import html5lib, RDF, re
 
 from django.shortcuts import (render_to_response, redirect)
 from django.http import HttpResponse
-from django.template import RequestContext, Template, Context
+from django.template import (RequestContext, Template, Context)
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
 from aacore.spider import spider
 from plugins import sniffer
 from models import *
-from rdfutils import *
-from utils import *
-from mdx_aa import get_aa_markdown
-from mdx_sectionedit_lite import sectionalize, sectionalize_replace
+from rdfutils import get_model
+from utils import (dewikify, convert_line_endings)
+from mdx import get_markdown
+from mdx.mdx_sectionedit_lite import (sectionalize, sectionalize_replace)
 
 
 def page_detail (request, slug):
@@ -60,7 +60,7 @@ def page_detail (request, slug):
         return redirect(url) 
 
     context['page'] = page
-    md = get_aa_markdown(context=RequestContext(request))
+    md = get_markdown(context=RequestContext(request))
     rendered = md.convert(page.content)
     #t = Template("{% load filters aatags %}" + rendered)
     #c = RequestContext(request)
@@ -127,7 +127,7 @@ def page_edit (request, slug):
                 page.save()
 
         if is_ajax:
-            md = get_aa_markdown(context=RequestContext(request))
+            md = get_markdown(context=RequestContext(request))
             rendered = md.convert(content)
             return HttpResponse(mark_safe(rendered))
         #else:
