@@ -1,4 +1,7 @@
 """
+Splits a markdown source into a flat list of sections.
+
+Markdown extension adds {@data-section=%d} attribute markup to headers.
 """
 
 import markdown, re
