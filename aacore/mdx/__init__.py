@@ -37,6 +37,7 @@ def get_markdown():
     """
     return markdown.Markdown(extensions=[
             "extra",
+            "meta",
             mdx_semanticwikilinks.makeExtension(configs=[('make_link', make_link)]),
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),

@@ -4,7 +4,6 @@ var TEXTAREA_MIN_PADDING_BOTTOM = 30;
 var currentTextArea = undefined; /* used for timecode pasting */
 
 $(document).ready(function() {
-
     function resetTimelines () {
         /* Connect videos to timed sections */
         $("video").each(function(){
