@@ -39,12 +39,12 @@ $(document).ready(function() {
     resetTimelines();
 
     $("section textarea").live("focus", function () {
-        console.log("textarea focus", this);
+        // console.log("textarea focus", this);
         currentTextArea = this;
         // ENSURE TEXTAREA HEIGHT IS OK HACK
+        var $this = $(this);
         var textareaheight = $this.height();
         var sectionheight = $this.closest(".section1").height();
-        console.log("hh", sectionheight, textareaheight);
         if (textareaheight + TEXTAREA_MIN_PADDING_BOTTOM > sectionheight) {
             $this.css("height", (sectionheight - TEXTAREA_MIN_PADDING_BOTTOM)+"px");
         }
