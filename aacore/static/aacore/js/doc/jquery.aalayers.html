@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <title>Toc</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+            
+    <script src="../jquery.sort_by_zindex.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../jquery.aalayers.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        // $('ul').sortable();
+    });
+    </script>
+
+    <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css" type="text/css" media="screen" charset="utf-8">
+
+    <style type="text/css" media="screen">
+        section {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            background-color: white;
+        }
+    </style>    
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $('div#wrapper').aalayers();
+            $('section').draggable();
+            $('input[type="button"]').click(function(e) {
+                var clone = $('section:last').clone();
+                clone.attr('id', clone.attr('id') + '_cloned')
+                    .find('h1:first')
+                    .text(clone.find('h1:first').text() + '_cloned')
+                    .end()
+                .draggable();
+                $('body').append(clone);
+                $('div#wrapper').aalayers('populate');
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <!--<form action="toc_submit" method="post" accept-charset="utf-8">-->
+    <!--<fieldset id="">-->
+        <!--<legend></legend>-->
+        <!--<ul>-->
+            <!--<li><input type="checkbox" name="some_name" value="" /><label for="name"><a href="#">Annotation 1</a></label></li>-->
+            <!--<li><input type="checkbox" name="some_name" value="" /><label for="name"><a href="#">Annotation 2</a></label></li>-->
+            <!--<li><input type="checkbox" name="some_name" value="" /><label for="name"><a href="#">Annotation 3</a></label></li>-->
+        <!--</ul>-->
+    <!--</fieldset>-->
+    <!--<p style="display: none"><input type="submit" value="Submit"></p>-->
+    <!--</form>-->
+    <input type="button" name="add" value="add section">
+
+    <div id="wrapper">
+        
+    </div>
+    
+    <section id="section1" style="display: none; z-index:8; top: 100px; left: 160px;"><h1 id="section1">Section 1</a></section>
+    <section id="section2" style="z-index:9; top: 130px; left: 130px;"><h1 id="section2">Section 2</a></section>
+    <section id="section3" style="z-index:7; top: 160px; left: 100px;"><h1 id="section3">Section 3</a></section>
+
+</body>
+</html>
