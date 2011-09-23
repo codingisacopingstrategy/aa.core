@@ -111,6 +111,11 @@ def page_edit(request, slug):
         content = request.POST.get('content', '')
         content = convert_line_endings(content, 0)  # Normalizes EOL
 
+        button = request.POST.get("_button", "")
+        if button.lower() == "cancel":
+            url = reverse('aa-page-detail', kwargs={'slug': slug})
+            return redirect(url)
+
         if page:
             if section:  # section edit
                 page.content = sectionalize_replace(page.content, (section - 1), content)

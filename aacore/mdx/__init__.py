@@ -17,7 +17,6 @@ import mdx_addsectionstoolbar
 import mdx_timecodes
 from aacore.utils import wikify
 
-
 def make_link(rel, target, label):
     """
     Custom implementation of the SemanticWikilinks make_link function.
@@ -43,7 +42,7 @@ def get_markdown():
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
             mdx_sectionedit.makeExtension(),
-            mdx_addsections.makeExtension(configs=[('class','annotation%(LEVEL)d'),]),
+            mdx_addsections.makeExtension(configs=[('class','section%(LEVEL)d'),]),
             mdx_addsectionstoolbar.makeExtension(),
             ],
         ) 
@@ -52,3 +51,5 @@ def get_markdown():
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
+

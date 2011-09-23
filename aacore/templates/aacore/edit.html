@@ -12,7 +12,7 @@
 </nav>
 <form action="." method="post" accept-charset="utf-8">{% csrf_token %}
     <textarea name="content" rows="24" cols="80">{{ content }}</textarea>
-    <p><input type="submit" value="Save"></p>
+    <p><input type="submit" name="_button" value="Save"><input type="submit" name="_button" value="Cancel"></p>
     {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
 </form>
 {% endblock %}

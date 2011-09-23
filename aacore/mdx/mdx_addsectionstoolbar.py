@@ -12,14 +12,14 @@ def add_sectionstoolbar (tree, tag, tagclass, typeof, moveAttributes=True):
         children = list(doc)
         for i, child in enumerate(children):
             if child.tag == "section" \
-                    and "annotation" in child.attrib.get('class')\
+                    and "section" in child.attrib.get('class')\
                     and child.attrib.get('data-section'):
                 wrapper = etree.Element('div')
                 wrapper.set("class", 'wrapper')
                 for elt in list(child):
                     child.remove(elt)
                     wrapper.append(elt)
-                if "annotation1" in child.attrib.get('class'):
+                if "section1" in child.attrib.get('class'):
                     a = etree.Element('a')
                     a.set("class", 'edit')
                     section = child.attrib.get('data-section')
