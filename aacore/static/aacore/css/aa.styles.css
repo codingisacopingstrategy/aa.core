@@ -54,13 +54,13 @@ body {
 nav {
     text-align: right;
 }   
-nav ul li {
+nav#toolbar ul li {
     display: inline;
 }   
-nav ul li:before {
+nav#toolbar ul li:before {
     content: " | ";
 }   
-nav ul li:first-child:before {
+nav#toolbar ul li:first-child:before {
     content: "";
 }   
 
@@ -177,4 +177,8 @@ nav#west-pane pre code {
 }
 .active {
     background: yellow;
+}
+span[property="aa:start"]:hover,
+span[property="aa:end"]:hover {
+    cursor: pointer;
 }

@@ -1,14 +1,7 @@
 {% extends "aacore/base.html" %}
 
 {% block extrahead %}
-{% if geometry %}
-<!-- Annotation geometry -->
-<script>
-    window.geometry = {{ geometry|safe }};
-</script>
-{% endif %}
 <!-- Page specific javascript -->
-<!-- Annotation geometry -->
 <script>
     var page = "{{ page }}";
 </script>
@@ -17,11 +10,15 @@
 <script src="{{ STATIC_URL }}aacore/js/jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}aacore/js/jquery.ui.playlist.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/aa.view.js"></script>
+
+{% for css in extra_css %}
+<link rel="stylesheet" href="{{ css }}" type="text/css" media="screen" charset="utf-8">
+{% endfor %}
 {% endblock %}
 
 
 {% block body %}
-<nav>
+<nav id="toolbar">
     <ul>
         {% if page %}
         <li><a href="{% url aa-page-edit slug=page.name %}">edit</a></li>

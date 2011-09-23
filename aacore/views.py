@@ -64,6 +64,8 @@ def page_detail(request, slug):
     rendered = md.convert(page.content)
     t = Template("{% load filters aatags %}" + rendered)
     c = RequestContext(request)
+    if 'css' in md.Meta:
+        context['extra_css'] = md.Meta['css']
     context['content'] = mark_safe(t.render(c))
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
@@ -111,7 +113,7 @@ def page_edit(request, slug):
 
         if page:
             if section:  # section edit
-                page.content = sectionalize_replace(page.content, (section - 1), content + "\n")
+                page.content = sectionalize_replace(page.content, (section - 1), content)
                 page.save()
             else:
                 if content == "delete":

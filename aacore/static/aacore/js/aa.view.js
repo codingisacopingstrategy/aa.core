@@ -8,6 +8,8 @@ $(document).ready(function() {
             show: function (elt) {
                 $(elt).closest('section.annotation1').find('div.wrapper').autoscrollable("scrollto", elt);
                 $(elt).addClass("active");
+                $(elt).trigger('activate');
+                console.log('hello');
             },
             hide: function (elt) {
                 $(elt).removeClass("active");
@@ -24,10 +26,11 @@ $(document).ready(function() {
     });
 
     // Clicking subtitles jumps to that time in the video
-    $('span[property="aa:start"],span[property="aa:end"]').click(function () {
-        var t = $.timecode_tosecs_attr($(this).attr("content"));
-        var video = $('video source[src="' + $(this).parents('section.annotation1').attr('about')  + '"]').parent('video')[0];
-        video.currentTime = t;
+    $('span[property="aa:start"], span[property="aa:end"]').click(function () {
+        var about = $(this).parents('section.annotation1').attr('about');
+        var video = $('video[src="' + about + '"]')[0] || 
+                    $('video source[src="' + about + '"]').parent('video')[0];
+        video.currentTime = $.timecode_tosecs_attr($(this).attr("content"));
         video.play();
     });
 

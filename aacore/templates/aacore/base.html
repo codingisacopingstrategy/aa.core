@@ -14,6 +14,7 @@
 <script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    
 <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
 <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
+<script src="{{ STATIC_URL }}lib/jquery.toc.min.js"></script>   
 <link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css"/>
 {% endblock jquery %}
 
@@ -22,6 +23,25 @@ $(document).ready(function() {
     var layout = $('body').layout({applyDefaultStyles: false});
     layout.close("west");
     layout.close("east");
+    $("nav#east-pane").tabs();
+
+    var toc = $('<ul id="toc"></ul>');
+    $("section.annotation1").each(function() {
+        var id = $(this).attr('id');
+        var text = $(this).find('h1:first').text()
+        toc.append($('<li><a href="#' + id + '">' + text + '</a></li>'));
+    });
+    toc.appendTo($('#tabs-2')).sortable();
+
+    // var bla = $('#tabs-2').toc({
+    //     exclude: 'h2, h3, h4, h5, h6',
+    //     context: '#center',
+    //     numerate: false,
+    // }).find('ul').sortable({
+    //     change: function(event, ui) {
+    //         console.log('changed');
+    //     },
+    // });
 });
 </script> 
 
@@ -43,143 +63,15 @@ $(document).ready(function() {
 </div>
 
 <nav id="east-pane" class="ui-layout-east" style="text-align: left;"> 
-<h2>Syntax Cheatsheet:</h2>
-
-<h3>Phrase Emphasis</h3>
-
-<pre><code>*italic*   **bold**
-_italic_   __bold__
-</code></pre>
-
-<h3>Links</h3>
-
-<p>Inline:</p>
-
-<pre><code>An [example](http://url.com/ "Title")
-</code></pre>
-
-<p>Reference-style labels (titles are optional):</p>
-
-<pre><code>An [example][id]. Then, anywhere
-else in the doc, define the link:
-
-  [id]: http://example.com/  "Title"
-</code></pre>
-
-<h3>Images</h3>
-
-<p>Inline (titles are optional):</p>
-
-<pre><code>![alt text](/path/img.jpg "Title")
-</code></pre>
-
-<p>Reference-style:</p>
-
-<pre><code>![alt text][id]
-
-[id]: /url/to/img.jpg "Title"
-</code></pre>
-
-<h3>Headers</h3>
-
-<p>Setext-style:</p>
-
-<pre><code>Header 1
-========
-
-Header 2
---------
-</code></pre>
-
-<p>atx-style (closing #'s are optional):</p>
-
-<pre><code># Header 1 #
-
-## Header 2 ##
-
-###### Header 6
-</code></pre>
-
-<h3>Lists</h3>
-
-<p>Ordered, without paragraphs:</p>
-
-<pre><code>1.  Foo
-2.  Bar
-</code></pre>
-
-<p>Unordered, with paragraphs:</p>
-
-<pre><code>*   A list item.
-
-    With multiple paragraphs.
-
-*   Bar
-</code></pre>
-
-<p>You can nest them:</p>
-
-<pre><code>*   Abacus
-    * answer
-*   Bubbles
-    1.  bunk
-    2.  bupkis
-        * BELITTLER
-    3. burper
-*   Cunning
-</code></pre>
-
-<h3>Blockquotes</h3>
-
-<pre><code>&gt; Email-style angle brackets
-&gt; are used for blockquotes.
-
-&gt; &gt; And, they can be nested.
-
-&gt; #### Headers in blockquotes
-&gt; 
-&gt; * You can quote a list.
-&gt; * Etc.
-</code></pre>
-
-<h3>Code Spans</h3>
-
-<pre><code>`&lt;code&gt;` spans are delimited
-by backticks.
-
-You can include literal backticks
-like `` `this` ``.
-</code></pre>
-
-<h3>Preformatted Code Blocks</h3>
-
-<p>Indent every line of a code block by at least 4 spaces or 1 tab.</p>
-
-<pre><code>This is a normal paragraph.
-
-    This is a preformatted
-    code block.
-</code></pre>
-
-<h3>Horizontal Rules</h3>
-
-<p>Three or more dashes or asterisks:</p>
-
-<pre><code>---
-
-* * *
-
-- - - - 
-</code></pre>
-
-<h3>Manual Line Breaks</h3>
-
-<p>End a line with two or more spaces:</p>
-
-<pre><code>Roses are red,   
-Violets are blue.
-</code></pre>
-</div>
+	<ul>
+		<li><a href="#tabs-1">Cheatsheet</a></li>
+		<li><a href="#tabs-2">Palette</a></li>
+	</ul>
+	<div id="tabs-1">
+        {% include "aacore/partials/markdown_help.html" %}
+	</div>
+	<div id="tabs-2">
+	</div>
 </nav>
 </body>
 </html>
