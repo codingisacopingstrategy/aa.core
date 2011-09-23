@@ -87,25 +87,23 @@ $('section').live('dblclick', function(e) {
                  type: 'ajax',
              }
          },
-         rows      : 6,
-         width     : '100%',
+         // width     : '100%',
          type      : 'textarea',
          cancel    : 'Cancel',
-         submit    : 'OK',
+         submit    : 'Save',
          indicator : 'Saving changes',
          tooltip   : "Doubleclick to edit...",
          onblur    : 'ignore',
          event     : "edit",
-         style     : 'inherit',
          callback : function(value, settings) {
             $(this).replaceWith(function() {
                 return $(this).contents();
             });
-            $('section[class^="annotation"]').each(function(index) {
+            $('section[class^="section"]').each(function(index) {
                 $(this).attr('data-section', index + 1);
             })
-            $('section.annotation1').aaplaylist('destroy');
-            $('section.annotation1').aaplaylist();
+            $('section.section1').aaplaylist('destroy');
+            $('section.section1').aaplaylist();
         }
     }).trigger('edit');
 });
@@ -116,4 +114,6 @@ $("a.edit").live("click", function(e) {
         .find('div.wrapper')
         .trigger('dblclick');
 });
+
+
 })(jQuery);

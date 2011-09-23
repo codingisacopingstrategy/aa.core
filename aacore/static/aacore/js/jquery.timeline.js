@@ -403,16 +403,14 @@ var methods = {
             var elt = this;
             var $this = $(this),
             data = $this.data('timeline');
-            // tooltip = $('<div />', { text : $this.attr('title') });
-            // FIRST TIME INIT
             if ( ! data ) {
-                data = {
-                    target : $this,
-                    timeline : aTimeline({ show: opts.show, hide: opts.hide})
-                };
+                // FIRST TIME INIT
+                data = { target : $this };
                 data.options = opts;
                 $(this).data('timeline', data);
             }
+            // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
+            data.timeline = aTimeline({ show: opts.show, hide: opts.hide})
             $this.bind("timeupdate", function (evt) {
                 // console.log("timeupdate", evt.target, evt.target.currentTime);
                 // allow a wrapped getCurrentTime for the element (via playable?)
@@ -449,7 +447,7 @@ var methods = {
             }
             if (start) start = timecode_tosecs_attr(start);
             if (end) end = timecode_tosecs_attr(end);
-            // console.log("add", this, start, end);
+            if (options.debug) console.log("add", this, start, end);
             data.timeline.add(this, start, end, options.show, options.hide);
         });
         // console.log("end of add");
