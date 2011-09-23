@@ -35,7 +35,6 @@ $.widget("ui.aaplaylist", {
                 var before = data.substring(0, start);
                 var after = data.substring(end, data.length)
                 content = before + style + after;
-                console.log(content);
                 
                 $.post("edit/", {
                     content: content,
@@ -101,9 +100,12 @@ $('section').live('dblclick', function(e) {
             $(this).replaceWith(function() {
                 return $(this).contents();
             });
+
+            // Updates section number
             $('section[class^="annotation"]').each(function(index) {
                 $(this).attr('data-section', index + 1);
             })
+
             $('section.annotation1').aaplaylist('destroy');
             $('section.annotation1').aaplaylist();
         }

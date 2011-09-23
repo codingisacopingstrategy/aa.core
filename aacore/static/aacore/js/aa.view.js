@@ -9,7 +9,6 @@ $(document).ready(function() {
                 $(elt).closest('section.annotation1').find('div.wrapper').autoscrollable("scrollto", elt);
                 $(elt).addClass("active");
                 $(elt).trigger('activate');
-                console.log('hello');
             },
             hide: function (elt) {
                 $(elt).removeClass("active");
@@ -35,5 +34,7 @@ $(document).ready(function() {
     });
 
     $('section.annotation1').aaplaylist();
+
+    $('div#tabs-2').aalayers({selector: 'section.annotation1'});
 });
 })(jQuery);

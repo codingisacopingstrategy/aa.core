@@ -2,6 +2,19 @@
 
 {% block extrahead %}
 <!-- Page specific javascript -->
+<!-- z-index + visibility -->
+<script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
+<script src="{{ STATIC_URL }}aacore/js/jquery.aalayers.js"></script>   
+
+<script> 
+$(document).ready(function() {
+    var layout = $('body').layout({applyDefaultStyles: false});
+    layout.close("west");
+    layout.close("east");
+    $("nav#east-pane").tabs();
+});
+</script> 
+
 <script>
     var page = "{{ page }}";
 </script>
@@ -30,4 +43,18 @@
 <article>
     {{ content|safe }}
 </article>
+{% endblock %}
+
+{% block postbody %}
+<nav id="east-pane" class="ui-layout-east" style="text-align: left;"> 
+	<ul>
+		<li><a href="#tabs-1">Cheatsheet</a></li>
+		<li><a href="#tabs-2">Palette</a></li>
+	</ul>
+	<div id="tabs-1">
+        {% include "aacore/partials/markdown_help.html" %}
+	</div>
+	<div id="tabs-2">
+	</div>
+</nav>
 {% endblock %}

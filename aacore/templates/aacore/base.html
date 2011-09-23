@@ -14,36 +14,9 @@
 <script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    
 <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
 <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
-<script src="{{ STATIC_URL }}lib/jquery.toc.min.js"></script>   
+
 <link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css"/>
 {% endblock jquery %}
-
-<script> 
-$(document).ready(function() {
-    var layout = $('body').layout({applyDefaultStyles: false});
-    layout.close("west");
-    layout.close("east");
-    $("nav#east-pane").tabs();
-
-    var toc = $('<ul id="toc"></ul>');
-    $("section.annotation1").each(function() {
-        var id = $(this).attr('id');
-        var text = $(this).find('h1:first').text()
-        toc.append($('<li><a href="#' + id + '">' + text + '</a></li>'));
-    });
-    toc.appendTo($('#tabs-2')).sortable();
-
-    // var bla = $('#tabs-2').toc({
-    //     exclude: 'h2, h3, h4, h5, h6',
-    //     context: '#center',
-    //     numerate: false,
-    // }).find('ul').sortable({
-    //     change: function(event, ui) {
-    //         console.log('changed');
-    //     },
-    // });
-});
-</script> 
 
 <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" type="text/css"/>
 
@@ -53,25 +26,20 @@ $(document).ready(function() {
 </head>
 
 <body>
+
+{% block prebody %}
 <nav id="west-pane" class="ui-layout-west"> 
     <input type="search" name="some_name" value="" />
     <input type="submit" name="some_name" value="Search" />
 </nav>
+{% endblock %}
 
 <div id="center" class="ui-layout-center"> 
 {% block body %}{% endblock body %} 
 </div>
 
-<nav id="east-pane" class="ui-layout-east" style="text-align: left;"> 
-	<ul>
-		<li><a href="#tabs-1">Cheatsheet</a></li>
-		<li><a href="#tabs-2">Palette</a></li>
-	</ul>
-	<div id="tabs-1">
-        {% include "aacore/partials/markdown_help.html" %}
-	</div>
-	<div id="tabs-2">
-	</div>
-</nav>
+{% block postbody %}
+{% endblock %}
+
 </body>
 </html>
