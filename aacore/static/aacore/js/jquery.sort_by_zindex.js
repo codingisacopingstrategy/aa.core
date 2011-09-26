@@ -26,24 +26,19 @@
          *    >>> $('section').sort_by_zindex();
          *    >>> $('section').sort_by_zindex({reverse: true});
          */
+
         var opts = $.extend({}, $.fn.sort_by_zindex.defaults, options);
 
-        var compare_zindex = function (a, b) {
-            var azi = getComputedStyle(a).getPropertyValue('z-index');
-            var bzi = getComputedStyle(b).getPropertyValue('z-index');
-            if (azi < bzi) {
-                return -1;
-            } else if (azi > bzi) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        var Elts = $(this).toArray();
-        var Sorted = Elts.sort(compare_zindex);
-        if (opts.reverse) Sorted.reverse()
-        return $(Sorted)
+        var Elts = $(this).toArray()
+            .sort(function (a, b) {
+                var azi = getComputedStyle(a).getPropertyValue('z-index');
+                var bzi = getComputedStyle(b).getPropertyValue('z-index');
+                if (azi < bzi) { return -1; } 
+                else if (azi > bzi) { return 1; }
+                else { return 0; }
+            });
+        if (opts.reverse) { Elts.reverse(); }
+        return $(Elts);
     };
 
     $.fn.sort_by_zindex.defaults = {
