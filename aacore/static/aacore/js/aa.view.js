@@ -38,8 +38,55 @@ $(document).ready(function() {
         }
     });
 
+    var post_styles = function(event, ui) {
+        console.log(this);
+        /*
+         * Updates and posts the annotation style
+         */
+        // RegExp
+        var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
+        var STYLE_ATTR_RE = /{@style=.*?}/; 
+        var start;
+        var end;
+        var content = "";
+
+        var style = "{@style=" + $.trim($(this).attr('style')) + "}";
+
+        var section = $(this).attr("data-section");
+        $.get("edit/", {
+            section: section,
+            type: 'ajax', 
+        }, function(data) {
+            // Searches for Header
+            var header_match = HASH_HEADER_RE.exec(data);
+            if (header_match) {
+                // Defines the substring to replace
+                var style_match = STYLE_ATTR_RE.exec(header_match[0]);
+                if (style_match) {
+                    start = header_match.index + style_match.index;
+                    end = start + style_match[0].length;
+                } else {
+                    start = header_match.slice(1,3).join('').length;
+                    end = start;
+                };
+                var before = data.substring(0, start);
+                var after = data.substring(end, data.length)
+                content = before + style + after;
+                
+                $.post("edit/", {
+                    content: content,
+                    section: section,
+                    type: 'ajax', 
+                });
+            }
+        });
+    }
+
     /* Activate level-1 sections as (editable) playlists */
-    $('section.section1').aaplaylist();
+    $('section.section1').aaplaylist({
+        post_draggable: post_styles,
+        post_resizable: post_styles,
+    });
     $("section.section1 > div.wrapper").autoscrollable();
 
     resetTimelines();
@@ -100,6 +147,22 @@ $(document).ready(function() {
     });
     /* }}} End shortcuts */
 
-    $('div#tabs-2').aalayers({selector: 'section.section1'});
+    $('div#tabs-2').aalayers({
+        selector: 'section.section1',
+        post_reorder: function(event, ui, settings) {
+            var $this = settings.$container;
+            $this.find('li')
+                .reverse()
+                .each(function(i) {
+                    var target = $(this).find('a').attr('href');
+                    $(target).css('z-index', i);
+                    post_styles.apply($(target), [event, ui]);
+                });
+        },
+        post_toggle: function(event, settings, target) {
+            target.toggle();
+            post_styles.apply(target, [event]);
+        },
+    });
 });
 })(jQuery);

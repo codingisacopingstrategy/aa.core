@@ -22,18 +22,8 @@
         init : function (options) {
             var settings = {
                 selector: 'section',
-                post_reorder: function(event, ui, settings) {
-                    var $this = settings.$container;
-                    $this.find('li')
-                        .reverse()
-                        .each(function(i) {
-                            var target = $(this).find('a').attr('href');
-                            $(target).css('z-index', i);
-                        });
-                },
-                post_toggle: function(event, settings, target) {
-                    target.toggle();
-                },
+                post_reorder: function(event, ui, settings) {},
+                post_toggle: function(event, settings, target) {},
             };
 
             return this.each(function() {
@@ -72,7 +62,7 @@
             + "</form>"
         ).find('ul').sortable({
             stop : function(event, ui) {
-                data.post_reorder.apply(data.container, [event, ui, data]);
+                data.post_reorder.apply(data.$container, [event, ui, data]);
             },
         }));
         _populate(data);
