@@ -186,3 +186,6 @@ span[property="aa:start"]:hover,
 span[property="aa:end"]:hover {
     cursor: pointer;
 }
+.ui-draggable nav {
+    cursor: move;
+}

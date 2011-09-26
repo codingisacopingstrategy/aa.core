@@ -45,8 +45,6 @@ $.widget("ui.aaplaylist", {
         });
     },
     _create: function() {
-        // creation code for mywidget
-        // can use this.options
         this.element
             .draggable('destroy')
             .draggable({
@@ -60,9 +58,7 @@ $.widget("ui.aaplaylist", {
             });
     },
     destroy: function() {
-        //this.element.find('nav').remove();
         $.Widget.prototype.destroy.apply(this, arguments); // default destroy
-         // now do other stuff particular to this widget
     }
 });
 

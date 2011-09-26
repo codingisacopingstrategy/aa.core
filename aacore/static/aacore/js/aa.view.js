@@ -1,6 +1,6 @@
 (function($) {
 
-var TEXTAREA_MIN_PADDING_BOTTOM = 30;
+var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
 $(document).ready(function() {
@@ -10,8 +10,10 @@ $(document).ready(function() {
             var url = $(this).attr('src') || $("[src]:first", this).attr('src');
             $(this).timeline({
                 show: function (elt) {
-                    $(elt).closest('section.section1').find('div.wrapper').autoscrollable("scrollto", elt);
-                    $(elt).addClass("active");
+                    $(elt).addClass("active")
+                        .closest('section.section1')
+                            .find('div.wrapper:first')
+                                .autoscrollable("scrollto", elt);
                 },
                 hide: function (elt) {
                     $(elt).removeClass("active");
@@ -24,7 +26,7 @@ $(document).ready(function() {
         // Make timecodes clickable (jump to time in matching videos)
         $('span[property="aa:start"],span[property="aa:end"]').click(function () {
             var t = $.timecode_tosecs_attr($(this).attr("content"));
-            var video = $('video source[src="' + $(this).parents('section.section1').attr('about')  + '"]').parent('video')[0];
+            var video = $('video[src="' + $(this).parents('section.section1').attr('about')  + '"]')[0] || $('video source[src="' + $(this).parents('section.section1').attr('about')  + '"]').parent('video')[0];
             video.currentTime = t;
             video.play();
         });
@@ -33,54 +35,55 @@ $(document).ready(function() {
 
     /* Activate level-1 sections as (editable) playlists */
     $('section.section1').aaplaylist();
-    // $("section.section1 > div.wrapper").autoscrollable();
-    $("section.section1").autoscrollable();
+    $("section.section1 > div.wrapper").autoscrollable();
 
     resetTimelines();
 
     $("section textarea").live("focus", function () {
-        // console.log("textarea focus", this);
         currentTextArea = this;
         // ENSURE TEXTAREA HEIGHT IS OK HACK
         var $this = $(this);
         var textareaheight = $this.height();
         var sectionheight = $this.closest(".section1").height();
         if (textareaheight + TEXTAREA_MIN_PADDING_BOTTOM > sectionheight) {
-            $this.css("height", (sectionheight - TEXTAREA_MIN_PADDING_BOTTOM)+"px");
+            $this.css("height", (sectionheight - TEXTAREA_MIN_PADDING_BOTTOM) + "px");
         }
     }).live("blur", function () {
         currentTextArea = undefined;
     });
 
-    /////////////////////////
-    // SHORTCUTS
+
+    /* Shortcuts {{{ */
 
     function firstVideo () {
-        // returns first playing video (unwrapped) element (if one is playing), or just first video otherwise
+        /*
+         * returns first playing video (unwrapped) element (if one is playing),
+         * or just first video otherwise
+         */
         $("video").each(function () {
             if (!this.paused) return this;
         });
         var vids = $("video:first");
         if (vids.length) return vids[0];
     }
+
     shortcut.add("Ctrl+Shift+Down", function () {
-        console.log("pastetimecode");
         if (currentTextArea) {
-            var vid = firstVideo();
-            if (vid) {
-                var ct = vid.currentTime;
-                $.insertAtCaret(currentTextArea, $.timecode_fromsecs(ct, true)+" -->", true);
+            var video = firstVideo();
+            if (video) {
+                var ct = $.timecode_fromsecs(video.currentTime, true);
+                $.insertAtCaret(currentTextArea, ct + " -->", true);
             }
         }
     });
+
     shortcut.add("Ctrl+Shift+Left", function () {
-        // console.log("seek back");
         $("video").each(function () {
             this.currentTime = this.currentTime - 5;
         });
     });
+
     shortcut.add("Ctrl+Shift+Right", function () {
-        // console.log("seek forward");
         $("video").each(function () {
             this.currentTime = this.currentTime + 5;
         });
@@ -90,7 +93,7 @@ $(document).ready(function() {
             var foo = this.paused ? this.play() : this.pause();
         });
     });
-    /////////////////////////////////////
+    /* }}} End shortcuts */
 
     $('div#tabs-2').aalayers({selector: 'section.section1'});
 });
