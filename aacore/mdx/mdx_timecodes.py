@@ -2,20 +2,25 @@
 #-*- coding:utf-8 -*-
 
 """
-    Active Archives timecode to (timed) section preprocessor
+    Active Archives: Timecodes
     ========================================================
+
+    Preprocessor:
 
     Turns SRT-style timecode patterns into markdown level-2 headers and markups
     timecodes with RDFA as aa:start/aa:end values (where aa is the active
     archives namespace
 
+    Tree Processor:
+    Fills in implicit end times:
+    Elements with data-start attributes, but no data-end get "auto-set" by subsequent
+    siblings data-start values. NB: only data-end attributes get set (inner/visible markup is not touched)
+
     >>> import markdown
     >>> from mdx_timecodes import TimeCodesExtension
 """
 
-
 import markdown, re
-
 
 TIMECODE_RE = re.compile(
     r"""^
@@ -56,23 +61,41 @@ def replace_timecodes(lines):
     else:
         return newlines
 
-
-class TimeCodesExtension(markdown.Extension):
-
-    def extendMarkdown(self, md, md_globals):
-        """ Add TimeCodesPreprocessor to the Markdown instance. """
-
-        md.preprocessors.add('timecodes_block', 
-                                 TimeCodesPreprocessor(md), 
-                                 "_begin")
-
-
 class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
-    
     def run(self, lines):
         """ Match and store Fenced Code Blocks in the HtmlStash. """
         return replace_timecodes(lines)
 
+####################
+class TimeCodesTreeprocessor(markdown.treeprocessors.Treeprocessor):
+    """
+    This Tree Processor adds explicit endtimes to timed sections where a subsequent sibling element has a start time.
+    """
+    def run(self, doc):
+        fill_missing_ends(doc)
+        # print doc.find("*[@data-start]")
+
+def fill_missing_ends (node):
+    children = list(node)
+    for i, child in enumerate(children):
+        fill_missing_ends(child)
+        if child.get("data-start") and not child.get("data-end"):
+            start = child.get("data-start")
+            # print "start without end", child, start
+            for sibling in children[i+1:]:
+                if sibling.get("data-start"):
+                    # print "found matching end", sibling.get("data-start")
+                    child.set("data-end", sibling.get("data-start"))
+                    break
+####################
+
+class TimeCodesExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.preprocessors.add('timecodes_block', TimeCodesPreprocessor(md), "_begin")
+
+        ext = TimeCodesTreeprocessor(md)
+        ext.config = self.config
+        md.treeprocessors.add("timecodes", ext, "_end")
 
 def makeExtension(configs=None):
     return TimeCodesExtension()
@@ -82,11 +105,13 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
-#    text = """
-#00:03:21 --> 00:45:56
-#Some text
-#""".strip()
-#    print markdown.markdown(text, ['timecodes', 'semanticdata'])
+    text = """
+00:01:00 -->
+00:02:00 --> 
+00:03:00 --> 00:04:00
+Hello
+""".strip()
+    print markdown.markdown(text, ['timecodes', 'semanticdata'])
 
 
 

@@ -4,7 +4,10 @@ var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
 $(document).ready(function() {
+    // in a sense resetting timelines should happen whenever the page has changed (throttled?)
+
     function resetTimelines () {
+        console.log("resetting timelines");
         /* Connect videos to timed sections */
         $("video").each(function(){
             var url = $(this).attr('src') || $("[src]:first", this).attr('src');
@@ -22,16 +25,18 @@ $(document).ready(function() {
                 end: function (elt) { return $(elt).attr('data-end') }
             }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
         });
+    }
 
-        // Make timecodes clickable (jump to time in matching videos)
-        $('span[property="aa:start"],span[property="aa:end"]').click(function () {
-            var t = $.timecode_tosecs_attr($(this).attr("content"));
-            var video = $('video[src="' + $(this).parents('section.section1').attr('about')  + '"]')[0] || $('video source[src="' + $(this).parents('section.section1').attr('about')  + '"]').parent('video')[0];
+    /// CLICKABLE TIMECODES
+    $('span[property="aa:start"],span[property="aa:end"]').live("click", function () {
+        var t = $.timecode_tosecs_attr($(this).attr("content"));
+        var video = $('video[src="' + $(this).parents('*[about]').attr('about')  + '"]')[0] || $('video source[src="' + $(this).parents('*[about]').attr('about')  + '"]').parent('video')[0];
+        // console.log("timecode click", this, t, video);
+        if (video) {
             video.currentTime = t;
             video.play();
-        });
-
-    }
+        }
+    });
 
     /* Activate level-1 sections as (editable) playlists */
     $('section.section1').aaplaylist();
@@ -52,8 +57,8 @@ $(document).ready(function() {
         currentTextArea = undefined;
     });
 
-
-    /* Shortcuts {{{ */
+    /////////////////////////
+    // SHORTCUTS
 
     function firstVideo () {
         /*
