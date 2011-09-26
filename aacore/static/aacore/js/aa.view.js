@@ -20,7 +20,7 @@ $(document).ready(function() {
                 },
                 start: function (elt) { return $(elt).attr('data-start') },
                 end: function (elt) { return $(elt).attr('data-end') }
-            }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]', {debug:true});
+            }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
         });
 
         // Make timecodes clickable (jump to time in matching videos)
