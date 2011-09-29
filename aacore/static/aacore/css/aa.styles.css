@@ -48,9 +48,18 @@
 
 body {
     font-family: "LiberationSans", serif;
-    font-weight: bold;
+    font-weight: normal;
+    font-style: normal;
     letter-spacing: 0.5px;
 }
+
+em {
+    font-style: italic;
+}
+strong {
+    font-weight: bold;
+}
+
 nav {
     text-align: right;
 }   
