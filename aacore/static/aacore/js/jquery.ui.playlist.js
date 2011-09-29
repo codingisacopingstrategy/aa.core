@@ -12,10 +12,10 @@ $.widget("ui.aaplaylist", {
             .draggable('destroy')
             .draggable({
                 handle:'nav',
-                grid: [50, 50],
+                //grid: [50, 50],
                 stop: this.options.post_draggable,
             }).resizable({
-                grid: 50,
+                //grid: 50,
                 stop: this.options.post_resizable,
             });
     },
