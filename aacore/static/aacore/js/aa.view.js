@@ -7,9 +7,8 @@ $(document).ready(function() {
     // in a sense resetting timelines should happen whenever the page has changed (throttled?)
 
     function resetTimelines () {
-        console.log("resetting timelines");
-        /* Connect videos to timed sections */
-        $("video").each(function(){
+        /* Connect players to timed sections */
+        $(".player").each(function(){
             var url = $(this).attr('src') || $("[src]:first", this).attr('src');
             $(this).timeline({
                 show: function (elt) {
@@ -30,16 +29,16 @@ $(document).ready(function() {
     /// CLICKABLE TIMECODES
     $('span[property="aa:start"],span[property="aa:end"]').live("click", function () {
         var t = $.timecode_tosecs_attr($(this).attr("content"));
-        var video = $('video[src="' + $(this).parents('*[about]').attr('about')  + '"]')[0] || $('video source[src="' + $(this).parents('*[about]').attr('about')  + '"]').parent('video')[0];
-        // console.log("timecode click", this, t, video);
-        if (video) {
-            video.currentTime = t;
-            video.play();
+        var about = $(this).parents('*[about]').attr('about');
+        var player = $('[src="' + about + '"]')[0] 
+                    || $('source[src="' + about + '"]').parent('.player')[0];
+        if (player) {
+            player.currentTime = t;
+            player.play();
         }
     });
 
     var post_styles = function(event, ui) {
-        console.log(this);
         /*
          * Updates and posts the annotation style
          */
@@ -107,41 +106,41 @@ $(document).ready(function() {
     /////////////////////////
     // SHORTCUTS
 
-    function firstVideo () {
+    function firstPlayer () {
         /*
-         * returns first playing video (unwrapped) element (if one is playing),
-         * or just first video otherwise
+         * returns first playing player (unwrapped) element (if one is playing),
+         * or just first player otherwise
          */
-        $("video").each(function () {
+        $(".player").each(function () {
             if (!this.paused) return this;
         });
-        var vids = $("video:first");
+        var vids = $(".player:first");
         if (vids.length) return vids[0];
     }
 
     shortcut.add("Ctrl+Shift+Down", function () {
         if (currentTextArea) {
-            var video = firstVideo();
-            if (video) {
-                var ct = $.timecode_fromsecs(video.currentTime, true);
+            var player = firstPlayer();
+            if (player) {
+                var ct = $.timecode_fromsecs(player.currentTime, true);
                 $.insertAtCaret(currentTextArea, ct + " -->", true);
             }
         }
     });
 
     shortcut.add("Ctrl+Shift+Left", function () {
-        $("video").each(function () {
+        $(".player").each(function () {
             this.currentTime = this.currentTime - 5;
         });
     });
 
     shortcut.add("Ctrl+Shift+Right", function () {
-        $("video").each(function () {
+        $(".player").each(function () {
             this.currentTime = this.currentTime + 5;
         });
     });
     shortcut.add("Ctrl+Shift+Up", function () {
-        $("video").each(function () {
+        $(".player").each(function () {
             var foo = this.paused ? this.play() : this.pause();
         });
     });

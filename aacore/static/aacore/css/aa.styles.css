@@ -47,7 +47,7 @@
 }
 
 body {
-    font-family: "LiberationSans" serif;
+    font-family: "LiberationSans", serif;
     font-weight: bold;
     letter-spacing: 0.5px;
 }
@@ -188,4 +188,8 @@ span[property="aa:end"]:hover {
 }
 .ui-draggable nav {
     cursor: move;
+}
+
+img {
+    max-width: 100%;
 }
