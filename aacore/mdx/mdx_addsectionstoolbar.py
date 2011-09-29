@@ -25,7 +25,12 @@ def add_sectionstoolbar (tree, tag, tagclass, typeof, moveAttributes=True):
                     section = child.attrib.get('data-section')
                     a.set("href", 'edit/?section=%s' % section)
                     a.text = "edit"
+                    h1 = wrapper.find('h1')
+                    title = etree.Element('span')
+                    title.text = h1.text
+                    title.set("class", 'title')
                     nav = etree.Element('nav')
+                    nav.append(title)
                     nav.append(a)
                     child.append(nav)
                 child.append(wrapper)

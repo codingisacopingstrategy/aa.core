@@ -163,5 +163,37 @@ $(document).ready(function() {
             post_styles.apply(target, [event]);
         },
     });
+
+	// Animate scrolls
+    $("a").click(function(event){
+		//prevent the default action for the click event
+        if ($(this).attr('href').match('^#')) {
+            event.preventDefault();
+            //get the full url - like mysitecom/index.htm#home
+            var full_url = this.href;
+
+            //split the url by # and get the anchor target name - home in mysitecom/index.htm#home
+            var parts = full_url.split("#");
+            var target = $('#' + parts[1]);
+            target.closest('section.section1')
+                .find('div.wrapper:first')
+                    .autoscrollable("scrollto", target);
+        };
+	});
+$('.foldable').hide();
+ 
+$('.foldable_toggle').each(function() {
+	$(this).append('<span class="toggle">&nbsp;</span>');
+	$(this).wrapInner('<a href="#"></a>');
+});
+ 
+$('.foldable_toggle a').click(function() {
+	$(this).parent().next('.foldable').slideToggle('slow');
+	$(this).toggleClass('unfolded');
+	return false;
+});
+
 });
 })(jQuery);
+
+
