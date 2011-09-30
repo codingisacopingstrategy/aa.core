@@ -3,6 +3,9 @@ import sys
 import site 
 
 
+sys.stdout = sys.stderr
+
+
 ALLDIRS = ['/var/www/vhosts/aa.lgru.net/venv/lib/python2.6/site-packages/']
 
 

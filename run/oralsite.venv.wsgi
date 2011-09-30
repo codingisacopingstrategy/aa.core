@@ -3,6 +3,9 @@ import sys
 import site 
 
 
+sys.stdout = sys.stderr
+
+
 ALLDIRS = ['/home/sarma/www/fr.stdin.oralsite2/venv/lib/python2.6/site-packages/']
 
 
