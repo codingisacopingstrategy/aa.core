@@ -88,6 +88,10 @@ class Page(models.Model):
     content = models.TextField(blank=True)
 
     @models.permalink
+    def get_edit_url(self):
+        return ("aa-page-edit", (), {'slug': wikify(self.name)})
+
+    @models.permalink
     def get_absolute_url(self):
         return ("aa-page-detail", (), {'slug': wikify(self.name)})
 

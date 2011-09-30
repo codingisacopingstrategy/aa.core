@@ -5,7 +5,7 @@
 <nav>
     <ul>
         {% if page %}
-        <li><a href="{% url aa-page-detail slug=page.name %}">view</a></li>
+        <li><a href="{{ page.get_absolute_url }}">view</a></li>
         <li><a href="">view history</a></li>
         {% endif %}
     </ul>
