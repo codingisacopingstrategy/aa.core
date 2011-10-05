@@ -17,6 +17,7 @@ $(document).ready(function() {
 });
 </script> 
 
+<script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/jquery.jeditable.mini.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}aacore/js/jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
@@ -35,7 +36,8 @@ $(document).ready(function() {
 <nav id="toolbar">
     <ul>
         {% if page %}
-        <li><a href="{% url aa-page-edit slug=page.name %}">edit</a></li>
+        <li><label for="hide">hide decorations</label><input type="checkbox" name="hide" value="" id="hide" /></li>
+        <li><a href="{{ page.get_edit_url }}">edit</a></li>
         <li><a href="">view history</a></li>
         {% endif %}
     </ul>
@@ -48,14 +50,14 @@ $(document).ready(function() {
 
 {% block postbody %}
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
-	<ul>
-		<li><a href="#tabs-1">?</a></li>
+    <ul>
+        <li><a href="#tabs-1">?</a></li>
         <li><a href="#tabs-2">&lt;o&gt;</a></li>
-	</ul>
-	<div id="tabs-1">
+    </ul>
+    <div id="tabs-1">
         {% include "aacore/partials/markdown_help.html" %}
-	</div>
-	<div id="tabs-2">
-	</div>
+    </div>
+    <div id="tabs-2">
+    </div>
 </nav>
 {% endblock %}

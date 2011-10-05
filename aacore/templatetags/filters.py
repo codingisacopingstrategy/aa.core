@@ -39,12 +39,16 @@ def embed (value, arg):
     usage:
         {{ "http://video.constantvzw.org/AAworkshop/MVI_1675.ogv"|embed:"html5" }}
     """
-    if arg is None or arg not in ['html5']:
-        arg = html5
+    if arg is None or arg not in ['html5', 'html5audio']:
+        arg = "html5"
     if arg == "html5":
-        return """<video width="320" height="240" controls="controls" src="%s" type="video/ogg" />
+        return """<video class="player" width="320" height="240" controls="controls" src="%s" type="video/ogg" preload="auto"/>
         Your browser does not support the video tag.
         </video>""" % value
+    elif arg == "html5audio":
+        return """<audio class="player" controls="controls" src="%s" type="audio/ogg" preload="auto"/>
+        Your browser does not support the audio tag.
+        </audio>""" % value
     else:
         return None
 embed.is_safe = True
