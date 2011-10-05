@@ -7,7 +7,7 @@ $(document).ready(function() {
     // in a sense resetting timelines should happen whenever the page has changed (throttled?)
 
     function resetTimelines () {
-        console.log("resetting timelines");
+        // console.log("resetting timelines");
         /* Connect videos to timed sections */
         $("video").each(function(){
             var url = $(this).attr('src') || $("[src]:first", this).attr('src');
@@ -36,6 +36,14 @@ $(document).ready(function() {
             video.currentTime = t;
             video.play();
         }
+    });
+
+    $("section").draggable({
+        'helper' : 'clone',
+        start: function () {
+            // $(this).css({background: "black", color: "white"});
+        },
+        'containment': 'window'
     });
 
     var post_styles = function(event, ui) {
