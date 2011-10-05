@@ -26,7 +26,7 @@ def xpath (value, arg):
     page = htmlparser.parse(stdin)
     p = page.xpath(arg)
     if p:
-        return "\n".join([lxml.etree.tostring(absolutize_refs(value, item), encoding='unicode') for item in p])
+        return "\n".join([lxml.etree.tostring(absolutize_refs(value, item), encoding='utf-8') for item in p])
     else:
         return None
 xpath.is_safe = True
