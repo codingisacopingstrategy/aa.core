@@ -38,7 +38,7 @@ $(document).ready(function() {
         {% if page %}
         <li><label for="hide">hide decorations</label><input type="checkbox" name="hide" value="" id="hide" /></li>
         <li><a href="{{ page.get_edit_url }}">edit</a></li>
-        <li><a href="">view history</a></li>
+        <li><a href="{{ page.get_history_url }}">view history</a></li>
         {% endif %}
     </ul>
 </nav>

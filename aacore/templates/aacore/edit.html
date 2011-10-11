@@ -10,9 +10,14 @@
         {% endif %}
     </ul>
 </nav>
+{% if page %}
+<h1>Editing {{ page.name }}</h1>
+{% else %}
+<h1>Creating {{ name }}</h1>
+{% endif %}
 <form action="." method="post" accept-charset="utf-8">{% csrf_token %}
-    <textarea name="content" rows="24" cols="80">{{ content }}</textarea>
-    <p><input type="submit" name="_button" value="Save"><input type="submit" name="_button" value="Cancel"></p>
     {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
+    {{ form.as_p }}
+    <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>
 </form>
 {% endblock %}

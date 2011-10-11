@@ -82,6 +82,7 @@ $(document).ready(function() {
                 
                 $.post("edit/", {
                     content: content,
+                    message: "[LAYOUT] Changed",
                     section: section,
                     type: 'ajax', 
                 });

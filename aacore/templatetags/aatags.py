@@ -1,5 +1,7 @@
 from django.template.defaultfilters import stringfilter
 from django import template
+from datetime import datetime
+import time
 
 import aacore.models
 
@@ -34,6 +36,11 @@ def compactnamespace (url):
         if url.startswith(ns.url):
             return ns.name + ":" + url[len(ns.url):]
     return url
+
+
+@register.filter
+def epock2datetime(value):
+    return datetime(*time.gmtime(value)[:6])
 
 
 def page_list():
