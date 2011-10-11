@@ -31,6 +31,7 @@ from rdfutils import get_model
 from utils import (dewikify, convert_line_endings)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
+from forms import PageEditForm
 
 
 def page_detail(request, slug):
@@ -89,11 +90,10 @@ def page_edit(request, slug):
     except Page.DoesNotExist:
         page = None
 
-    # TODO: Use django form?
     # Gets the edit form
     if request.method == "GET":
         if page:
-            context['page'] = page
+            # Gets the whole content or just a section
             if section:
                 sections = sectionalize(page.content)
                 sectiondict = sections[section - 1]
@@ -101,47 +101,92 @@ def page_edit(request, slug):
                 context['section'] = section
             else:
                 context['content'] = page.content
+
+            # Returns plain content in case of ajax editing 
             if is_ajax:
                 return HttpResponse(context['content'])
+            else:
+                context['page'] = page  # So templates nows about what page we are editing
+                context['form'] = PageEditForm(initial={"content": context['content']})
+        else:
+            context['name'] = name  # So templates nows about what page we are editing
+            context['form'] = PageEditForm(initial={"content": '# My first section'})
+        
         return render_to_response("aacore/edit.html", context, \
                 context_instance=RequestContext(request))
 
     # Posts the edit form
     elif request.method == "POST":
-        content = request.POST.get('content', '')
-        content = convert_line_endings(content, 0)  # Normalizes EOL
+        #import pdb; pdb.set_trace()
 
-        button = request.POST.get("_button", "")
-        if button.lower() == "cancel":
+        is_cancelled = request.POST.get('cancel', None)
+        if is_cancelled:
+            print('is_cancelled')
             url = reverse('aa-page-detail', kwargs={'slug': slug})
             return redirect(url)
 
-        if page:
-            if section:  # section edit
-                page.content = sectionalize_replace(page.content, (section - 1), content)
-                page.save()
+        form = PageEditForm(request.POST)
+
+        if form.is_valid():  # Processes the content of the form
+            # Retrieves and cleans the form values
+            content = form.cleaned_data["content"].encode("utf-8")
+            content = convert_line_endings(content, 0)  # Normalizes EOL
+            message = form.cleaned_data["message"] or "<no messages>"
+            is_minor = form.cleaned_data["is_minor"]
+            author = "Anonymous <anonymous@%s>" % request.META['REMOTE_ADDR']
+
+            if page:
+                if section:  # section edit
+                    page.content = sectionalize_replace(page.content, (section - 1), content)
+                    page.commit(message=message, author=author, is_minor=is_minor)
+                else:
+                    if content == "delete":
+                        page.delete()
+                    else:
+                        page.content = content
+                        page.commit(message=message, author=author, is_minor=is_minor)
             else:
                 if content == "delete":
-                    page.delete()
+                    pass
                 else:
-                    page.content = content
-                    page.save()
-        else:
-            if content == "delete":
-                pass
-            else:
-                page = Page(content=content, name=name)
-                page.save()
+                    page = Page(content=content, name=name)
+                    page.commit(message=message, author=author, is_minor=is_minor)
 
-        if is_ajax:
-            md = get_markdown()
-            rendered = md.convert(content)
-            t = Template("{% load filters aatags %}" + rendered)
-            c = RequestContext(request)
-            return HttpResponse(mark_safe(t.render(c)))
-        #else:
+            if is_ajax:
+                md = get_markdown()
+                rendered = md.convert(content)
+                t = Template("{% load filters aatags %}" + rendered)
+                c = RequestContext(request)
+                return HttpResponse(mark_safe(t.render(c)))
+
+        else:  # Returns the invalid form for correction
+            # TODO: factorize this chunk
+            context['page'] = page  # So templates nows about what page we are editing
+            context['name'] = name  # So templates nows about what page we are editing
+            context['form'] = form
+            return render_to_response("aacore/edit.html", context, \
+                    context_instance=RequestContext(request))
+
         url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
+
+
+def page_history(request, slug):
+    """
+    """
+    context = {}
+    name = dewikify(slug)
+
+    try:
+        page = Page.objects.get(name=name)
+    except Page.DoesNotExist:
+        # Redirects to the edit page
+        url = reverse('aa-page-edit', kwargs={'slug': slug})
+        return redirect(url)
+
+    context['page'] = page
+
+    return render_to_response("aacore/history.html", context, context_instance=RequestContext(request))
 
 
 def sniff(request):
