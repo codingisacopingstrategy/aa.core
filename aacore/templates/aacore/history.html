@@ -1,0 +1,63 @@
+{% extends "aacore/base.html" %}
+{% load aatags %}
+
+
+{% block body %}
+<nav>
+    <ul>
+        {% if page %}
+        <li><a href="{{ page.get_absolute_url }}">view</a></li>
+        <li><a href="">view history</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<h1>History</h1>
+
+    <form action='{{ page.get_diff_url }}' method="get" accept-charset="utf-8">
+        <dl id="commits">
+            
+            {% for commit in page.iter_commits %}
+            
+                {% ifchanged commit.committed_date|epock2datetime|date:"F" %}
+                
+                    {% if not forloop.first %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+                    
+                    <dt>{{ commit.committed_date|epock2datetime|date:"jS o\f F" }}</dt>
+                    <dd>
+                        <ul>
+                {% endifchanged %}
+
+                            <li>
+                                <dl class="commit">
+                                    <dt>Select for diff</dt>
+                                    <dd class="commit-diff">
+                                        <input type="radio" name="c1" value="{{ commit.hexsha }}" />
+                                        <input type="radio" name="c2" value="{{ commit.hexsha }}" />
+                                    </dd>
+                                    <dt>Commit message</dt>
+                                    <dd class="commit-message">{{ commit.message }}</dd>
+                                    <dt>Author</dt>
+                                    <dd class="commit-author">by {{ commit.author }}</dd>
+                                    <dt>Stats</dt>
+                                    {# <dt>Technical Specifications</dt> #}
+                                    {# <dd class="commit-details"><a href='#'>view details</a></dd> #}
+                                </dl>
+                            </li>
+                            
+                {% if forloop.last %}
+                        </ul>
+                    </dd>
+                {% endif %}
+                
+            {% endfor %}
+            
+        </dl>
+        <p><input type="submit" name="submit" value="Compare" id="submit" /></p>
+    </form>
+
+{% endblock %}
+

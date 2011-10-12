@@ -171,22 +171,50 @@ def page_edit(request, slug):
         return redirect(url)
 
 
-def page_history(request, slug):
-    """
-    """
-    context = {}
+def page_history(request, slug): 
+    """ """ 
+    context = {} 
     name = dewikify(slug)
 
-    try:
-        page = Page.objects.get(name=name)
+    try: 
+        page = Page.objects.get(name=name) 
     except Page.DoesNotExist:
         # Redirects to the edit page
-        url = reverse('aa-page-edit', kwargs={'slug': slug})
+        url = reverse('aa-page-edit', kwargs={'slug': slug}) 
         return redirect(url)
 
     context['page'] = page
 
-    return render_to_response("aacore/history.html", context, context_instance=RequestContext(request))
+    return render_to_response("aacore/history.html", context,
+            context_instance=RequestContext(request))
+
+
+def page_diff(request, slug): 
+    """Shows a single wiki page."""
+    # Does the repo exist?
+    context = {} 
+    name = dewikify(slug)
+
+    if request.method == "GET": # If the form has been submitted...
+        try: 
+            page = Page.objects.get(name=name)
+        except Page.DoesNotExist:
+            # Redirects to the edit page
+            url = reverse('aa-page-edit', kwargs={'slug': slug}) 
+            return redirect(url)
+
+        context['page'] = page
+
+        c1 = request.GET.get("c1", None)
+        c2 = request.GET.get("c2", None)
+        
+        #if c1 is None or c2 is None:
+            #raise Http404
+
+        context['content'] = page.diff(c1, c2)
+
+    return render_to_response("aacore/diff.html", context,
+            context_instance=RequestContext(request))
 
 
 def sniff(request):

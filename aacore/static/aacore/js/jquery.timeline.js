@@ -412,7 +412,7 @@ var methods = {
             // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
             data.timeline = aTimeline({ show: opts.show, hide: opts.hide})
             $this.bind("timeupdate", function (evt) {
-                // console.log("timeupdate", evt.target, evt.target.currentTime);
+                console.log("timeupdate", evt.target, evt.target.currentTime);
                 // allow a wrapped getCurrentTime for the element (via playable?)
                 data.timeline.setCurrentTime(opts.currentTime(elt));
             });

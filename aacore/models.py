@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from utils import wikify
 import aacore.templatetags.aatags
 from settings import GIT_DIR
+from diff_match_patch import diff_match_patch
 
 ############################
 # RESOURCE
@@ -143,6 +144,44 @@ class Page(models.Model):
 
         self.save()
 
+    def diff(self, c1, c2):
+        def diff_prettyXhtml(self, diffs):
+            """
+            Extends google's diff_patch_match
+            Similar to diff_prettyHtml but returns an XHTML valid code
+            """
+            html = []
+            i = 0
+            for (op, data) in diffs:
+                text = (data.replace("&", "&amp;").replace("<", "&lt;")
+                         .replace(">", "&gt;").replace("\n", "<br />"))
+                if op == self.DIFF_INSERT:
+                    html.append("<ins class=\"added\" title=\"i=%i\">%s</ins>"
+                      % (i, text))
+                elif op == self.DIFF_DELETE:
+                    html.append("<del class=\"deleted\" title=\"i=%i\">%s</del>"
+                      % (i, text))
+                elif op == self.DIFF_EQUAL:
+                    #html.append("<span title=\"i=%i\">%s</span>" % (i, text))
+                    html.append(text)
+                if op != self.DIFF_DELETE:
+                    i += len(data)
+            return "".join(html)
+
+        repo = self.get_repository()
+        commit_1 = repo.commit(c1)
+        commit_2 = repo.commit(c2)
+        f1 = u"%s" % commit_1.tree[self.slug].data_stream.read()
+        f2 = u"%s" % commit_2.tree[self.slug].data_stream.read()
+        ui = diff_match_patch()
+        diff = ui.diff_main(f1, f2)
+        ui.diff_cleanupSemantic(diff)
+        return diff_prettyXhtml(ui, diff)
+
+
+    @models.permalink
+    def get_diff_url(self):
+        return ("aa-page-diff", (), {'slug': wikify(self.name)})
 
     @models.permalink
     def get_history_url(self):
