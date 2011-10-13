@@ -26,7 +26,7 @@
                     'vertical',
                     'fair',
                 ], 
-                'selector' : '.section1',
+                'selector' : 'section.section1:visible',
             });
             $("article:first").tiling("tile_fair");
 
@@ -41,26 +41,28 @@
                 end: function (elt) {
                     return $(elt).attr("data-end");
                 },
-            }).timeline("add", "section.section1:first section.section2", {
+            }).timeline("add", "section.section1 section.section2", {
                 show: function (elt) {
-                    // console.log("show", elt);
+                    var $elt = $(elt);
                     // $("#introduction").autoscrollable("scrollto", elt);
-                    $(elt).addClass("active");
-                    $(elt).fadeIn(1000);
+                    //$(elt).addClass("active");
+                    $elt.fadeIn(1000);
+                    $elt.css('display', 'table-cell');
+                    $elt.parents('section.section1').css('display', 'table');
                     $("article:first").tiling("update");
                 },
                 hide: function (elt) {
-                    $(elt).removeClass("active");
-                    $(elt).hide();
+                    var $elt = $(elt)
+                    //$elt.removeClass("active");
+                    $elt.hide()
+                    $("section.section1:not(:has(section:visible))").hide();
                     $("article:first").tiling("update");
                 }
             }).timeline("add", "audio:first", {
                 show: function (elt) {
-                    console.log("show", elt);
                     elt.play()
                 },
                 hide: function (elt) {
-                    console.log("hide", elt);
                     elt.pause()
                 }
             });
@@ -80,15 +82,6 @@ nav, h1, h2 {
     display: none;
 }
 
-/*
-#introduction {
-    height: 100%;
-    width: 100%;
-    border: 1px solid red;
-    display: table-cell;
-    vertical-align: middle;
-}
-*/
 article {
     position: absolute;
     top: 0;
@@ -114,7 +107,7 @@ article {
     text-align: center;
     font-size: 2em;
 }
-.section1 .active {
+.active {
     /*display: block;*/
 }
 
@@ -123,6 +116,35 @@ em {
     font-family: "Latin Modern Mono";
     font-style: italic;
 }
+
+.ui-slider-handle { background-color: yellow!important; }
+        section.section1 { 
+            display: table; 
+            /*border: 1px solid red;*/
+            height: 100%;
+            width: 100%;
+        }
+        section.section1 > div.wrapper { 
+            display: table-row; 
+            /*border: 1px solid green;*/
+            width: 100%;
+            height: 100%;
+        }
+        section.section2 { 
+            display: table-cell; 
+            /*border: 1px solid blue;*/
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 auto;
+            width: 100%;
+            height: 100%;
+        }
+        section.section2 div.wrapper {
+            max-width: 30em;
+            /* border: 1px solid yellow; */
+            margin: 0 auto;
+            padding: 0.5em;
+        }
 </style>
     
 </head>
@@ -139,6 +161,3477 @@ em {
     </audio>
 
     <article>
+<section class="section1">
+
+<nav>
+
+<span class="title">
+Timed Introduction by Myriam Van Imschoot  
+</span>
+
+<a class="edit" href="edit/?section=42">
+edit
+</a>
+
+</nav>
+
+<div class="wrapper aa-autoscrollable">
+
+<h1>
+Timed Introduction by Myriam Van Imschoot  
+</h1>
+
+
+<section class="section2" data-end="00:06,050" data-section="43" data-start="00:02,000" id="data-start0000000aastart0000000_rarr_data-section43" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:00,000" property="aa:start">
+00:00,000
+</span>
+ →
+</h2>
+
+
+<p>
+Antonia’s piece
+<em>
+Un après-midi
+</em>
+ 
+</p>
+
+
+</div>
+
+</section>
+
+<!--<section class="section2" data-end="00:07,987" data-section="44" data-start="00:04,050" id="data-start0004050aastart0004050_rarr_data-section44" typeof="aa:section" title="Doubleclick to edit...">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:04,050" property="aa:start">-->
+<!--00:04,050-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--was perhaps one of the signature pieces that -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:11,993" data-section="45" data-start="00:07,987" id="data-start0007987aastart0007987_rarr_data-section45" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:07,987" property="aa:start">-->
+<!--00:07,987-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--just after the turn of the millennium -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:17,856" data-section="46" data-start="00:11,993" id="data-start0011993aastart0011993_rarr_data-section46" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:11,993" property="aa:start">-->
+<!--00:11,993-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--pointed to a renewed interest in scores. -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:24,357" data-section="47" data-start="00:17,856" id="data-start0017856aastart0017856_rarr_data-section47" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:17,856" property="aa:start">-->
+<!--00:17,856-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--I was fortunate to perform twice in this piece. -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:34,887" data-section="48" data-start="00:24,357" id="data-start0024357aastart0024357_rarr_data-section48" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:24,357" property="aa:start">-->
+<!--00:24,357-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--The first time was upon invitation of Valérie Lanciaux for the festival -->
+<!--<em>-->
+<!--Lignes de Corps-->
+<!--</em>-->
+ <!--in the L’Espace Pier Paolo Pasolini at Valenciennes (December 2004). -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:41,807" data-section="49" data-start="00:34,887" id="data-start0034887aastart0034887_rarr_data-section49" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:34,887" property="aa:start">-->
+<!--00:34,887-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--The invitation stated that I could only participate -->
+<!--if I desired to become a man. -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:49,713" data-section="50" data-start="00:41,807" id="data-start0041807aastart0041807_rarr_data-section50" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:41,807" property="aa:start">-->
+<!--00:41,807-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--Thus Finn Random was born, -->
+<!--a red moustached guy with slick hair and side burns. -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<!--<section class="section2" data-end="00:56,389" data-section="51" data-start="00:49,713" id="data-start0049713aastart0049713_rarr_data-section51" typeof="aa:section">-->
+
+<!--<div class="wrapper">-->
+
+<!--<h2>-->
+
+<!--<span content="00:49,713" property="aa:start">-->
+<!--00:49,713-->
+<!--</span>-->
+ <!--→ -->
+<!--</h2>-->
+
+
+<!--<p>-->
+<!--He looked like a looser from the film Boogie Nights, -->
+<!--</p>-->
+
+
+<!--</div>-->
+
+<!--</section>-->
+
+<section class="section2" data-end="01:01,161" data-section="52" data-start="00:56,389" id="data-start0056389aastart0056389_rarr_data-section52" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:56,389" property="aa:start">
+00:56,389
+</span>
+ → 
+</h2>
+
+
+<p>
+but I came to embrace Finn all the same as my Drag King alter ego. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:03,592" data-section="53" data-start="01:01,161" id="data-start0101161aastart0101161_rarr_data-section53" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:01,161" property="aa:start">
+01:01,161
+</span>
+ → 
+</h2>
+
+
+<p>
+During this festival 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:08,329" data-section="54" data-start="01:03,592" id="data-start0103592aastart0103592_rarr_data-section54" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:03,592" property="aa:start">
+01:03,592
+</span>
+ → 
+</h2>
+
+
+<p>
+I also gave the performance lecture ‘She – and there could be no doubt about her gender’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:13,065" data-section="55" data-start="01:08,329" id="data-start0108329aastart0108329_rarr_data-section55" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:08,329" property="aa:start">
+01:08,329
+</span>
+ → 
+</h2>
+
+
+<p>
+a mixture of actions, letter readings and puppeteer show, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:16,769" data-section="56" data-start="01:13,065" id="data-start0113065aastart0113065_rarr_data-section56" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:13,065" property="aa:start">
+01:13,065
+</span>
+ → 
+</h2>
+
+
+<p>
+that Antonia attended and appreciated a lot. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:22,760" data-section="57" data-start="01:16,769" id="data-start0116769aastart0116769_rarr_data-section57" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:16,769" property="aa:start">
+01:16,769
+</span>
+ → 
+</h2>
+
+
+<p>
+A bond was created, and it had more than one tie... 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:25,627" data-section="58" data-start="01:22,760" id="data-start0122760aastart0122760_rarr_data-section58" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:22,760" property="aa:start">
+01:22,760
+</span>
+ → 
+</h2>
+
+
+<p>
+Although 
+<em>
+Un après-midi
+</em>
+ was devised for performers 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:29,401" data-section="59" data-start="01:25,627" id="data-start0125627aastart0125627_rarr_data-section59" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:25,627" property="aa:start">
+01:25,627
+</span>
+ → 
+</h2>
+
+
+<p>
+who did not rehearse 
+nor had ever performed the piece before, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:32,535" data-section="60" data-start="01:29,401" id="data-start0129401aastart0129401_rarr_data-section60" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:29,401" property="aa:start">
+01:29,401
+</span>
+ → 
+</h2>
+
+
+<p>
+Finn Random was called upon once more, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:38,050" data-section="61" data-start="01:32,535" id="data-start0132535aastart0132535_rarr_data-section61" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:32,535" property="aa:start">
+01:32,535
+</span>
+ → 
+</h2>
+
+
+<p>
+for performing in the Grenoble version (upon invitation of Ludovic Burel in 2006). 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:41,755" data-section="62" data-start="01:38,050" id="data-start0138050aastart0138050_rarr_data-section62" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:38,050" property="aa:start">
+01:38,050
+</span>
+ → 
+</h2>
+
+
+<p>
+On these and other occasions I/Finn had seen the scores in a hands on manner, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:44,000" data-section="63" data-start="01:41,755" id="data-start0141755aastart0141755_rarr_data-section63" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:41,755" property="aa:start">
+01:41,755
+</span>
+ → 
+</h2>
+
+
+<p>
+that is, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:47,412" data-section="64" data-start="01:44,000" id="data-start0144000aastart0144000_rarr_data-section64" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:44,000" property="aa:start">
+01:44,000
+</span>
+ → 
+</h2>
+
+
+<p>
+as part of preparing for performance. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:51,750" data-section="65" data-start="01:47,412" id="data-start0147412aastart0147412_rarr_data-section65" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:47,412" property="aa:start">
+01:47,412
+</span>
+ → 
+</h2>
+
+
+<p>
+So when Ludovic Burel contacted me to make a visual portfolio for Multitudes 
+dedicated to scores, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:59,447" data-section="66" data-start="01:51,750" id="data-start0151750aastart0151750_rarr_data-section66" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:51,750" property="aa:start">
+01:51,750
+</span>
+ → 
+</h2>
+
+
+<p>
+it was immediately clear to me that Antonia had to be part of this. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:01,618" data-section="67" data-start="01:59,447" id="data-start0159447aastart0159447_rarr_data-section67" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:59,447" property="aa:start">
+01:59,447
+</span>
+ → 
+</h2>
+
+
+<p>
+In my email to her I motivated our interest as 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:11,348" data-section="68" data-start="02:01,618" id="data-start0201618aastart0201618_rarr_data-section68" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:01,618" property="aa:start">
+02:01,618
+</span>
+ → 
+</h2>
+
+
+<p>
+a fascination for the way she paired Cagian procedures 
+with “un-Cagian material (photo novels, queer themes, etc) (...) 
+producing a wonderful mixture and a contemporary 'detournement' of the aleatory aesthetics”. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:14,355" data-section="69" data-start="02:11,348" id="data-start0211348aastart0211348_rarr_data-section69" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:11,348" property="aa:start">
+02:11,348
+</span>
+ → 
+</h2>
+
+
+<p>
+Yet, it was only during the interview 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:17,652" data-section="70" data-start="02:14,355" id="data-start0214355aastart0214355_rarr_data-section70" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:14,355" property="aa:start">
+02:14,355
+</span>
+ → 
+</h2>
+
+
+<p>
+that I realized the fullest implications of her approach.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:20,250" data-section="71" data-start="02:17,652" id="data-start0217652aastart0217652_rarr_data-section71" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:17,652" property="aa:start">
+02:17,652
+</span>
+ → 
+</h2>
+
+
+<p>
+Her continuous questioning of narrativity 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:23,921" data-section="72" data-start="02:20,250" id="data-start0220250aastart0220250_rarr_data-section72" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:20,250" property="aa:start">
+02:20,250
+</span>
+ → 
+</h2>
+
+
+<p>
+implies more than the sheer desire to find other ‘compositional models’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:28,333" data-section="73" data-start="02:23,921" id="data-start0223921aastart0223921_rarr_data-section73" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:23,921" property="aa:start">
+02:23,921
+</span>
+ → 
+</h2>
+
+
+<p>
+but touches issues from the social, political and cultural sphere. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:32,838" data-section="74" data-start="02:28,333" id="data-start0228333aastart0228333_rarr_data-section74" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:28,333" property="aa:start">
+02:28,333
+</span>
+ → 
+</h2>
+
+
+<p>
+The break with narrativity, 
+which she aspires, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:37,981" data-section="75" data-start="02:32,838" id="data-start0232838aastart0232838_rarr_data-section75" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:32,838" property="aa:start">
+02:32,838
+</span>
+ → 
+</h2>
+
+
+<p>
+is one that continuously questions 
+conventions and linkages at large, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:44,170" data-section="76" data-start="02:37,981" id="data-start0237981aastart0237981_rarr_data-section76" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:37,981" property="aa:start">
+02:37,981
+</span>
+ → 
+</h2>
+
+
+<p>
+as they underlie the construction of identities, genders and subjectivities. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:48,302" data-section="77" data-start="02:44,170" id="data-start0244170aastart0244170_rarr_data-section77" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:44,170" property="aa:start">
+02:44,170
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:53,376" data-section="78" data-start="02:48,302" id="data-start0248302aastart0248302_rarr_data-section78" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:48,302" property="aa:start">
+02:48,302
+</span>
+ → 
+</h2>
+
+
+<p>
+In the interview, 
+which is published here with only minor adaptations, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:55,779" data-section="79" data-start="02:53,376" id="data-start0253376aastart0253376_rarr_data-section79" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:53,376" property="aa:start">
+02:53,376
+</span>
+ → 
+</h2>
+
+
+<p>
+one can retrace these and other thoughts, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:02,698" data-section="80" data-start="02:55,779" id="data-start0255779aastart0255779_rarr_data-section80" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:55,779" property="aa:start">
+02:55,779
+</span>
+ → 
+</h2>
+
+
+<p>
+whereas other sections provide more lengthy and 
+detailed descriptions of how the scores functioned concretely.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:06,112" data-section="81" data-start="03:02,698" id="data-start0302698aastart0302698_rarr_data-section81" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:02,698" property="aa:start">
+03:02,698
+</span>
+ → 
+</h2>
+
+
+<p>
+Although such explanations are not an easy ‘read’ or ‘listen’ 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:09,572" data-section="82" data-start="03:06,112" id="data-start0306112aastart0306112_rarr_data-section82" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:06,112" property="aa:start">
+03:06,112
+</span>
+ → 
+</h2>
+
+
+<p>
+– the interview was served a research purpose, and was not meant for publication -, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:18,395" data-section="83" data-start="03:09,572" id="data-start0309572aastart0309572_rarr_data-section83" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:09,572" property="aa:start">
+03:09,572
+</span>
+ → 
+</h2>
+
+
+<p>
+it’s within the microcosm of technicalities that one can find 
+the connections with the larger philosophies 
+and their ripple-effects. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:22,163" data-section="84" data-start="03:18,395" id="data-start0318395aastart0318395_rarr_data-section84" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:18,395" property="aa:start">
+03:18,395
+</span>
+ → 
+</h2>
+
+
+<p>
+Antonia’s work is one that exercises the field of ‘desire’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:30,469" data-section="85" data-start="03:22,163" id="data-start0322163aastart0322163_rarr_data-section85" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:22,163" property="aa:start">
+03:22,163
+</span>
+ → 
+</h2>
+
+
+<p>
+both within complex situations of collaboration, performance and finally it’s impact on spectatorship.
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:37,000" data-section="86" data-start="03:30,469" id="data-start0330469aastart0330469_rarr_data-section86" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:30,469" property="aa:start">
+03:30,469
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:38,431" data-section="87" data-start="03:37,000" id="data-start0337000aastart0337000_rarr_data-section87" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:37,000" property="aa:start">
+03:37,000
+</span>
+ → 
+</h2>
+
+
+<p>
+One more thing, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:41,125" data-section="88" data-start="03:38,431" id="data-start0338431aastart0338431_rarr_data-section88" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:38,431" property="aa:start">
+03:38,431
+</span>
+ → 
+</h2>
+
+
+<p>
+on the occasion of the publication of the interview with Antonia Baehr in Oral Site 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:45,691" data-section="89" data-start="03:41,125" id="data-start0341125aastart0341125_rarr_data-section89" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:41,125" property="aa:start">
+03:41,125
+</span>
+ → 
+</h2>
+
+
+<p>
+I decided to add a newly-made bonus, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:48,494" data-section="90" data-start="03:45,691" id="data-start0345691aastart0345691_rarr_data-section90" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:45,691" property="aa:start">
+03:45,691
+</span>
+ → 
+</h2>
+
+
+<p>
+a short interview ‘extra’ on one motivation that Baehr mentioned in regard to her interest in scores: 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:52,000" data-section="91" data-start="03:48,494" id="data-start0348494aastart0348494_rarr_data-section91" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:48,494" property="aa:start">
+03:48,494
+</span>
+ → 
+</h2>
+
+
+<p>
+the practice of writing pieces 
+(next to an interest in reconfiguring collaboration and finding other compositional methods).
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:00:06" data-section="92" data-start="03:52,000" id="data-start0352000aastart0352000_rarr_data-section92" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:52,000" property="aa:start">
+03:52,000
+</span>
+ → 
+</h2>
+
+
+<p>
+Enjoy this interview
+</p>
+
+
+</div>
+
+</section>
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-e">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-s">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1001; ">
+
+</div>
+
+</section>
+<section class="section1">
+
+<nav>
+
+<span class="title">
+Timed Introduction by Myriam Van Imschoot  
+</span>
+
+<a class="edit" href="edit/?section=42">
+edit
+</a>
+
+</nav>
+
+<div class="wrapper aa-autoscrollable">
+
+<h1>
+Timed Introduction by Myriam Van Imschoot  
+</h1>
+
+
+<section class="section2" data-end="00:04,050" data-section="43" data-start="00:00,000" id="data-start0000000aastart0000000_rarr_data-section43" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:00,000" property="aa:start">
+00:00,000
+</span>
+ → 
+</h2>
+
+
+<p>
+Antonia’s piece 
+<em>
+Un après-midi
+</em>
+ 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:07,987" data-section="44" data-start="00:04,050" id="data-start0004050aastart0004050_rarr_data-section44" typeof="aa:section" title="Doubleclick to edit...">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:04,050" property="aa:start">
+00:04,050
+</span>
+ → 
+</h2>
+
+
+<p>
+was perhaps one of the signature pieces that 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:11,993" data-section="45" data-start="00:07,987" id="data-start0007987aastart0007987_rarr_data-section45" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:07,987" property="aa:start">
+00:07,987
+</span>
+ → 
+</h2>
+
+
+<p>
+just after the turn of the millennium 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:17,856" data-section="46" data-start="00:11,993" id="data-start0011993aastart0011993_rarr_data-section46" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:11,993" property="aa:start">
+00:11,993
+</span>
+ → 
+</h2>
+
+
+<p>
+pointed to a renewed interest in scores. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:24,357" data-section="47" data-start="00:17,856" id="data-start0017856aastart0017856_rarr_data-section47" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:17,856" property="aa:start">
+00:17,856
+</span>
+ → 
+</h2>
+
+
+<p>
+I was fortunate to perform twice in this piece. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:34,887" data-section="48" data-start="00:24,357" id="data-start0024357aastart0024357_rarr_data-section48" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:24,357" property="aa:start">
+00:24,357
+</span>
+ → 
+</h2>
+
+
+<p>
+The first time was upon invitation of Valérie Lanciaux for the festival 
+<em>
+Lignes de Corps
+</em>
+ in the L’Espace Pier Paolo Pasolini at Valenciennes (December 2004). 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:41,807" data-section="49" data-start="00:34,887" id="data-start0034887aastart0034887_rarr_data-section49" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:34,887" property="aa:start">
+00:34,887
+</span>
+ → 
+</h2>
+
+
+<p>
+The invitation stated that I could only participate 
+if I desired to become a man. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:49,713" data-section="50" data-start="00:41,807" id="data-start0041807aastart0041807_rarr_data-section50" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:41,807" property="aa:start">
+00:41,807
+</span>
+ → 
+</h2>
+
+
+<p>
+Thus Finn Random was born, 
+a red moustached guy with slick hair and side burns. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:56,389" data-section="51" data-start="00:49,713" id="data-start0049713aastart0049713_rarr_data-section51" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:49,713" property="aa:start">
+00:49,713
+</span>
+ → 
+</h2>
+
+
+<p>
+He looked like a looser from the film Boogie Nights, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:01,161" data-section="52" data-start="00:56,389" id="data-start0056389aastart0056389_rarr_data-section52" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:56,389" property="aa:start">
+00:56,389
+</span>
+ → 
+</h2>
+
+
+<p>
+but I came to embrace Finn all the same as my Drag King alter ego. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:03,592" data-section="53" data-start="01:01,161" id="data-start0101161aastart0101161_rarr_data-section53" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:01,161" property="aa:start">
+01:01,161
+</span>
+ → 
+</h2>
+
+
+<p>
+During this festival 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:08,329" data-section="54" data-start="01:03,592" id="data-start0103592aastart0103592_rarr_data-section54" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:03,592" property="aa:start">
+01:03,592
+</span>
+ → 
+</h2>
+
+
+<p>
+I also gave the performance lecture ‘She – and there could be no doubt about her gender’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:13,065" data-section="55" data-start="01:08,329" id="data-start0108329aastart0108329_rarr_data-section55" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:08,329" property="aa:start">
+01:08,329
+</span>
+ → 
+</h2>
+
+
+<p>
+a mixture of actions, letter readings and puppeteer show, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:16,769" data-section="56" data-start="01:13,065" id="data-start0113065aastart0113065_rarr_data-section56" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:13,065" property="aa:start">
+01:13,065
+</span>
+ → 
+</h2>
+
+
+<p>
+that Antonia attended and appreciated a lot. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:22,760" data-section="57" data-start="01:16,769" id="data-start0116769aastart0116769_rarr_data-section57" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:16,769" property="aa:start">
+01:16,769
+</span>
+ → 
+</h2>
+
+
+<p>
+A bond was created, and it had more than one tie... 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:25,627" data-section="58" data-start="01:22,760" id="data-start0122760aastart0122760_rarr_data-section58" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:22,760" property="aa:start">
+01:22,760
+</span>
+ → 
+</h2>
+
+
+<p>
+Although 
+<em>
+Un après-midi
+</em>
+ was devised for performers 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:29,401" data-section="59" data-start="01:25,627" id="data-start0125627aastart0125627_rarr_data-section59" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:25,627" property="aa:start">
+01:25,627
+</span>
+ → 
+</h2>
+
+
+<p>
+who did not rehearse 
+nor had ever performed the piece before, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:32,535" data-section="60" data-start="01:29,401" id="data-start0129401aastart0129401_rarr_data-section60" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:29,401" property="aa:start">
+01:29,401
+</span>
+ → 
+</h2>
+
+
+<p>
+Finn Random was called upon once more, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:38,050" data-section="61" data-start="01:32,535" id="data-start0132535aastart0132535_rarr_data-section61" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:32,535" property="aa:start">
+01:32,535
+</span>
+ → 
+</h2>
+
+
+<p>
+for performing in the Grenoble version (upon invitation of Ludovic Burel in 2006). 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:41,755" data-section="62" data-start="01:38,050" id="data-start0138050aastart0138050_rarr_data-section62" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:38,050" property="aa:start">
+01:38,050
+</span>
+ → 
+</h2>
+
+
+<p>
+On these and other occasions I/Finn had seen the scores in a hands on manner, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:44,000" data-section="63" data-start="01:41,755" id="data-start0141755aastart0141755_rarr_data-section63" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:41,755" property="aa:start">
+01:41,755
+</span>
+ → 
+</h2>
+
+
+<p>
+that is, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:47,412" data-section="64" data-start="01:44,000" id="data-start0144000aastart0144000_rarr_data-section64" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:44,000" property="aa:start">
+01:44,000
+</span>
+ → 
+</h2>
+
+
+<p>
+as part of preparing for performance. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:51,750" data-section="65" data-start="01:47,412" id="data-start0147412aastart0147412_rarr_data-section65" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:47,412" property="aa:start">
+01:47,412
+</span>
+ → 
+</h2>
+
+
+<p>
+So when Ludovic Burel contacted me to make a visual portfolio for Multitudes 
+dedicated to scores, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:59,447" data-section="66" data-start="01:51,750" id="data-start0151750aastart0151750_rarr_data-section66" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:51,750" property="aa:start">
+01:51,750
+</span>
+ → 
+</h2>
+
+
+<p>
+it was immediately clear to me that Antonia had to be part of this. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:01,618" data-section="67" data-start="01:59,447" id="data-start0159447aastart0159447_rarr_data-section67" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:59,447" property="aa:start">
+01:59,447
+</span>
+ → 
+</h2>
+
+
+<p>
+In my email to her I motivated our interest as 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:11,348" data-section="68" data-start="02:01,618" id="data-start0201618aastart0201618_rarr_data-section68" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:01,618" property="aa:start">
+02:01,618
+</span>
+ → 
+</h2>
+
+
+<p>
+a fascination for the way she paired Cagian procedures 
+with “un-Cagian material (photo novels, queer themes, etc) (...) 
+producing a wonderful mixture and a contemporary 'detournement' of the aleatory aesthetics”. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:14,355" data-section="69" data-start="02:11,348" id="data-start0211348aastart0211348_rarr_data-section69" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:11,348" property="aa:start">
+02:11,348
+</span>
+ → 
+</h2>
+
+
+<p>
+Yet, it was only during the interview 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:17,652" data-section="70" data-start="02:14,355" id="data-start0214355aastart0214355_rarr_data-section70" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:14,355" property="aa:start">
+02:14,355
+</span>
+ → 
+</h2>
+
+
+<p>
+that I realized the fullest implications of her approach.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:20,250" data-section="71" data-start="02:17,652" id="data-start0217652aastart0217652_rarr_data-section71" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:17,652" property="aa:start">
+02:17,652
+</span>
+ → 
+</h2>
+
+
+<p>
+Her continuous questioning of narrativity 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:23,921" data-section="72" data-start="02:20,250" id="data-start0220250aastart0220250_rarr_data-section72" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:20,250" property="aa:start">
+02:20,250
+</span>
+ → 
+</h2>
+
+
+<p>
+implies more than the sheer desire to find other ‘compositional models’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:28,333" data-section="73" data-start="02:23,921" id="data-start0223921aastart0223921_rarr_data-section73" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:23,921" property="aa:start">
+02:23,921
+</span>
+ → 
+</h2>
+
+
+<p>
+but touches issues from the social, political and cultural sphere. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:32,838" data-section="74" data-start="02:28,333" id="data-start0228333aastart0228333_rarr_data-section74" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:28,333" property="aa:start">
+02:28,333
+</span>
+ → 
+</h2>
+
+
+<p>
+The break with narrativity, 
+which she aspires, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:37,981" data-section="75" data-start="02:32,838" id="data-start0232838aastart0232838_rarr_data-section75" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:32,838" property="aa:start">
+02:32,838
+</span>
+ → 
+</h2>
+
+
+<p>
+is one that continuously questions 
+conventions and linkages at large, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:44,170" data-section="76" data-start="02:37,981" id="data-start0237981aastart0237981_rarr_data-section76" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:37,981" property="aa:start">
+02:37,981
+</span>
+ → 
+</h2>
+
+
+<p>
+as they underlie the construction of identities, genders and subjectivities. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:48,302" data-section="77" data-start="02:44,170" id="data-start0244170aastart0244170_rarr_data-section77" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:44,170" property="aa:start">
+02:44,170
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:53,376" data-section="78" data-start="02:48,302" id="data-start0248302aastart0248302_rarr_data-section78" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:48,302" property="aa:start">
+02:48,302
+</span>
+ → 
+</h2>
+
+
+<p>
+In the interview, 
+which is published here with only minor adaptations, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:55,779" data-section="79" data-start="02:53,376" id="data-start0253376aastart0253376_rarr_data-section79" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:53,376" property="aa:start">
+02:53,376
+</span>
+ → 
+</h2>
+
+
+<p>
+one can retrace these and other thoughts, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:02,698" data-section="80" data-start="02:55,779" id="data-start0255779aastart0255779_rarr_data-section80" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:55,779" property="aa:start">
+02:55,779
+</span>
+ → 
+</h2>
+
+
+<p>
+whereas other sections provide more lengthy and 
+detailed descriptions of how the scores functioned concretely.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:06,112" data-section="81" data-start="03:02,698" id="data-start0302698aastart0302698_rarr_data-section81" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:02,698" property="aa:start">
+03:02,698
+</span>
+ → 
+</h2>
+
+
+<p>
+Although such explanations are not an easy ‘read’ or ‘listen’ 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:09,572" data-section="82" data-start="03:06,112" id="data-start0306112aastart0306112_rarr_data-section82" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:06,112" property="aa:start">
+03:06,112
+</span>
+ → 
+</h2>
+
+
+<p>
+– the interview was served a research purpose, and was not meant for publication -, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:18,395" data-section="83" data-start="03:09,572" id="data-start0309572aastart0309572_rarr_data-section83" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:09,572" property="aa:start">
+03:09,572
+</span>
+ → 
+</h2>
+
+
+<p>
+it’s within the microcosm of technicalities that one can find 
+the connections with the larger philosophies 
+and their ripple-effects. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:22,163" data-section="84" data-start="03:18,395" id="data-start0318395aastart0318395_rarr_data-section84" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:18,395" property="aa:start">
+03:18,395
+</span>
+ → 
+</h2>
+
+
+<p>
+Antonia’s work is one that exercises the field of ‘desire’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:30,469" data-section="85" data-start="03:22,163" id="data-start0322163aastart0322163_rarr_data-section85" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:22,163" property="aa:start">
+03:22,163
+</span>
+ → 
+</h2>
+
+
+<p>
+both within complex situations of collaboration, performance and finally it’s impact on spectatorship.
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:37,000" data-section="86" data-start="03:30,469" id="data-start0330469aastart0330469_rarr_data-section86" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:30,469" property="aa:start">
+03:30,469
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:38,431" data-section="87" data-start="03:37,000" id="data-start0337000aastart0337000_rarr_data-section87" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:37,000" property="aa:start">
+03:37,000
+</span>
+ → 
+</h2>
+
+
+<p>
+One more thing, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:41,125" data-section="88" data-start="03:38,431" id="data-start0338431aastart0338431_rarr_data-section88" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:38,431" property="aa:start">
+03:38,431
+</span>
+ → 
+</h2>
+
+
+<p>
+on the occasion of the publication of the interview with Antonia Baehr in Oral Site 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:45,691" data-section="89" data-start="03:41,125" id="data-start0341125aastart0341125_rarr_data-section89" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:41,125" property="aa:start">
+03:41,125
+</span>
+ → 
+</h2>
+
+
+<p>
+I decided to add a newly-made bonus, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:48,494" data-section="90" data-start="03:45,691" id="data-start0345691aastart0345691_rarr_data-section90" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:45,691" property="aa:start">
+03:45,691
+</span>
+ → 
+</h2>
+
+
+<p>
+a short interview ‘extra’ on one motivation that Baehr mentioned in regard to her interest in scores: 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:52,000" data-section="91" data-start="03:48,494" id="data-start0348494aastart0348494_rarr_data-section91" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:48,494" property="aa:start">
+03:48,494
+</span>
+ → 
+</h2>
+
+
+<p>
+the practice of writing pieces 
+(next to an interest in reconfiguring collaboration and finding other compositional methods).
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:00:06" data-section="92" data-start="03:52,000" id="data-start0352000aastart0352000_rarr_data-section92" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:52,000" property="aa:start">
+03:52,000
+</span>
+ → 
+</h2>
+
+
+<p>
+Enjoy this interview
+</p>
+
+
+</div>
+
+</section>
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-e">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-s">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1001; ">
+
+</div>
+
+</section>
+<section class="section1">
+
+<nav>
+
+<span class="title">
+Timed Introduction by Myriam Van Imschoot  
+</span>
+
+<a class="edit" href="edit/?section=42">
+edit
+</a>
+
+</nav>
+
+<div class="wrapper aa-autoscrollable">
+
+<h1>
+Timed Introduction by Myriam Van Imschoot  
+</h1>
+
+
+<section class="section2" data-end="00:04,050" data-section="43" data-start="00:00,000" id="data-start0000000aastart0000000_rarr_data-section43" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:00,000" property="aa:start">
+00:00,000
+</span>
+ → 
+</h2>
+
+
+<p>
+Antonia’s piece 
+<em>
+Un après-midi
+</em>
+ 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:07,987" data-section="44" data-start="00:04,050" id="data-start0004050aastart0004050_rarr_data-section44" typeof="aa:section" title="Doubleclick to edit...">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:04,050" property="aa:start">
+00:04,050
+</span>
+ → 
+</h2>
+
+
+<p>
+was perhaps one of the signature pieces that 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:11,993" data-section="45" data-start="00:07,987" id="data-start0007987aastart0007987_rarr_data-section45" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:07,987" property="aa:start">
+00:07,987
+</span>
+ → 
+</h2>
+
+
+<p>
+just after the turn of the millennium 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:17,856" data-section="46" data-start="00:11,993" id="data-start0011993aastart0011993_rarr_data-section46" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:11,993" property="aa:start">
+00:11,993
+</span>
+ → 
+</h2>
+
+
+<p>
+pointed to a renewed interest in scores. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:24,357" data-section="47" data-start="00:17,856" id="data-start0017856aastart0017856_rarr_data-section47" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:17,856" property="aa:start">
+00:17,856
+</span>
+ → 
+</h2>
+
+
+<p>
+I was fortunate to perform twice in this piece. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:34,887" data-section="48" data-start="00:24,357" id="data-start0024357aastart0024357_rarr_data-section48" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:24,357" property="aa:start">
+00:24,357
+</span>
+ → 
+</h2>
+
+
+<p>
+The first time was upon invitation of Valérie Lanciaux for the festival 
+<em>
+Lignes de Corps
+</em>
+ in the L’Espace Pier Paolo Pasolini at Valenciennes (December 2004). 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:41,807" data-section="49" data-start="00:34,887" id="data-start0034887aastart0034887_rarr_data-section49" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:34,887" property="aa:start">
+00:34,887
+</span>
+ → 
+</h2>
+
+
+<p>
+The invitation stated that I could only participate 
+if I desired to become a man. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:49,713" data-section="50" data-start="00:41,807" id="data-start0041807aastart0041807_rarr_data-section50" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:41,807" property="aa:start">
+00:41,807
+</span>
+ → 
+</h2>
+
+
+<p>
+Thus Finn Random was born, 
+a red moustached guy with slick hair and side burns. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:56,389" data-section="51" data-start="00:49,713" id="data-start0049713aastart0049713_rarr_data-section51" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:49,713" property="aa:start">
+00:49,713
+</span>
+ → 
+</h2>
+
+
+<p>
+He looked like a looser from the film Boogie Nights, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:01,161" data-section="52" data-start="00:56,389" id="data-start0056389aastart0056389_rarr_data-section52" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="00:56,389" property="aa:start">
+00:56,389
+</span>
+ → 
+</h2>
+
+
+<p>
+but I came to embrace Finn all the same as my Drag King alter ego. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:03,592" data-section="53" data-start="01:01,161" id="data-start0101161aastart0101161_rarr_data-section53" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:01,161" property="aa:start">
+01:01,161
+</span>
+ → 
+</h2>
+
+
+<p>
+During this festival 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:08,329" data-section="54" data-start="01:03,592" id="data-start0103592aastart0103592_rarr_data-section54" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:03,592" property="aa:start">
+01:03,592
+</span>
+ → 
+</h2>
+
+
+<p>
+I also gave the performance lecture ‘She – and there could be no doubt about her gender’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:13,065" data-section="55" data-start="01:08,329" id="data-start0108329aastart0108329_rarr_data-section55" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:08,329" property="aa:start">
+01:08,329
+</span>
+ → 
+</h2>
+
+
+<p>
+a mixture of actions, letter readings and puppeteer show, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:16,769" data-section="56" data-start="01:13,065" id="data-start0113065aastart0113065_rarr_data-section56" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:13,065" property="aa:start">
+01:13,065
+</span>
+ → 
+</h2>
+
+
+<p>
+that Antonia attended and appreciated a lot. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:22,760" data-section="57" data-start="01:16,769" id="data-start0116769aastart0116769_rarr_data-section57" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:16,769" property="aa:start">
+01:16,769
+</span>
+ → 
+</h2>
+
+
+<p>
+A bond was created, and it had more than one tie... 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:25,627" data-section="58" data-start="01:22,760" id="data-start0122760aastart0122760_rarr_data-section58" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:22,760" property="aa:start">
+01:22,760
+</span>
+ → 
+</h2>
+
+
+<p>
+Although 
+<em>
+Un après-midi
+</em>
+ was devised for performers 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:29,401" data-section="59" data-start="01:25,627" id="data-start0125627aastart0125627_rarr_data-section59" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:25,627" property="aa:start">
+01:25,627
+</span>
+ → 
+</h2>
+
+
+<p>
+who did not rehearse 
+nor had ever performed the piece before, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:32,535" data-section="60" data-start="01:29,401" id="data-start0129401aastart0129401_rarr_data-section60" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:29,401" property="aa:start">
+01:29,401
+</span>
+ → 
+</h2>
+
+
+<p>
+Finn Random was called upon once more, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:38,050" data-section="61" data-start="01:32,535" id="data-start0132535aastart0132535_rarr_data-section61" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:32,535" property="aa:start">
+01:32,535
+</span>
+ → 
+</h2>
+
+
+<p>
+for performing in the Grenoble version (upon invitation of Ludovic Burel in 2006). 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:41,755" data-section="62" data-start="01:38,050" id="data-start0138050aastart0138050_rarr_data-section62" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:38,050" property="aa:start">
+01:38,050
+</span>
+ → 
+</h2>
+
+
+<p>
+On these and other occasions I/Finn had seen the scores in a hands on manner, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:44,000" data-section="63" data-start="01:41,755" id="data-start0141755aastart0141755_rarr_data-section63" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:41,755" property="aa:start">
+01:41,755
+</span>
+ → 
+</h2>
+
+
+<p>
+that is, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:47,412" data-section="64" data-start="01:44,000" id="data-start0144000aastart0144000_rarr_data-section64" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:44,000" property="aa:start">
+01:44,000
+</span>
+ → 
+</h2>
+
+
+<p>
+as part of preparing for performance. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:51,750" data-section="65" data-start="01:47,412" id="data-start0147412aastart0147412_rarr_data-section65" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:47,412" property="aa:start">
+01:47,412
+</span>
+ → 
+</h2>
+
+
+<p>
+So when Ludovic Burel contacted me to make a visual portfolio for Multitudes 
+dedicated to scores, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="01:59,447" data-section="66" data-start="01:51,750" id="data-start0151750aastart0151750_rarr_data-section66" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:51,750" property="aa:start">
+01:51,750
+</span>
+ → 
+</h2>
+
+
+<p>
+it was immediately clear to me that Antonia had to be part of this. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:01,618" data-section="67" data-start="01:59,447" id="data-start0159447aastart0159447_rarr_data-section67" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="01:59,447" property="aa:start">
+01:59,447
+</span>
+ → 
+</h2>
+
+
+<p>
+In my email to her I motivated our interest as 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:11,348" data-section="68" data-start="02:01,618" id="data-start0201618aastart0201618_rarr_data-section68" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:01,618" property="aa:start">
+02:01,618
+</span>
+ → 
+</h2>
+
+
+<p>
+a fascination for the way she paired Cagian procedures 
+with “un-Cagian material (photo novels, queer themes, etc) (...) 
+producing a wonderful mixture and a contemporary 'detournement' of the aleatory aesthetics”. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:14,355" data-section="69" data-start="02:11,348" id="data-start0211348aastart0211348_rarr_data-section69" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:11,348" property="aa:start">
+02:11,348
+</span>
+ → 
+</h2>
+
+
+<p>
+Yet, it was only during the interview 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:17,652" data-section="70" data-start="02:14,355" id="data-start0214355aastart0214355_rarr_data-section70" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:14,355" property="aa:start">
+02:14,355
+</span>
+ → 
+</h2>
+
+
+<p>
+that I realized the fullest implications of her approach.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:20,250" data-section="71" data-start="02:17,652" id="data-start0217652aastart0217652_rarr_data-section71" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:17,652" property="aa:start">
+02:17,652
+</span>
+ → 
+</h2>
+
+
+<p>
+Her continuous questioning of narrativity 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:23,921" data-section="72" data-start="02:20,250" id="data-start0220250aastart0220250_rarr_data-section72" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:20,250" property="aa:start">
+02:20,250
+</span>
+ → 
+</h2>
+
+
+<p>
+implies more than the sheer desire to find other ‘compositional models’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:28,333" data-section="73" data-start="02:23,921" id="data-start0223921aastart0223921_rarr_data-section73" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:23,921" property="aa:start">
+02:23,921
+</span>
+ → 
+</h2>
+
+
+<p>
+but touches issues from the social, political and cultural sphere. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:32,838" data-section="74" data-start="02:28,333" id="data-start0228333aastart0228333_rarr_data-section74" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:28,333" property="aa:start">
+02:28,333
+</span>
+ → 
+</h2>
+
+
+<p>
+The break with narrativity, 
+which she aspires, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:37,981" data-section="75" data-start="02:32,838" id="data-start0232838aastart0232838_rarr_data-section75" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:32,838" property="aa:start">
+02:32,838
+</span>
+ → 
+</h2>
+
+
+<p>
+is one that continuously questions 
+conventions and linkages at large, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:44,170" data-section="76" data-start="02:37,981" id="data-start0237981aastart0237981_rarr_data-section76" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:37,981" property="aa:start">
+02:37,981
+</span>
+ → 
+</h2>
+
+
+<p>
+as they underlie the construction of identities, genders and subjectivities. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:48,302" data-section="77" data-start="02:44,170" id="data-start0244170aastart0244170_rarr_data-section77" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:44,170" property="aa:start">
+02:44,170
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:53,376" data-section="78" data-start="02:48,302" id="data-start0248302aastart0248302_rarr_data-section78" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:48,302" property="aa:start">
+02:48,302
+</span>
+ → 
+</h2>
+
+
+<p>
+In the interview, 
+which is published here with only minor adaptations, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="02:55,779" data-section="79" data-start="02:53,376" id="data-start0253376aastart0253376_rarr_data-section79" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:53,376" property="aa:start">
+02:53,376
+</span>
+ → 
+</h2>
+
+
+<p>
+one can retrace these and other thoughts, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:02,698" data-section="80" data-start="02:55,779" id="data-start0255779aastart0255779_rarr_data-section80" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="02:55,779" property="aa:start">
+02:55,779
+</span>
+ → 
+</h2>
+
+
+<p>
+whereas other sections provide more lengthy and 
+detailed descriptions of how the scores functioned concretely.
+<br>
+
+
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:06,112" data-section="81" data-start="03:02,698" id="data-start0302698aastart0302698_rarr_data-section81" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:02,698" property="aa:start">
+03:02,698
+</span>
+ → 
+</h2>
+
+
+<p>
+Although such explanations are not an easy ‘read’ or ‘listen’ 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:09,572" data-section="82" data-start="03:06,112" id="data-start0306112aastart0306112_rarr_data-section82" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:06,112" property="aa:start">
+03:06,112
+</span>
+ → 
+</h2>
+
+
+<p>
+– the interview was served a research purpose, and was not meant for publication -, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:18,395" data-section="83" data-start="03:09,572" id="data-start0309572aastart0309572_rarr_data-section83" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:09,572" property="aa:start">
+03:09,572
+</span>
+ → 
+</h2>
+
+
+<p>
+it’s within the microcosm of technicalities that one can find 
+the connections with the larger philosophies 
+and their ripple-effects. 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:22,163" data-section="84" data-start="03:18,395" id="data-start0318395aastart0318395_rarr_data-section84" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:18,395" property="aa:start">
+03:18,395
+</span>
+ → 
+</h2>
+
+
+<p>
+Antonia’s work is one that exercises the field of ‘desire’, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:30,469" data-section="85" data-start="03:22,163" id="data-start0322163aastart0322163_rarr_data-section85" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:22,163" property="aa:start">
+03:22,163
+</span>
+ → 
+</h2>
+
+
+<p>
+both within complex situations of collaboration, performance and finally it’s impact on spectatorship.
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:37,000" data-section="86" data-start="03:30,469" id="data-start0330469aastart0330469_rarr_data-section86" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:30,469" property="aa:start">
+03:30,469
+</span>
+ → 
+</h2>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:38,431" data-section="87" data-start="03:37,000" id="data-start0337000aastart0337000_rarr_data-section87" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:37,000" property="aa:start">
+03:37,000
+</span>
+ → 
+</h2>
+
+
+<p>
+One more thing, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:41,125" data-section="88" data-start="03:38,431" id="data-start0338431aastart0338431_rarr_data-section88" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:38,431" property="aa:start">
+03:38,431
+</span>
+ → 
+</h2>
+
+
+<p>
+on the occasion of the publication of the interview with Antonia Baehr in Oral Site 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:45,691" data-section="89" data-start="03:41,125" id="data-start0341125aastart0341125_rarr_data-section89" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:41,125" property="aa:start">
+03:41,125
+</span>
+ → 
+</h2>
+
+
+<p>
+I decided to add a newly-made bonus, 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:48,494" data-section="90" data-start="03:45,691" id="data-start0345691aastart0345691_rarr_data-section90" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:45,691" property="aa:start">
+03:45,691
+</span>
+ → 
+</h2>
+
+
+<p>
+a short interview ‘extra’ on one motivation that Baehr mentioned in regard to her interest in scores: 
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="03:52,000" data-section="91" data-start="03:48,494" id="data-start0348494aastart0348494_rarr_data-section91" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:48,494" property="aa:start">
+03:48,494
+</span>
+ → 
+</h2>
+
+
+<p>
+the practice of writing pieces 
+(next to an interest in reconfiguring collaboration and finding other compositional methods).
+</p>
+
+
+</div>
+
+</section>
+
+<section class="section2" data-end="00:00:06" data-section="92" data-start="03:52,000" id="data-start0352000aastart0352000_rarr_data-section92" typeof="aa:section">
+
+<div class="wrapper">
+
+<h2>
+
+<span content="03:52,000" property="aa:start">
+03:52,000
+</span>
+ → 
+</h2>
+
+
+<p>
+Enjoy this interview
+</p>
+
+
+</div>
+
+</section>
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-e">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-s">
+
+</div>
+
+<div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1001; ">
+
+</div>
+
+</section>
 <section class="section1">
 
 <nav>
