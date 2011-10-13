@@ -20,41 +20,46 @@
             return Math._round(number*coefficient)/coefficient;
         }
         $(document).ready(function() {
-            $("#player").player({
+            $("body").voidplayer({
                 duration: 30,
                 loop: true,
             })
 
             $('#slider').slider({
-                max: $("#player").player('duration'),
+                max: $("body").voidplayer('duration'),
+                animate: true,
                 step: 0.1,
                 start: function(e) {
-                    $("#player").player('pause');
+                    $("body").voidplayer('pause');
                 },
                 slide: function(e) {
-                    $("#player").player('currentTime', $(this).slider('value'));
+                    $("body").voidplayer('currentTime', $(this).slider('value'));
                 },
                 stop: function(e) {
                     console.log($(this).slider('value'));
-                    $("#player").player('play');
+                    $("body").voidplayer('play');
                 },
             });
                 
-            $("#player").bind('play', function(e) { 
+            $("body").bind('play', function(e) { 
                 console.log('play');
             }).bind('timeupdate', function(e) { 
-                console.log('timeupdate: ' + $(this).player('currentTime'));
-                $("#slider").slider('value', $(this).player('currentTime'));
-                $('#time').text(Math.round($(this).player('currentTime'), 2) + "/" + $(this).player('duration')) ;
+                console.log('timeupdate: ' + $(this).voidplayer('currentTime'));
+                $("#slider").slider('value', $(this).voidplayer('currentTime'));
+                $('#time').text(Math.round($(this).voidplayer('currentTime'), 2) + "/" + $(this).voidplayer('duration')) ;
+            }).bind('seeking', function(e) { 
+                console.log('seeking');
+                $('audio').get(0).currentTime = $(this).voidplayer('currentTime') - $('audio').attr('data-start');
             }).bind('ended', function(e) { 
                 console.log('ended');
             });
 
             $("#play").bind('click', function(e) {
-                $('#player').player('play');
+                $('body').voidplayer('play');
+                $('audio').get(0).play();
             });
             $("#pause").bind('click', function(e) {
-                $('#player').player('pause');
+                $('body').voidplayer('pause');
             });
         });
     </script>
@@ -65,5 +70,9 @@
     <div id="time"></div>
     <span id="play">play</span>
     <span id="pause">pause</span>
+
+    <p><audio data-start="15" class="player" controls="controls" src="http://repo.oralsite.stdin.fr/Antonia%20Baehr/antonia%20baehr_edit.ogg" type="audio/ogg" preload="auto"/> 
+        Your browser does not support the audio tag.
+        </audio></p>
 </body>
 </html>
