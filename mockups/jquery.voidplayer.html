@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <title>Master-timeline</title>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script src="jquery.voidplayer.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css">
+        #slider { margin: 10px; }
+    </style>
+    <script>
+        Math._round = Math.round;
+        Math.round = function(number, precision)
+        {
+            precision = Math.abs(parseInt(precision)) || 0;
+            var coefficient = Math.pow(10, precision);
+            return Math._round(number*coefficient)/coefficient;
+        }
+        $(document).ready(function() {
+            $("#player").player({
+                duration: 30,
+                loop: true,
+            })
+
+            $('#slider').slider({
+                max: $("#player").player('duration'),
+                step: 0.1,
+                start: function(e) {
+                    $("#player").player('pause');
+                },
+                slide: function(e) {
+                    $("#player").player('currentTime', $(this).slider('value'));
+                },
+                stop: function(e) {
+                    console.log($(this).slider('value'));
+                    $("#player").player('play');
+                },
+            });
+                
+            $("#player").bind('play', function(e) { 
+                console.log('play');
+            }).bind('timeupdate', function(e) { 
+                console.log('timeupdate: ' + $(this).player('currentTime'));
+                $("#slider").slider('value', $(this).player('currentTime'));
+                $('#time').text(Math.round($(this).player('currentTime'), 2) + "/" + $(this).player('duration')) ;
+            }).bind('ended', function(e) { 
+                console.log('ended');
+            });
+
+            $("#play").bind('click', function(e) {
+                $('#player').player('play');
+            });
+            $("#pause").bind('click', function(e) {
+                $('#player').player('pause');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="player"></div>
+    <div id="slider"></div>
+    <div id="time"></div>
+    <span id="play">play</span>
+    <span id="pause">pause</span>
+</body>
+</html>
