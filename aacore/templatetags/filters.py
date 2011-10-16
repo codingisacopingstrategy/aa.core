@@ -6,6 +6,8 @@ import urlparse
 
 register = template.Library()
 
+from aacore.settings import USER_AGENT
+
 
 @register.filter
 @stringfilter
@@ -20,7 +22,7 @@ def xpath (value, arg):
             elt.set('src', urlparse.urljoin(baseurl, elt.get("src")))
         return lxmlnode
     request = urllib2.Request(value)
-    request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.1.5) Gecko/20091109 Ubuntu/9.10 (karmic) Firefox/3.5.5")
+    request.add_header("User-Agent", USER_AGENT)
     stdin = urllib2.urlopen(request)
     htmlparser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), namespaceHTMLElements=False)
     page = htmlparser.parse(stdin)
@@ -30,6 +32,7 @@ def xpath (value, arg):
     else:
         return None
 xpath.is_safe = True
+
 
 @register.filter
 @stringfilter
