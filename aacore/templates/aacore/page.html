@@ -36,9 +36,8 @@ $(document).ready(function() {
 <nav id="toolbar">
     <ul>
         {% if page %}
-        <li><label for="hide">hide decorations</label><input type="checkbox" name="hide" value="" id="hide" /></li>
-        <li><a href="{{ page.get_edit_url }}">edit</a></li>
-        <li><a href="{{ page.get_history_url }}">view history</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
+        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
         {% endif %}
     </ul>
 </nav>
@@ -51,8 +50,8 @@ $(document).ready(function() {
 {% block postbody %}
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>
-        <li><a href="#tabs-1">?</a></li>
-        <li><a href="#tabs-2">&lt;o&gt;</a></li>
+        <li><a title="Help" href="#tabs-1">?</a></li>
+        <li><a title="Layers" href="#tabs-2">⪗</a></li>
     </ul>
     <div id="tabs-1">
         {% include "aacore/partials/markdown_help.html" %}

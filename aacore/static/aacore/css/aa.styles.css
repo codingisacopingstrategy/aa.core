@@ -72,7 +72,7 @@ body {
     font-family: "LiberationSans", serif;
     font-weight: normal;
     font-style: normal;
-    letter-spacing: 0.5px;
+    /*letter-spacing: 0.5px;*/
 }
 
 em {
@@ -82,6 +82,14 @@ strong {
     font-weight: bold;
 }
 
+nav#toolbar {
+    text-align: right;
+    position: relative;
+    z-index: 999;
+}   
+nav#toolbar a {
+    background-color: white;
+}
 nav {
     /*text-align: right;*/
     padding: 0 0.5em;
@@ -96,10 +104,15 @@ nav#toolbar ul li {
     display: inline;
 }   
 nav#toolbar ul li:before {
-    content: " | ";
+    /*content: " | ";*/
 }   
 nav#toolbar ul li:first-child:before {
     content: "";
+}   
+nav#toolbar ul li a {
+    font-size: 22px;
+    border-bottom: 0px;
+
 }   
 
 article {
@@ -167,7 +180,7 @@ section.section1 {
     font-size: 13px;
     line-height: 18px;
     overflow: hidden;
-    box-shadow: 3px 3px 6px #CCC;
+    /*box-shadow: 3px 3px 6px #DDD;*/
 }
 section.section1 h2, p {
     margin-bottom: 18px;
@@ -241,3 +254,10 @@ img {
 }
 
 section.section1 h1 { display: none; }
+
+.collapsed {
+    height: auto!important;
+}
+.collapsed > div.wrapper {
+    display:none;
+}
