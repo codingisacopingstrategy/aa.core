@@ -49,13 +49,13 @@ $(document).ready(function() {
         end: function (elt) {
             return $(elt).attr("data-end");
         },
-    }).timeline("add", "audio", {
-        show: function (elt) {
-            elt.play()
-        },
-        hide: function (elt) {
-            elt.pause()
-        }
+    //}).timeline("add", "audio", {
+        //show: function (elt) {
+            //elt.play()
+        //},
+        //hide: function (elt) {
+            //elt.pause()
+        //}
     }).timeline("add", "section#introduction section.section2", {
         show: function (elt) {
             var $elt = $(elt);
