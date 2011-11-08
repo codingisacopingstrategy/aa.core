@@ -136,12 +136,51 @@ $(document).ready(function() {
             $("body").voidplayer('currentTime', $(this).slider('value'));
         },
         stop: function(e) {
-            console.log($(this).slider('value'));
+            //console.log($(this).slider('value'));
             $("body").voidplayer('play');
             synchronize($('audio').get(0), $("body").get(0));
             $("audio").attr('muted', false);
         },
     });
+
+    // Landmarks
+    function placeLandmarks () {
+        var position = $('#slider').position();
+        var left = position.left;
+        var right = position.left + $('#slider').width();
+        var duration = $("body").voidplayer('duration');
+        $('.playable').each(function() {
+            var elt = $('<a href="#"><img src="landmark.png" /></a>');
+            elt.attr('data-position', $(this).attr('data-start'));
+            elt.attr('title', $(this).find('h1:first').text() + '\n' + $(this).attr('data-start'));
+            var elt_duration = $.timecode_tosecs($(this).attr('data-start'));
+            var elt_pos = elt_duration / duration;
+            $('body').append(elt);
+            elt.css('position', 'absolute');
+            elt.css('left', left + ($('#slider').width() * elt_pos) - 4);
+            elt.bind('click', function() {
+                $("body").voidplayer('currentTime', elt_duration + 0.01);
+            });
+        });
+        $('section.section2').each(function() {
+            var elt = $('<a href="#"><img src="landmark2.png" /></a>');
+            elt.attr('data-position', $(this).attr('data-start'));
+            elt.attr('title', $(this).find('h1:first').text() + '\n' + $(this).attr('data-start'));
+            var elt_duration = $.timecode_tosecs($(this).attr('data-start'));
+            var elt_pos = elt_duration / duration;
+            $('body').append(elt);
+            elt.css('position', 'absolute');
+            elt.css('left', left + ($('#slider').width() * elt_pos) - 4);
+            elt.css('top', 24);
+            elt.bind('click', function() {
+                $("body").voidplayer('currentTime', elt_duration + 0.01);
+            });
+        });
+
+        
+    }
+    placeLandmarks();
+     
         
     $("body").bind('play', function(e) { 
         // console.log('play');
@@ -156,13 +195,17 @@ $(document).ready(function() {
         // console.log('ended');
     });
 
+
+    // FIXME: synchonization problems with the play/pause buttons
     $("#play").bind('click', function(e) {
         $('body').voidplayer('play');
-        $('audio:first').voidplayer('play');
-        // $('audio').get(0).play();
+        $('audio').get(0).play();
+        synchronize($('audio').get(0), $("body").get(0));
+        //$('audio:first').voidplayer('play');
     });
     $("#pause").bind('click', function(e) {
         $('body').voidplayer('pause');
-        $('audio:first').voidplayer('pause');
+        $('audio').get(0).pause();
+        //$('audio:first').voidplayer('pause');
     });
 });
