@@ -107,20 +107,20 @@ $(document).ready(function() {
             $("section.section1:not(:has(section:visible))").hide();
             $("article:first").tiling("update");
         }
-    }).timeline("add", "section#related_materials section.section2", {
-        show: function (elt) {
-            var $elt = $(elt);
-            $elt.fadeIn(1000);
-            $elt.css('display', 'table-cell');
-            $elt.parents('section.section1').css('display', 'table');
-            $("article:first").tiling("update");
-        },
-        hide: function (elt) {
-            var $elt = $(elt)
-            $elt.hide()
-            $("section.section1:not(:has(section:visible))").hide();
-            $("article:first").tiling("update");
-        }
+    //}).timeline("add", "section#related_materials section.section2", {
+        //show: function (elt) {
+            //var $elt = $(elt);
+            //$elt.fadeIn(1000);
+            //$elt.css('display', 'table-cell');
+            //$elt.parents('section.section1').css('display', 'table');
+            //$("article:first").tiling("update");
+        //},
+        //hide: function (elt) {
+            //var $elt = $(elt)
+            //$elt.hide()
+            //$("section.section1:not(:has(section:visible))").hide();
+            //$("article:first").tiling("update");
+        //}
     });
 
     // Scrubber 
@@ -156,13 +156,13 @@ $(document).ready(function() {
         // console.log('ended');
     });
 
-    //$("#play").bind('click', function(e) {
-        //$('body').voidplayer('play');
-        //$('audio:first').voidplayer('play');
-        //// $('audio').get(0).play();
-    //});
-    //$("#pause").bind('click', function(e) {
-        //$('body').voidplayer('pause');
-        //$('audio:first').voidplayer('pause');
-    //});
+    $("#play").bind('click', function(e) {
+        $('body').voidplayer('play');
+        $('audio:first').voidplayer('play');
+        // $('audio').get(0).play();
+    });
+    $("#pause").bind('click', function(e) {
+        $('body').voidplayer('pause');
+        $('audio:first').voidplayer('pause');
+    });
 });
