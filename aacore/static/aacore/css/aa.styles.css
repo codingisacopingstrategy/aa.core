@@ -106,14 +106,17 @@ article {
     background-color: white;
 }
 a {
-    color: inherit;
+    color: Blue;
     text-decoration: none;
-    border-bottom: 1px solid MediumSpringGreen;
+    /*border-bottom: 1px solid MediumSpringGreen;*/
 }
 
 a:hover {
-    border-bottom: 0px solid MediumSpringGreen;;
+    /*border-bottom: 0px solid MediumSpringGreen;;*/
     background-color: MediumSpringGreen;
+}
+a.edit {
+    color: white;
 }
 
 section.section1 > nav {
@@ -240,8 +243,16 @@ h6 {
 
 }
 
+nav#east-pane ul.ui-tabs-nav {
+    border: none;
+    border-bottom: 1px solid black;
+}
+nav#east-pane div.ui-tabs-panel {
+    padding: 1em 11px;
+}
 nav#east-pane {
     font-size: 13px;
+
 }
 nav#east-pane li a {
     border-bottom: none !important;
@@ -274,8 +285,18 @@ span[property="aa:end"]:hover {
 img {
     max-width: 100%;
 }
+div.iviewer-nav a {
+    border: 1px solid black;
+    color: black;
+    padding: 2px 6px;
+    display: inline-block;
+    text-align: center;
+    min-width: 10px;
+    margin-bottom: 6px;
+}
 div.iviewer img {
     max-width: none !important; 
 }
 
 section.section1 h1 { display: none; }
+
