@@ -274,5 +274,8 @@ span[property="aa:end"]:hover {
 img {
     max-width: 100%;
 }
+div.iviewer img {
+    max-width: none !important; 
+}
 
 section.section1 h1 { display: none; }

@@ -2,32 +2,29 @@
     <a href="#" id="in">+</a> 
     <a href="#" id="out">-</a> 
     <a href="#" id="fit">fit</a> 
-    <a href="#" id="orig">orig</a> 
+    <a href="#" id="orig">100%</a> 
     <a href="#" id="update">update</a> 
 </span> 
 
-<div id="viewer" class="viewer" style="width:300px; height:300px; position:relative; border:1px solid black"></div>
+<div id="iviewer" class="iviewer" style="width:100%; height:300px; position:relative; border:1px solid black"></div>
 <script src="http://test.dpetroff.ru/jquery.iviewer/test/jquery.mousewheel.min.js"></script>
 <script src="http://test.dpetroff.ru/jquery.iviewer/jquery.iviewer.js"></script>
 
 <script>
 var $ = jQuery;
 $(document).ready(function() {
-    $("#viewer").iviewer({
+    $("#iviewer").iviewer({
         src: "{{ value }}", 
         update_on_resize: false,
-        zoom: 200,
-        initCallback: function () {
-            var object = this;
-            $("#in").click(function(){ object.zoom_by(1);}); 
-            $("#out").click(function(){ object.zoom_by(-1);}); 
-            $("#fit").click(function(){ object.fit();}); 
-            $("#orig").click(function(){  object.set_zoom(100); }); 
-            $("#update").click(function(){ object.update_container_info();});
-        },
+        zoom: "fit",
         onFinishLoad: function() {
-            $("#viewer").data('viewer').setCoords(-500,-500);
+            $(".iviewer").data('iviewer').setCoords(-500,-500);
         },
     });
+    $("#in").click(function(){ $("#iviewer").iviewer("zoom_by", 1);}); 
+    $("#out").click(function(){ $("#iviewer").iviewer("zoom_by", -1);}); 
+    $("#fit").click(function(){ $("#iviewer").iviewer("fit");}); 
+    $("#orig").click(function(){ $("#iviewer").iviewer("set_zoom", 100);}); 
+    $("#update").click(function(){ $("#iviewer").iviewer("update");}); 
 });
 </script>
