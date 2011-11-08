@@ -216,9 +216,41 @@ div.wrapper:hover {
 }
 h1 { 
     text-decoration: underline;
+    text-transform: uppercase;
+}
+h2 {
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+h3 {
+    font-weight: bold;
+    margin: 18px 0;
+}
+h4 {
+    margin: 18px 0;
+
+}
+h5 {
+    margin: 18px 0;
+
+}
+h6 {
+    margin: 18px 0;
+
+}
+
+nav#east-pane {
+    font-size: 13px;
 }
 nav#east-pane li a {
     border-bottom: none !important;
+}
+nav#east-pane #tabs-1 h3 {
+    border-top: 1px dotted black;
+}
+nav#east-pane #tabs-1 div {
+    display: none;
 }
 
 nav#west-pane {
