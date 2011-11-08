@@ -217,6 +217,9 @@ div.wrapper:hover {
 h1 { 
     text-decoration: underline;
 }
+nav#east-pane li a {
+    border-bottom: none !important;
+}
 
 nav#west-pane {
     font-weight: normal
