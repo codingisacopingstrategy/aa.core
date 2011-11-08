@@ -1,3 +1,4 @@
+import codecs
 import os.path
 from git import Repo, NoSuchPathError
 import cStringIO
@@ -123,7 +124,7 @@ class Page(models.Model):
 
         # Writes content to the CONTENT file
         path = os.path.join(GIT_DIR, self.slug)
-        f = open(path, "w")
+        f = codecs.open(path, "w", "utf-8")
         f.write(self.content)
         f.close()
 
