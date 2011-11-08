@@ -26,7 +26,7 @@ $(document).ready(function() {
             'vertical',
             'fair',
         ], 
-        'selector' : 'section.section1:visible',
+        'selector' : 'section.section1:visible:not(.foo)',
     });
     $("article:first").tiling("tile_fair");
 
@@ -107,20 +107,20 @@ $(document).ready(function() {
             $("section.section1:not(:has(section:visible))").hide();
             $("article:first").tiling("update");
         }
-    //}).timeline("add", "section#related_materials section.section2", {
-        //show: function (elt) {
-            //var $elt = $(elt);
-            //$elt.fadeIn(1000);
-            //$elt.css('display', 'table-cell');
-            //$elt.parents('section.section1').css('display', 'table');
-            //$("article:first").tiling("update");
-        //},
-        //hide: function (elt) {
-            //var $elt = $(elt)
-            //$elt.hide()
-            //$("section.section1:not(:has(section:visible))").hide();
-            //$("article:first").tiling("update");
-        //}
+    }).timeline("add", "section#quotes section.section2", {
+        show: function (elt) {
+            var $elt = $(elt);
+            $elt.fadeIn(1000);
+            $elt.css('display', 'table-cell');
+            $elt.parents('section.section1').css('display', 'table');
+            $("article:first").tiling("update");
+        },
+        hide: function (elt) {
+            var $elt = $(elt)
+            $elt.hide()
+            $("section.section1:not(:has(section:visible))").hide();
+            $("article:first").tiling("update");
+        }
     });
 
     // Scrubber 
@@ -162,20 +162,20 @@ $(document).ready(function() {
                 $("body").voidplayer('currentTime', elt_duration + 0.01);
             });
         });
-        $('section.section2').each(function() {
-            var elt = $('<a href="#"><img src="landmark2.png" /></a>');
-            elt.attr('data-position', $(this).attr('data-start'));
-            elt.attr('title', $(this).find('h1:first').text() + '\n' + $(this).attr('data-start'));
-            var elt_duration = $.timecode_tosecs($(this).attr('data-start'));
-            var elt_pos = elt_duration / duration;
-            $('body').append(elt);
-            elt.css('position', 'absolute');
-            elt.css('left', left + ($('#slider').width() * elt_pos) - 4);
-            elt.css('top', 24);
-            elt.bind('click', function() {
-                $("body").voidplayer('currentTime', elt_duration + 0.01);
-            });
-        });
+        //$('section.section2').each(function() {
+            //var elt = $('<a href="#"><img src="landmark2.png" /></a>');
+            //elt.attr('data-position', $(this).attr('data-start'));
+            //elt.attr('title', $(this).find('h1:first').text() + '\n' + $(this).attr('data-start'));
+            //var elt_duration = $.timecode_tosecs($(this).attr('data-start'));
+            //var elt_pos = elt_duration / duration;
+            //$('body').append(elt);
+            //elt.css('position', 'absolute');
+            //elt.css('left', left + ($('#slider').width() * elt_pos) - 4);
+            //elt.css('top', 24);
+            //elt.bind('click', function() {
+                //$("body").voidplayer('currentTime', elt_duration + 0.01);
+            //});
+        //});
 
         
     }
