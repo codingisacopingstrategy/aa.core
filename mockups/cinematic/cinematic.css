@@ -29,7 +29,7 @@ div#controls {
     position: absolute;
     bottom: 1em;
     left: 1em;
-    z-index: 2;
+    z-index: 999;
 }
 
 body {
