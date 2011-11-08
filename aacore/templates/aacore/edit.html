@@ -2,20 +2,22 @@
 
 
 {% block body %}
-<nav>
+<nav id="toolbar">
     <ul>
+        <li><a href="/">oral site</a></li>
         {% if page %}
-        <li><a href="{{ page.get_absolute_url }}">view</a></li>
-        <li><a href="">view history</a></li>
+        <li><a href="{{ page.get_absolute_url }}">view page</a></li>
+        <li><a href="{{ page.get_history_url }}">view history</a></li>
         {% endif %}
     </ul>
 </nav>
+
 {% if page %}
 <h1>Editing {{ page.name }}</h1>
 {% else %}
 <h1>Creating {{ name }}</h1>
 {% endif %}
-<form action="." method="post" accept-charset="utf-8">{% csrf_token %}
+<form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
     {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
     {{ form.as_p }}
     <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>

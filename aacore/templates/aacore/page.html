@@ -36,12 +36,10 @@ $(document).ready(function() {
 {% block body %}
 <nav id="toolbar">
     <ul>
-        {% if page %}
         <li><a href="/">oral site</a></li>
         <!--<li><label for="hide">hide decorations</label><input type="checkbox" name="hide" value="" id="hide" /></li>-->
         <li><a href="{{ page.get_edit_url }}">edit page</a></li>
         <li><a href="{{ page.get_history_url }}">view history</a></li>
-        {% endif %}
     </ul>
 </nav>
 
