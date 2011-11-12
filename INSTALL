@@ -1,0 +1,33 @@
+This is the INSTALL file for Active Archives (AA). This document provides
+convenient steps so a user/developer can have AA running quickly.
+
+
+Dependencies
+============
+
+Please first install these software in order to get AA running properly:
+
+  - Django <http://www.djangoproject.org/>
+  - SQLite3 <http://www.sqlite.org/>
+  - PySQLite2 <http://trac.edgewall.org/wiki/PySqlite>
+  - Git <http://git-scm.com/>
+  - Git-Python <http://gitorious.org/git-python>
+  - google-diff-match-patch <http://code.google.com/p/google-diff-match-patch/>
+
+
+Installation
+============
+
+ 1. Once you've installed the required dependencies:
+        cd /path/to/aa.core/run
+
+ 2. Build the database:
+        python manage syncdb
+    (The prompt will ask for the admin infos.)
+    (Initial data will be loaded.) 
+    
+ 3. Run the django webserver:
+        python manage.py runserver
+
+ 4. Open a web browser and visit this URL:
+        <http://localhost:8000/>
