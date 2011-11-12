@@ -129,7 +129,7 @@ def page_edit(request, slug):
 
         if form.is_valid():  # Processes the content of the form
             # Retrieves and cleans the form values
-            content = form.cleaned_data["content"].encode("utf-8")
+            content = form.cleaned_data["content"]
             content = convert_line_endings(content, 0)  # Normalizes EOL
             message = form.cleaned_data["message"] or "<no messages>"
             is_minor = form.cleaned_data["is_minor"]
