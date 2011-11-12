@@ -23,9 +23,9 @@
 <nav id="toolbar">
     <ul>
         {% if page %}
-        <li><label for="hide">hide decorations</label><input type="checkbox" name="hide" value="" id="hide" /></li>
-        <li><a href="{{ page.get_edit_url }}">edit</a></li>
-        <li><a href="">view history</a></li>
+        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
+        <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
         {% endif %}
     </ul>
 </nav>
@@ -38,14 +38,14 @@
 {% block postbody %}
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>
-        <li><a href="#tabs-2" style="font-size: 22px; padding: 0 11px 1px;">∢</a></li>
-        <li><a href="#tabs-1">?</a></li>
+        <li><a title="Layers" href="#tabs-2">⪗</a></li>
+        <li><a title="Help" href="#tabs-1">?</a></li>
     </ul>
+    <div id="tabs-2">
+    </div>
     <div id="tabs-1">
         {% include "aacore/partials/timecode_help.html" %}
         {% include "aacore/partials/markdown_help.html" %}
-    </div>
-    <div id="tabs-2">
     </div>
 </nav>
 <nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> 

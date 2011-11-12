@@ -4,10 +4,10 @@
 {% block body %}
 <nav id="toolbar">
     <ul>
-        <li><a href="/">oral site</a></li>
         {% if page %}
-        <li><a href="{{ page.get_absolute_url }}">view page</a></li>
-        <li><a href="{{ page.get_history_url }}">view history</a></li>
+        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
+        <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
         {% endif %}
     </ul>
 </nav>

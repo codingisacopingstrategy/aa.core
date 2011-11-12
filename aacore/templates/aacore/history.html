@@ -5,16 +5,19 @@
 {% block body %}
 <nav id="toolbar">
     <ul>
-        <li><a href="/">oral site</a></li>
-        <li><a href="{{ page.get_absolute_url }}">view page</a></li>
-        <li><a href="{{ page.get_edit_url }}">edit page</a></li>
+        {% if page %}
+        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
+        <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
+        {% endif %}
     </ul>
 </nav>
 
-<h1>History of {{ page }}</h1>
+<h1>History</h1>
 
+    <form action='{{ page.get_diff_url }}' method="get" accept-charset="utf-8">
+        <p><input type="submit" name="submit" value="Compare selected revisions" id="submit" /></p>
 
-    <form id="history-form" action='{{ page.get_diff_url }}' method="get" accept-charset="utf-8">
         <dl id="commits">
             
             {% for commit in page.iter_commits %}
@@ -39,10 +42,10 @@
                                         <input type="radio" name="c2" value="{{ commit.hexsha }}" />
                                     </dd>
                                     <dt>Commit message</dt>
-                                    <dd class="commit-message">{{ commit.message }}</dd>
+                                    <dd class="commit-message"><a href="{{ page.get_absolute_url }}?rev={{ commit.hexsha }}">{{ commit.message }}</a></dd>
                                     <dt>Author</dt>
                                     <dd class="commit-author">by {{ commit.author }}</dd>
-                                    {#<dt>Stats</dt>#}
+                                    <!--<dt>Stats</dt>-->
                                     {# <dt>Technical Specifications</dt> #}
                                     {# <dd class="commit-details"><a href='#'>view details</a></dd> #}
                                 </dl>
@@ -56,7 +59,7 @@
             {% endfor %}
             
         </dl>
-        <p><input type="submit" name="submit" value="Compare" id="submit" /></p>
+        <p><input type="submit" name="submit" value="Compare selected revisions" id="submit" /></p>
     </form>
 
 {% endblock %}

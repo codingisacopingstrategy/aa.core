@@ -8,12 +8,13 @@ class PageEditForm(forms.Form):
     content = forms.CharField(
         widget=forms.Textarea(attrs={'rows': '12'}),
         label="",
+        required=False,
     )
     message = forms.CharField(
         label="Summary",
         required=False,
     )
     is_minor = forms.BooleanField(
-        required=False,
         label="This is a minor Edit",
+        required=False,
     )

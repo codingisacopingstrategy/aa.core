@@ -78,11 +78,13 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
                 if typeof:
                     wrapper.set("typeof", typeof)
                 if tagclass:
+                    classes = wrapper.get("class", "")
+                    print("the class " + classes)
                     if '%(LEVEL)d' in tagclass:
                         tagclass = tagclass % {'LEVEL': n}
-                        wrapper.set("class", tagclass)
+                        wrapper.set("class", " ".join([tagclass, classes]))
                     else:
-                        wrapper.set("class", tagclass)
+                        wrapper.set("class", " ".join([tagclass, classes]))
                 parent.remove(child)
                 parent.insert(i, wrapper)
                 wrapper.append(child)

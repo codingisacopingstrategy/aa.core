@@ -1,0 +1,19 @@
+{% extends "aacore/base.html" %}
+
+{% block body %}
+<nav id="toolbar">
+    <ul>
+        {% if page %}
+        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
+        <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<article>
+<pre>
+{{ content|safe }}
+</pre>
+</article>
+{% endblock %}

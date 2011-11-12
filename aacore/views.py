@@ -292,6 +292,14 @@ def page_detail(request, slug):
         return redirect(url)
 
     context['page'] = page
+    md = get_markdown()
+    rev = request.REQUEST.get('rev', 'HEAD')
+    rendered = md.convert(page.read(rev=rev))
+    t = Template("{% load filters aatags %}" + rendered)
+    c = RequestContext(request)
+    if 'css' in md.Meta:
+        context['extra_css'] = md.Meta['css']
+    context['content'] = mark_safe(t.render(c))
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
@@ -383,7 +391,7 @@ def page_edit(request, slug):
                 md = get_markdown()
                 rendered = md.convert(content)
                 return HttpResponse(rendered)
-				
+
         else:  # Returns the invalid form for correction
             # TODO: factorize this chunk
             context['page'] = page  # So templates nows about what page we are editing
@@ -395,22 +403,51 @@ def page_edit(request, slug):
         url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
 
-def page_history(request, slug):
-    """
-    """
-    context = {}
+
+def page_history(request, slug): 
+    """ """ 
+    context = {} 
     name = dewikify(slug)
 
-    try:
-        page = Page.objects.get(name=name)
+    try: 
+        page = Page.objects.get(name=name) 
     except Page.DoesNotExist:
         # Redirects to the edit page
-        url = reverse('aa-page-edit', kwargs={'slug': slug})
+        url = reverse('aa-page-edit', kwargs={'slug': slug}) 
         return redirect(url)
 
     context['page'] = page
 
-    return render_to_response("aacore/history.html", context, context_instance=RequestContext(request))
+    return render_to_response("aacore/history.html", context,
+            context_instance=RequestContext(request))
+
+
+def page_diff(request, slug): 
+    """Shows a single wiki page."""
+    # Does the repo exist?
+    context = {} 
+    name = dewikify(slug)
+
+    if request.method == "GET": # If the form has been submitted...
+        try: 
+            page = Page.objects.get(name=name)
+        except Page.DoesNotExist:
+            # Redirects to the edit page
+            url = reverse('aa-page-edit', kwargs={'slug': slug}) 
+            return redirect(url)
+
+        context['page'] = page
+
+        c1 = request.GET.get("c1", None)
+        c2 = request.GET.get("c2", None)
+        
+        #if c1 is None or c2 is None:
+            #raise Http404
+
+        context['content'] = page.diff(c1, c2)
+
+    return render_to_response("aacore/diff.html", context,
+            context_instance=RequestContext(request))
 
 
 
