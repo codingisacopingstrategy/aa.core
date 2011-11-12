@@ -1,30 +1,12 @@
-= Migration Instructions =
+The Active Archives Video Wiki inverts the paradigm of uploading resources into
+a centralized server and instead allows resources to remain "active", in-place
+and online. Caching and proxy functionality allow (light-weight) copies of
+resources to be manipulated and preserved even as the original sources change
+or become (temporarily) unavailable. Strategically, the project aims to clarify
+some of the "cloudy" aspects of Web 2.0 regarding issues of licensing, sharing,
+ownership, access, and longevity of online material. Designed to break open the
+"black box" of online video, users are encouraged to write with video, creating
+new compositions made from collages of disparate (online) elements.
 
-South is an essential tool to keep your AA database up to date when changes are made to the underlying database structure (aka schema changes).
-See "Schema changes" in the ChangeLog file for descriptions of when schema changes occur
-
-1. Ensure that South is installed (one time only)...
-
-* sudo easy_install South
-
-2. Ensure that the aabrowser app is using South (one time only)...
-
-* Add "south" to INSTALLED_APPS in settings.py
-* ./manage.py syncdb
-
-  to load the South table into the database.
-
-  YOU MUST HAVE THE CODE IN THE PRE_CHANGE STATE at this point (if necessary svn revert first!)
-
-* Run ./manage.py convert_to_south aabrowser
-  South will automatically make and pretend to apply your first migration.
-
-3. Use South to migrate the database (bringing it in line with the code)... (to be done each time schema changes)
-
-* svn update
-  to bring the code up to date, and include schema changes)
-* ./manage.py schemamigration aabrowser --auto
-* ./manage.py migrate aabrowser
-
-
+For more information about the project, see <http://activearchives.org/>
 
