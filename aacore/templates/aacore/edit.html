@@ -2,17 +2,24 @@
 
 
 {% block body %}
-<nav>
+<nav id="toolbar">
     <ul>
+        <li><a href="/">oral site</a></li>
         {% if page %}
-        <li><a href="{{ page.get_absolute_url }}">view</a></li>
-        <li><a href="">view history</a></li>
+        <li><a href="{{ page.get_absolute_url }}">view page</a></li>
+        <li><a href="{{ page.get_history_url }}">view history</a></li>
         {% endif %}
     </ul>
 </nav>
-<form action="." method="post" accept-charset="utf-8">{% csrf_token %}
-    <textarea name="content" rows="24" cols="80">{{ content }}</textarea>
-    <p><input type="submit" name="_button" value="Save"><input type="submit" name="_button" value="Cancel"></p>
+
+{% if page %}
+<h1>Editing {{ page.name }}</h1>
+{% else %}
+<h1>Creating {{ name }}</h1>
+{% endif %}
+<form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
     {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
+    {{ form.as_p }}
+    <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>
 </form>
 {% endblock %}

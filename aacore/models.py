@@ -1,15 +1,21 @@
 import RDF
-import os, urllib2
+import codecs
+import os, os.path, urllib2
+from git import Repo, NoSuchPathError
+import cStringIO
+from ConfigParser import ConfigParser
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 import utils # import wikify
-# import aacore.templatetags.aatags
 from rdfutils import rdfnode, prep_uri
 from settings import CACHE_DIR
 import resource_opener
+from settings import GIT_DIR
 
 ############################
 # License
@@ -220,6 +226,61 @@ class Page(models.Model):
     """
     name = models.CharField(max_length=255)
     content = models.TextField(blank=True)
+
+    @property
+    def slug(self):
+        """
+        Returns the wikified name of the page.
+        """
+        return wikify(self.name)
+
+    def get_repository(self):
+        try:
+            repo = Repo(GIT_DIR)
+        except NoSuchPathError:
+            repo = Repo.init(GIT_DIR)
+        return repo 
+
+    def iter_commits(self):
+        repo = self.get_repository()
+        return repo.iter_commits(paths=self.slug)
+
+    def commit(self, message="No message", author="Anonymous <anonymous@127.0.0.1>", is_minor=False):
+        """
+        Commits page content and saves it it in the database.
+        """
+        # Makes sure the content ends with a newline
+        if self.content[-1] != "\n":
+            self.content += "\n"
+
+        repo = self.get_repository()
+
+        # Writes content to the CONTENT file
+        path = os.path.join(GIT_DIR, self.slug)
+        f = codecs.open(path, "w", "utf-8")
+        f.write(self.content)
+        f.close()
+
+        # Adds the newly creates files and commits
+        repo.index.add([self.slug,])
+        repo.git.commit(message=message, author=author)
+
+        # Add the commit metadata in a git note, formatted as
+        # a .ini config file 
+        config = ConfigParser()
+        config.add_section('metadata')
+        config.set('metadata','is_minor', is_minor)
+
+        output = cStringIO.StringIO()
+        config.write(output)
+        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
+
+        self.save()
+
+
+    @models.permalink
+    def get_history_url(self):
+        return ("aa-page-history", (), {'slug': wikify(self.name)})
 
     @models.permalink
     def get_edit_url(self):

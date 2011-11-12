@@ -5,3 +5,4 @@
 .svn
 *.swp
 venv/
+repositories/
