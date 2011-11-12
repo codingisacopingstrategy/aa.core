@@ -98,10 +98,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'aacore',
-#    'flickr',
-#    'youtube',
-#    'ffmpeg',
-#    'internetarchive',
+    'flickr',
+    'youtube',
+    'ffmpeg',
+    'internetarchive',
 
 )
 
