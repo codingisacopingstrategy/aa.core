@@ -22,6 +22,7 @@ On Ubuntu, this should do the trick:
     sudo pip install gitpython
     sudo pip install html5lib
     sudo pip install markdown
+    sudo pip install diff-match-patch
     sudo apt-get install python-librdf
 
 
