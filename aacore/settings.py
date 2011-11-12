@@ -1,4 +1,5 @@
 from django.conf import settings
+import os.path
 
 
 EXIFTOOL = getattr(settings, 'AA_EXIFTOOL', 'exiftool')
@@ -12,4 +13,4 @@ DEFAULT_REL_NAMESPACE = getattr(settings, 'AA_DEFAULT_REL_NAMESPACE', "aa")
 RDF_STORAGE_NAME = getattr(settings, 'AA_RDF_STORAGE_NAME', "aa")
 RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
 
-GIT_DIR = getattr(settings, 'AA_GIT_DIR', "/home/aleray/work/aa.new/aa.core/repositories")
+GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "../repositories"))
