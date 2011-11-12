@@ -1,0 +1,251 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sarma="http://sarma.be/terms/" xmlns:aa="http://activearchives.org/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dcterms="http://purl.org/dc/terms/" 
+    version="HTML+RDFa 1.1">
+<head>
+<title>active archives</title>
+<script src="/static/lib/jquery/jquery.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="/static/lib/jquery/jquery-ui.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/static/lib/jquery/jquery-ui.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<script src="/static/jquery.djangocsrf.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/static/styles.css" type="text/css" charset="utf-8" />
+
+<style>
+td { 
+    vertical-align: top;
+}
+td.deriv {
+    padding-left: 24px;
+    color: gray;
+}
+</style>
+
+</head>
+<body>
+
+<div about="http://www.archive.org/details/uso20110129">
+
+    <div class="original_link"><a href="http://www.archive.org/details/uso20110129">http://www.archive.org/details/uso20110129</a></div>
+
+    
+    <div class="thumbnail">
+        <img src="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-999-the-film-scores-of-dmitri-shostakovich_thumb.jpg" />
+        <a rel="foaf:thumbnail" href="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-999-the-film-scores-of-dmitri-shostakovich_thumb.jpg"></a>
+    </div>
+
+    
+
+    <h2 property="dc:title">Late Film Scores of Dmitri Shostakovich</h2>
+    <p property="dc:description"><table cellpadding="4"><tr><td>No other major composer of the twentieth century devoted more of his career to film music than Dmitri Shostakovich. Altogether he composed scores to over 36 films, from <i>New Babylon (1929)</i> to <i>King Lear (1971)</i>. While generally written in a more accessible idiom than most of his orchestral or chamber works, Shostakovich’s film scores nevertheless boast meticulous craftsmanship and reveal the composer’s complex and often paradoxical musical personality. Major excerpts from three of his mature film scores are featured in this program presented in Mandel Hall at the University of Chicago, Chicago, Illinois. 29 January 2011.</td></tr></table><img src="http://users.catastrophe.net/eric/images/1x1.gif" alt="1x1.gif" /></p>
+    <dl>
+        <dt>Reference</dt>
+        <dd>
+
+            <span property="aa:reference">ia:uso20110129</span>
+        </dd>
+
+        <dt>Date</dt>
+        <dd>
+            <span property="dc:date" content="2011-03-13">March 13, 2011</span>
+        </dd>
+
+        <dt>Creators</dt>
+        <dd>
+            <a rel="dc:creator" href="http://www.archive.org/search.php?query=creator%3A%22Eric+Pancer%22">Eric Pancer</a>
+        </dd>
+
+        <dt>Collections</dt>
+        <dd>
+            <a rel="dc:collection" href="http://www.archive.org/details/opensource_audio">Community Audio</a>
+
+        </dd>
+
+        <dt>License</dt>
+        <dd>
+            <a rel="dc:license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/us/">http://creativecommons.org/licenses/by-nc-nd/3.0/us/</a>
+        </dd>
+
+        <dt class="tags">Tags</dt>    
+        <dd class="tags">
+
+            <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%222011%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">2011</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%222010s%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">2010s</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22university+of+chicago%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">university of chicago</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22symphony%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">symphony</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22orchestra%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">orchestra</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22uso%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">uso</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22barbara+schubert%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">barbara schubert</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22shostakovich%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">shostakovich</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22film+music%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">film music</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22film%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">film</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22score%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">score</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22soviet%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">soviet</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22russian%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">russian</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22live%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">live</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22music%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">music</span></a></span>, <span class="tag"><a rel="foaf:topic" href="http://www.archive.org/search.php?query=subject%3A%22performance%22"><span about="http://www.archive.org/details/uso20110129" property="dc:subject">performance</span></a></span>
+
+            </ul>
+        </dd>
+
+        <dt class="files">Files</dt>    
+        <dd class="files">
+<ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-001-shostakovich-gadfly-mvtI-overture.wav"><span property="dc:format">WAVE</span> uso20110129-001-shostakovich-gadfly-mvtI-overture.wav</li>
+  <ul>
+
+    <li>uso20110129-001-shostakovich-gadfly-mvtI-overture.flac</li>
+    <li>uso20110129-001-shostakovich-gadfly-mvtI-overture.mp3</li>
+    <li>uso20110129-001-shostakovich-gadfly-mvtI-overture.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-002-shostakovich-gadfly-mvtII-contradance.wav"><span property="dc:format">WAVE</span> uso20110129-002-shostakovich-gadfly-mvtII-contradance.wav</li>
+  <ul>
+
+    <li>uso20110129-002-shostakovich-gadfly-mvtII-contradance.flac</li>
+    <li>uso20110129-002-shostakovich-gadfly-mvtII-contradance.mp3</li>
+    <li>uso20110129-002-shostakovich-gadfly-mvtII-contradance.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-003-shostakovich-gadfly-mvtIII-folk-festival.wav"><span property="dc:format">WAVE</span> uso20110129-003-shostakovich-gadfly-mvtIII-folk-festival.wav</li>
+  <ul>
+
+    <li>uso20110129-003-shostakovich-gadfly-mvtIII-folk-festival.flac</li>
+    <li>uso20110129-003-shostakovich-gadfly-mvtIII-folk-festival.mp3</li>
+    <li>uso20110129-003-shostakovich-gadfly-mvtIII-folk-festival.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-004-shostakovich-gadfly-mvtVII-introduction.wav"><span property="dc:format">WAVE</span> uso20110129-004-shostakovich-gadfly-mvtVII-introduction.wav</li>
+
+  <ul>
+    <li>uso20110129-004-shostakovich-gadfly-mvtVII-introduction.flac</li>
+    <li>uso20110129-004-shostakovich-gadfly-mvtVII-introduction.mp3</li>
+    <li>uso20110129-004-shostakovich-gadfly-mvtVII-introduction.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-005-shostakovich-gadfly-mvtXI-scene.wav"><span property="dc:format">WAVE</span> uso20110129-005-shostakovich-gadfly-mvtXI-scene.wav</li>
+
+  <ul>
+    <li>uso20110129-005-shostakovich-gadfly-mvtXI-scene.flac</li>
+    <li>uso20110129-005-shostakovich-gadfly-mvtXI-scene.mp3</li>
+    <li>uso20110129-005-shostakovich-gadfly-mvtXI-scene.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-006-shostakovich-king-lear-mvtVIII-the-fool.wav"><span property="dc:format">WAVE</span> uso20110129-006-shostakovich-king-lear-mvtVIII-the-fool.wav</li>
+
+  <ul>
+    <li>uso20110129-006-shostakovich-king-lear-mvtVIII-the-fool.flac</li>
+    <li>uso20110129-006-shostakovich-king-lear-mvtVIII-the-fool.mp3</li>
+    <li>uso20110129-006-shostakovich-king-lear-mvtVIII-the-fool.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-007-shostakovich-king-lear-mvtXI-introduction-march-of-time.wav"><span property="dc:format">WAVE</span> uso20110129-007-shostakovich-king-lear-mvtXI-introduction-march-of-time.wav</li>
+
+  <ul>
+    <li>uso20110129-007-shostakovich-king-lear-mvtXI-introduction-march-of-time.flac</li>
+    <li>uso20110129-007-shostakovich-king-lear-mvtXI-introduction-march-of-time.mp3</li>
+    <li>uso20110129-007-shostakovich-king-lear-mvtXI-introduction-march-of-time.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-008-shostakovich-king-lear-mvtXII-introduction-first-appearance-of-king-lears-castle.wav"><span property="dc:format">WAVE</span> uso20110129-008-shostakovich-king-lear-mvtXII-introduction-first-appearance-of-king-lears-castle.wav</li>
+
+  <ul>
+    <li>uso20110129-008-shostakovich-king-lear-mvtXII-introduction-first-appearance-of-king-lears-castle.flac</li>
+    <li>uso20110129-008-shostakovich-king-lear-mvtXII-introduction-first-appearance-of-king-lears-castle.mp3</li>
+    <li>uso20110129-008-shostakovich-king-lear-mvtXII-introduction-first-appearance-of-king-lears-castle.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-009-shostakovich-king-lear-mvtXIV-beginning-of-the-catastrophe.wav"><span property="dc:format">WAVE</span> uso20110129-009-shostakovich-king-lear-mvtXIV-beginning-of-the-catastrophe.wav</li>
+
+  <ul>
+    <li>uso20110129-009-shostakovich-king-lear-mvtXIV-beginning-of-the-catastrophe.flac</li>
+    <li>uso20110129-009-shostakovich-king-lear-mvtXIV-beginning-of-the-catastrophe.mp3</li>
+    <li>uso20110129-009-shostakovich-king-lear-mvtXIV-beginning-of-the-catastrophe.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-010-shostakovich-king-lear-mvtXV-the-voice-of-truth.wav"><span property="dc:format">WAVE</span> uso20110129-010-shostakovich-king-lear-mvtXV-the-voice-of-truth.wav</li>
+
+  <ul>
+    <li>uso20110129-010-shostakovich-king-lear-mvtXV-the-voice-of-truth.flac</li>
+    <li>uso20110129-010-shostakovich-king-lear-mvtXV-the-voice-of-truth.mp3</li>
+    <li>uso20110129-010-shostakovich-king-lear-mvtXV-the-voice-of-truth.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-011-shostakovich-king-lear-mvtXVI-the-storm.wav"><span property="dc:format">WAVE</span> uso20110129-011-shostakovich-king-lear-mvtXVI-the-storm.wav</li>
+
+  <ul>
+    <li>uso20110129-011-shostakovich-king-lear-mvtXVI-the-storm.flac</li>
+    <li>uso20110129-011-shostakovich-king-lear-mvtXVI-the-storm.mp3</li>
+    <li>uso20110129-011-shostakovich-king-lear-mvtXVI-the-storm.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-012-shostakovich-king-lear-mvtXX-the-fool.wav"><span property="dc:format">WAVE</span> uso20110129-012-shostakovich-king-lear-mvtXX-the-fool.wav</li>
+
+  <ul>
+    <li>uso20110129-012-shostakovich-king-lear-mvtXX-the-fool.flac</li>
+    <li>uso20110129-012-shostakovich-king-lear-mvtXX-the-fool.mp3</li>
+    <li>uso20110129-012-shostakovich-king-lear-mvtXX-the-fool.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-013-shostakovich-hamlet-mvtI-introduction.wav"><span property="dc:format">WAVE</span> uso20110129-013-shostakovich-hamlet-mvtI-introduction.wav</li>
+
+  <ul>
+    <li>uso20110129-013-shostakovich-hamlet-mvtI-introduction.flac</li>
+    <li>uso20110129-013-shostakovich-hamlet-mvtI-introduction.mp3</li>
+    <li>uso20110129-013-shostakovich-hamlet-mvtI-introduction.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-014-shostakovich-hamlet-mvtV-ball-at-the-castle.wav"><span property="dc:format">WAVE</span> uso20110129-014-shostakovich-hamlet-mvtV-ball-at-the-castle.wav</li>
+
+  <ul>
+    <li>uso20110129-014-shostakovich-hamlet-mvtV-ball-at-the-castle.flac</li>
+    <li>uso20110129-014-shostakovich-hamlet-mvtV-ball-at-the-castle.mp3</li>
+    <li>uso20110129-014-shostakovich-hamlet-mvtV-ball-at-the-castle.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-015-shostakovich-hamlet-mvtIX-the-ghost.wav"><span property="dc:format">WAVE</span> uso20110129-015-shostakovich-hamlet-mvtIX-the-ghost.wav</li>
+
+  <ul>
+    <li>uso20110129-015-shostakovich-hamlet-mvtIX-the-ghost.flac</li>
+    <li>uso20110129-015-shostakovich-hamlet-mvtIX-the-ghost.mp3</li>
+    <li>uso20110129-015-shostakovich-hamlet-mvtIX-the-ghost.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-016-shostakovich-hamlet-mvtXIX-in-the-garden.wav"><span property="dc:format">WAVE</span> uso20110129-016-shostakovich-hamlet-mvtXIX-in-the-garden.wav</li>
+
+  <ul>
+    <li>uso20110129-016-shostakovich-hamlet-mvtXIX-in-the-garden.flac</li>
+    <li>uso20110129-016-shostakovich-hamlet-mvtXIX-in-the-garden.mp3</li>
+    <li>uso20110129-016-shostakovich-hamlet-mvtXIX-in-the-garden.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-017-shostakovich-hamlet-mvts-XXIII-XXI-scene-of-the-poisoning.wav"><span property="dc:format">WAVE</span> uso20110129-017-shostakovich-hamlet-mvts-XXIII-XXI-scene-of-the-poisoning.wav</li>
+
+  <ul>
+    <li>uso20110129-017-shostakovich-hamlet-mvts-XXIII-XXI-scene-of-the-poisoning.flac</li>
+    <li>uso20110129-017-shostakovich-hamlet-mvts-XXIII-XXI-scene-of-the-poisoning.mp3</li>
+    <li>uso20110129-017-shostakovich-hamlet-mvts-XXIII-XXI-scene-of-the-poisoning.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-018-shostakovich-hamlet-mvts-XIII-XV-arrival-and-scene-of-the-players.wav"><span property="dc:format">WAVE</span> uso20110129-018-shostakovich-hamlet-mvts-XIII-XV-arrival-and-scene-of-the-players.wav</li>
+
+  <ul>
+    <li>uso20110129-018-shostakovich-hamlet-mvts-XIII-XV-arrival-and-scene-of-the-players.flac</li>
+    <li>uso20110129-018-shostakovich-hamlet-mvts-XIII-XV-arrival-and-scene-of-the-players.mp3</li>
+    <li>uso20110129-018-shostakovich-hamlet-mvts-XIII-XV-arrival-and-scene-of-the-players.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-019-shostakovich-hamlet-mvtXXVIII-ophelia.wav"><span property="dc:format">WAVE</span> uso20110129-019-shostakovich-hamlet-mvtXXVIII-ophelia.wav</li>
+
+  <ul>
+    <li>uso20110129-019-shostakovich-hamlet-mvtXXVIII-ophelia.flac</li>
+    <li>uso20110129-019-shostakovich-hamlet-mvtXXVIII-ophelia.mp3</li>
+    <li>uso20110129-019-shostakovich-hamlet-mvtXXVIII-ophelia.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-020-shostakovich-hamlet-mvts-XXXII-XXXIV-duel-and-death-of-hamlet.wav"><span property="dc:format">WAVE</span> uso20110129-020-shostakovich-hamlet-mvts-XXXII-XXXIV-duel-and-death-of-hamlet.wav</li>
+
+  <ul>
+    <li>uso20110129-020-shostakovich-hamlet-mvts-XXXII-XXXIV-duel-and-death-of-hamlet.flac</li>
+    <li>uso20110129-020-shostakovich-hamlet-mvts-XXXII-XXXIV-duel-and-death-of-hamlet.mp3</li>
+    <li>uso20110129-020-shostakovich-hamlet-mvts-XXXII-XXXIV-duel-and-death-of-hamlet.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-021-shostakovich-gadfly-galop-no6.wav"><span property="dc:format">WAVE</span> uso20110129-021-shostakovich-gadfly-galop-no6.wav</li>
+
+  <ul>
+    <li>uso20110129-021-shostakovich-gadfly-galop-no6.flac</li>
+    <ul>
+      <li>uso20110129.ffp</li>
+      <li>uso20110129.md5</li>
+    </ul>
+    <li>uso20110129-021-shostakovich-gadfly-galop-no6.mp3</li>
+
+    <li>uso20110129-021-shostakovich-gadfly-galop-no6.ogg</li>
+  </ul>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129-999-the-film-scores-of-dmitri-shostakovich.jpg"><span property="dc:format">JPEG</span> uso20110129-999-the-film-scores-of-dmitri-shostakovich.jpg</li>
+  <ul>
+    <li>uso20110129-999-the-film-scores-of-dmitri-shostakovich_thumb.jpg</li>
+  </ul>
+
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129_files.xml"><span property="dc:format">Metadata</span> uso20110129_files.xml</li>
+  <li about="http://ia700405.us.archive.org/34/items/uso20110129/uso20110129_meta.xml"><span property="dc:format">Metadata</span> uso20110129_meta.xml</li>
+</ul>
+
+<div class="files_summary">90 files</div>
+        </dd>
+
+    </dl>
+
+</div>
+
+</body>
+</html>
+
+
