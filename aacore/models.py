@@ -11,7 +11,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-import utils # import wikify
+import utils
 from rdfutils import rdfnode, prep_uri
 from settings import CACHE_DIR
 import resource_opener
@@ -232,7 +232,7 @@ class Page(models.Model):
         """
         Returns the wikified name of the page.
         """
-        return wikify(self.name)
+        return utils.wikify(self.name)
 
     def get_repository(self):
         try:
@@ -280,7 +280,7 @@ class Page(models.Model):
 
     @models.permalink
     def get_history_url(self):
-        return ("aa-page-history", (), {'slug': wikify(self.name)})
+        return ("aa-page-history", (), {'slug': utils.wikify(self.name)})
 
     @models.permalink
     def get_edit_url(self):
@@ -292,9 +292,6 @@ class Page(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def slug (self):
-        return utils.wikify(self.name)
 
 #from django.db.models.signals import post_save
 #from django.dispatch import receiver

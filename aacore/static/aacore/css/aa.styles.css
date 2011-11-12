@@ -417,7 +417,7 @@ a.directlink {
     margin-bottom: 20px;
 }
 
-section.section1 h1 { display: none; }
+/*section.section1 h1 { display: none; }*/
 
 form#edit-all textarea {
     width: 700px;

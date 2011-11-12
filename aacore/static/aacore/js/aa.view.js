@@ -278,7 +278,7 @@ $(document).ready(function() {
         east: {
             size: 360,
             fxSpeed: "slow",
-            initClosed: true
+            initClosed: false
         },
         south: {
             fxName: "slide",

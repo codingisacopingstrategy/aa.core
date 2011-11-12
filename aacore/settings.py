@@ -16,4 +16,5 @@ INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Relation
 
 import os
 CACHE_DIR = os.path.join(settings.MEDIA_ROOT, "cache")
-GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "../repositories"))
+GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "repositories"))
+
