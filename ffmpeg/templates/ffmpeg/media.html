@@ -1,0 +1,103 @@
+{% extends "aacore/base.html" %}
+{% load aacoretags %}
+
+{% block head %}
+<style>
+td { 
+    vertical-align: top;
+}
+td.deriv {
+    padding-left: 24px;
+    color: gray;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div about="{{asset.url}}" id="minipage">
+<a href="{%url aa-browse %}?uri={{asset.url|urlencode}}" class="backlink">{{asset.url}}</a>
+
+<!--    <div class="original_link"><a href="{{asset.url}}">{{asset.url}}</a></div>-->
+
+    {% if asset.title %}<h2 property="dc:title">{{asset.title}}</h2>{%endif%}
+
+    <dl>
+        {% if asset.wiki_reference %}
+        <dt>Reference</dt>
+        <dd>
+            <span property="aa:reference">{{asset.wiki_reference}}</span>
+        </dd>
+        {% endif %}
+
+        <dt>Duration</dt>
+        <dd>
+            <span property="media:duration">{{asset.duration}}</span>
+        </dd>
+
+        {% if asset.audio_info_raw %}
+        <dt>Video</dt>
+        <dd>
+            {% if asset.video_codec %}<span property="media:video_codec">{{asset.video_codec}}</span>{% endif %}
+            {% if asset.width and asset.height %}<span property="media:width">{{asset.width}}</span>&#x00D7;<span property="media:height">{{asset.height}}</span>{%endif%}
+            {% if asset.framerate %}<span property="media:framerate">{{asset.framerate}}</span>fps{% endif %}
+        </dd>
+        {% endif %}
+
+        {% if asset.audio_info_raw %}
+        <dt>Audio</dt>
+        <dd>
+            {% if asset.audio_codec %}<span property="media:audio_codec">{{asset.audio_codec}}</span>{% endif %}
+            {% if asset.audio_bitrate %}<span property="media:bit_rate">{{asset.audio_bitrate}}</span>kB/s{% endif %}
+            {% if asset.audio_sampling_rate %}<span property="media:audio_sampling_rate">{{asset.audio_sampling_rate}}</span>Hz{% endif %}
+            {% if asset.audio_bits %}<span property="media:audio_bits">{{asset.audio_bits}}</span>bit{% endif %}
+            {% if asset.audio_channels %}<span property="media:audio_channels">{{asset.audio_channels_display}}</span>{% endif %}
+        </dd>
+        {% endif %}
+
+        {% if asset.artist %}
+        <dt>Artist</dt>
+        <dd>
+            <span property="dc:creator">{{asset.artist}}</span>
+        </dd>
+        {% endif %}
+
+        {% if asset.date %}
+        <dt>Date</dt>
+        <dd>
+            <span property="dc:date">{{asset.date}}</span>
+        </dd>
+        {% endif %}
+
+        {% if asset.location %}
+        <dt>Location</dt>
+        <dd>
+            <span property="aa:location">{{asset.location}}</span>
+        </dd>
+        {% endif %}
+
+        {% if asset.copyright %}
+        <dt>Copyright</dt>
+        <dd>
+            <a rel="dc:license" href="http://www.copyright.gov/">{{asset.copyright}}</a>
+        </dd>
+        {% endif %}
+
+        {% if asset.license %}
+        <dt>License</dt>
+        <dd>
+            <a rel="dc:license" href="{{asset.license}}">{{asset.license}}</a>
+        </dd>
+        {% endif %}
+
+        {% if asset.contact %}
+        <dt>Contact</dt>
+        <dd>
+            <span property="aa:contact">{{asset.contact}}</span>
+        </dd>
+        {% endif %}
+
+    </dl>
+
+</div>
+{% endblock %}
+
