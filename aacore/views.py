@@ -62,7 +62,8 @@ def page_detail(request, slug):
 
     context['page'] = page
     md = get_markdown()
-    rendered = md.convert(page.content)
+    rev = request.REQUEST.get('rev', 'HEAD')
+    rendered = md.convert(page.read(rev=rev))
     t = Template("{% load filters aatags %}" + rendered)
     c = RequestContext(request)
     if 'css' in md.Meta:

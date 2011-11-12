@@ -353,18 +353,33 @@ form#edit-all input[type=text] {
     width: 620px;
 }
 
-dl#commits dt {
-    float: left;
-    margin-right: 0.5em;
+dl#commits > dt {
+    font-weight: bold;
 }
-dl#commits dt:after {
-    content: ": "
+dl.commit > dt {
+    display: none;
 }
-dl#commits li {
-    margin-top: 1em;
+dl.commit {
+    border-bottom: 1px solid black;
 }
-form#history-form p {
-    clear: both;
-    margin-top: 3em;
-    display: block;
+/*dl.commit li {*/
+    /*margin-top: 1em;*/
+/*}*/
+/*form#history-form p {*/
+    /*clear: both;*/
+    /*margin-top: 3em;*/
+    /*display: block;*/
+/*}*/
+
+del {
+    text-decoration: line-through;
+    color: red;
 }
+add {
+    background-color: green;
+    color: white;
+}
+/*span.equal {*/
+    /*background-color: yellow;*/
+/*}*/
+
