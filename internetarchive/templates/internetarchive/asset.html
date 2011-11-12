@@ -1,0 +1,70 @@
+{% extends "aacore/base.html" %}
+{% load aacoretags %}
+
+{% block head %}
+<style>
+td { 
+    vertical-align: top;
+}
+td.deriv {
+    padding-left: 24px;
+    color: gray;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div about="{{asset.url}}" id="minipage">
+<a href="{%url aa-browse %}?uri={{asset.url|urlencode}}" class="backlink">{{asset.url}}</a>
+
+    {% if asset.misc_image %}
+    <div class="thumbnail">
+        <img src="{{asset.misc_image}}" />
+        <a rel="foaf:thumbnail" href="{{asset.misc_image}}"></a>
+    </div>
+    {% endif %}
+
+    <h2 property="dc:title">{{asset.title}}</h2>
+    <p property="dc:description">{{asset.description|safe}}</p>
+    <dl>
+        <dt>Reference</dt>
+        <dd>
+            <span property="aa:reference">{{asset.wiki_reference}}</span>
+        </dd>
+
+        <dt>Date</dt>
+        <dd>
+            <span property="dc:date" content="{{asset.publicdate|iso8601_date}}">{{asset.publicdate|date}}</span>
+        </dd>
+
+        <dt>Creators</dt>
+        <dd>
+            {% for creator in asset.creators.all %}<a rel="dc:creator" href="{{creator.url}}">{{creator.username}}</a>{% if not forloop.last %}, {%endif%}{%endfor%}
+        </dd>
+
+        <dt>Collections</dt>
+        <dd>
+            {% for collection in asset.collections.all %}<a rel="dc:collection" href="{{collection.url}}">{{collection.name}}</a>{% if not forloop.last %}, {%endif%}{%endfor%}
+        </dd>
+
+        <dt>License</dt>
+        <dd>
+            <a rel="dc:license" href="{{asset.license}}">{{asset.license}}</a>
+        </dd>
+
+        <dt class="tags">Tags</dt>    
+        <dd class="tags">
+            {% for subject in asset.subjects.all %}<span class="tag"><a rel="foaf:topic" href="{{subject.url}}"><span about="{{asset.url}}" property="dc:subject">{{subject.name}}</span></a></span>{% if not forloop.last %}, {%endif%}{% endfor %}
+        </dd>
+
+        <dt class="files">Files</dt>    
+        <dd class="files">
+<div class="files_summary">{{asset.files.count}} files</div>
+{{asset.files_list|safe}}
+        </dd>
+
+    </dl>
+
+</div>
+{% endblock %}
+

@@ -1,0 +1,75 @@
+{% extends "aacore/base_sarma.html" %}
+{% load aacoretags %}
+{% load markup %}
+{% load sarmatags %}
+
+{% block body %}
+{% if editlink %}
+<div id="editlink"><a href="{{editlink}}">edit</a></div>
+{% endif %}
+
+{%block sidebar%}
+{% sidebar %}
+{% endblock %}
+
+{%block context%}
+<nav>
+<div id="context">
+<h3>Relationships</h3>
+<ul>
+{% for rel in rels %}
+<li><a class="{{rel.compact_url}}" href="{% url aacore.views.rel rel.id %}">{{rel.name_plural}}</a></li>
+{% endfor %}
+</ul>
+</div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h2 property="dc:title">{{title}}</h2>
+    <p class="meta">
+        <a rel="rdf:type" href="http://activearchives.org/terms/item">item</a>
+    </p>
+    {{text|aasimplemarkdown|safe}} 
+    {% if links.get_bindings_count %}
+    <hr class="linkslist" />
+    {% regroup links by rel as links_by_rel %}
+    <div id="linkslist">
+        <ul class="linkslist">
+            {% for rel in links_by_rel %}
+            <li>{% ifequal rel.grouper|rdfnode "http://activearchives.org/terms/link" %}<span class="grouper_title">{{title}}</span> is linked to from page:{%else%}<span class="grouper_title">{{title}}</span> is referred to as <span class="grouper_rel">{{rel.grouper|rel_name_for_url}}</span> in:{%endifequal%}</li>
+                <ul>
+                    {% for item in rel.list %}
+                    <li><a href="{{item.doc|rdfnode}}">{{item.title|rdfnode}}</a>{% if item.author %}, <span class="listing_author">{{item.author|rdfnode_fix_pagenames}}</span>{%endif%}{%if item.date %}, <span class="listing_date">{{item.date|rdfnode|slice:":4"}}</span>{%endif%}</li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <p>Graph of related:{% for rel in rels %}
+        <a href="{%url aa-link-graph slug rel.id %}">{{rel.name_plural}}</a>{%endfor%}
+    </p>
+ 
+{% comment %}
+    <div>
+        <h4>Facet</h4>
+        {% for doc in flinks %}
+        <div>{{doc.doc}}<br />
+        <dl style="margin-left: 20px">
+            {% for key, value in doc.tagsbyrel.items %}
+            <dt>{{ key }}<dt> <dd>{{value}}</dd>
+            {% endfor %}
+        </dl>
+        </div>
+        {% endfor %}
+    </div>
+{% endcomment %}
+
+    {% endif %}
+</div>
+{% endblock content%}
+
+{% endblock body %}
+

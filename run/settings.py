@@ -96,22 +96,19 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.markup',
     'django.contrib.staticfiles',
+
     'aacore',
+    'flickr',
+    'youtube',
+    'ffmpeg',
+    'internetarchive',
+
 )
 
 ###################
 # AA
 ###################
 
-SITE_BASE_URL = "http://localhost:8000"
-
-#celery install, see http://query7.com/tutorial-celery-with-django
-#BROKER_BACKEND = "djkombu.transport.DatabaseTransport"
-#BROKER_HOST = "localhost"
-#BROKER_PORT = 5672
-#BROKER_USER = "guest"
-#BROKER_PASSWORD = "guest"
-#BROKER_VHOST = "/"
-
-# DJANGOTASK_DAEMON_THREAD = True
+AA_INDEXED_MODELS = ("aacore.models.Relationship", "aacore.models.Page", "sarmadocs.models.Document")
+# AA_INDEXED_MODELS = ("aacore.models.Relationship", "aacore.models.Page", "aacore.models.RDFSource", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
 

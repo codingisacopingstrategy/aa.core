@@ -170,8 +170,8 @@ section.section1 {
     left: 0;
     font-size: 13px;
     line-height: 18px;
-    overflow: hidden;
-    box-shadow: 3px 3px 6px #CCC;
+    overflow: auto;
+    /*box-shadow: 3px 3px 6px #CCC;*/
 }
 section.section1 h2, p {
     margin-bottom: 18px;
@@ -326,7 +326,98 @@ div.iviewer img {
     max-width: none !important; 
 }
 
-section.section1 h1 { display: none; }
+section.section1 h1 {
+    text-decoration: none;
+    margin: 0;
+    height: 20px;
+    background: black;
+    color: white;
+    font-size: 15px;
+}
+
+section.section1 h1.drophover {
+    background: yellow;
+}
+
+/* section_edit_link */
+.section_edit_link {
+    font-size: 10px;
+    cursor: pointer;
+    color: gray;
+    display: block;
+    float: right;
+    padding-right: 3px;
+}
+.section_edit_link:hover {
+    color: blue;
+}
+/* section_edit: hide contents while editing */
+section.editing * { display: none; }
+section.editing div.section_edit { display: inline; }
+section.editing div.section_edit * { display: inline; }
+/* section_edit textarea */
+section.editing div.section_edit textarea {
+    border: 1px solid black;
+    width: 100%;
+}
+
+/* Embed */
+div.aa_embed {
+    position: relative;
+}
+div.aa_embed .links {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    display: none;
+}
+div.aa_embed .links a {
+    padding: 4px 8px;
+    background: gray;
+    color: white;
+    margin-right: 5px;
+    text-transform: uppercase;
+    font-size:smaller;
+    border-bottom: none;
+}
+div.aa_embed .links a:hover {
+    background: black;
+    color: white;
+}
+/* draggable reference to a URL */
+a.directlink {
+    background: black;
+    color: white;
+    padding: 4px 8px;
+    background: black;
+    color: white;
+    text-transform: uppercase;
+    font-size:smaller;
+    border-bottom: none;
+    z-index: 100;
+}
+
+.browser a {
+    border-bottom: none;
+}
+.browser a:hover {
+    background: black;
+    color: white;
+}
+.browser td {
+    vertical-align: top;
+}
+
+#south-pane {
+    background: #EEE;
+}
+
+
+#browser_top {
+    margin-bottom: 20px;
+}
+
+/*section.section1 h1 { display: none; }*/
 
 form#edit-all textarea {
     width: 700px;

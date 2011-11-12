@@ -1,0 +1,733 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<style>
+body {
+    background: gray;
+}
+a { color: black; text-decoration: none; border-bottom: 1px dotted black}
+a:hover { color: blue; }
+video {
+    float: left;
+}
+#subtitles {
+    float: left;
+    width: 300px;
+    height: 300px;
+    overflow: auto;
+}
+#images {
+    float: left;
+    width: 300px;
+}
+#subtitles .title {
+    background: lightgray;
+    padding: 10px;
+    font-family: Georgia;
+}
+#subtitles .active {
+    background: white;
+}
+</style>
+<script src="../../../lib/jquery/jquery.js" type="text/javascript" charset="utf-8"></script>
+<script src="../jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../../lib/jquery/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="../../../lib/jquery/jquery-ui.css" type="text/css" charset="utf-8" />
+<script src="../jquery.timelayers.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" language="javascript" charset="utf-8">
+$(document).ready(function () {
+    $("#subtitles").autoscrollable();
+    $("video").timeline({
+        start: function (elt) {
+            return $(elt).attr("data-start");
+        },
+        end: function (elt) {
+            return $(elt).attr("data-end");
+        },
+    }).timeline("add", "#subtitles div.title", {
+        show: function (elt) {
+            // console.log("show", elt);
+            $("#subtitles").autoscrollable("scrollto", elt);
+            $(elt).addClass("active");
+        },
+        hide: function (elt) {
+            $(elt).removeClass("active");
+        }
+    }).timeline("add", "#images div.title", {
+        show: function (elt) {
+            $(elt).show(1000);
+        },
+        hide: function (elt) {
+            $(elt).hide(1000);
+        }
+    });
+
+    // Clicking subtitles jumps to that time in the video
+    $("#subtitles div.title").click(function () {
+        var t = $.timecode_tosecs_attr($(this).attr("data-start"));
+        var video = $("video")[0];
+        video.currentTime = t;
+        video.play();
+    });
+
+
+    $("<div></div>").appendTo("body").css({
+        position: 'absolute',
+        left: '5px',
+        bottom: '5px',
+        width: '980px',
+        height: '100px',
+        background: '#444',
+    }).timelayers();
+
+});
+</script>
+</head>
+
+<body>
+
+<p>Sadie Plant<br>
+<a href="http://www.constantvzw.org/site/-About-VJ10-.html">Verbindingen/Jonctions 10</a><br>
+Brussels, November 2007</p>
+
+<p style="color:white">Note: subtitles begin at 2:22 and end at 18:00.
+<br>
+Click on a title to jump to that section.</p>
+
+<video controls src="http://video.constantvzw.org/vj10/sadie-plant.ogg">video</video>
+
+<div id="subtitles" class="section">
+
+    <div class="title" data-start="00:02:21,766" data-end="00:03:19,393">
+    I have to begin with many thanks to Femke and Laurence, because it really has been a great pleasure for me to have been here this weekend. It’s nearly five years since I came to an event like this, believe it or not, and I really cannot say enough how much I have enjoyed it, and how stimulating I have found it. So yes, a big thank you to both for getting me here. And as you say, it’s ten years since I wrote Zeros + Ones, and you are marking ten years of this festival too, so it’s an interesting moment to think about a lot of the issues that have come up over the weekend. This is a more or less spontaneous report, very much an ‘open performance’, to use Simon Yuill’s words, and not to be taken as any kind of definitive account of what has happened this weekend. But still I hope it can bring a few of the many and varied strands of this event together, not to form a true conclusion, but perhaps to provide some kind of digestif after a wonderful meal.
+    </div>
+
+    <div class="title" data-start="00:03:19,393" data-end="00:03:48,937">
+    I thought I should begin as Femke very wisely began, with the theme of cooking. Femke gave us a recipe at the beginning of the weekend, really a kind of recipe for the whole event, with cooking as an example of the fact that there are many models, many activities, many things that we do in our everyday lives, which might inform and expand our ideas about technology and how we work with them.
+    </div>
+
+    <div class="title" data-start="00:03:48,937" data-end="00:04:19,317">
+    So, I too will begin with this idea of cooking, which is as Femke said a very magical, transformative experience. Femke’s clip from the Cathérine Deneuve film was a really lovely instance of the kind of deep elemental, magical chemistry which goes on in cooking.
+    </div>
+
+    <div class="title" data-start="00:04:19,317" data-end="00:04:41,770">
+    It is this that makes it such an instructive and interesting candidate, for a model to illuminate the work of programming, which itself obviously has this same kind of potential to bring something into effect in a very direct and immediate sense.
+    </div>
+
+    <div class="title" data-start="00:04:41,770" data-end="00:04:54,339">
+    And cooking is also the work behind the scene, the often forgotten work, again a little bit like programming, that results in something which – again like a lot of technology – can operate on many different scales.
+    </div>
+
+    <div class="title" data-start="00:04:54,339" data-end="00:05:20,757">
+    Cooking is in one sense the most basic kind of activity, a simple matter of survival, but it can also work on a gourmet level too, where it becomes the most refined – and well paid – kind of work. It can be the most detailed, fiddly, sort of decorative work; it can be the most backbreaking, heavy industrial work – bread making for example as well. So it really covers the whole panoply of these extremes.
+    </div>
+
+    <div class="title" data-start="00:05:20,757" data-end="00:05:43,536">
+    If we think about a recipe, and ask ourselves about the machine that the recipe requires, it’s obviously running on an incredibly complex assemblage: you have the kitchen, you have all the ingredients, you have machines for cooling things, machines for heating things, you have the person doing the cooking, the tools in question.
+    </div>
+
+    <div class="title" data-start="00:05:43,536" data-end="00:06:35,702">
+    We really are talking here about a complex process, and not just an end result. The process is also, again, a very ‘open’ activity. Simon Yuill defined an ‘open performance’ as a partial composition completed in the performance.
+    </div>
+
+    <div class="title" data-start="00:06:35,702" data-end="00:06:57,279">
+    Cooking is always about experimentation and the kitchen really is a kind of lab. The instructions may be exact, the conditions may be more or less precise but the results are never the same twice. There are just too many variables, too many contingencies involved.
+    </div>
+
+    <div class="title" data-start="00:06:57,279" data-end="00:07:10,863">
+    Of course like any experimental work, it can go completely wrong, it often does go wrong: sometimes it really is all about process, and not about eating at all! But as Simon again said today, quoting Sun Ra: there are no real mistakes, there are no truly wrong things.
+    </div>
+
+    <div class="title" data-start="00:07:10,863" data-end="00:07:35,401">
+    This was certainly the case with the fantastic cooking process that we had throughout the whole day yesterday, which ended with us eating these fantastic mussels, which I am sure elpueblodechina thought in fact were not as they should have been. But only she knew what she was aiming at: for the people who ate them they were delicious, their flavour enhanced by the whole experience of their production. elpueblodechina’s meal made us ask: what does it mean for something to go wrong?
+    </div>
+
+    <div class="title" data-start="00:07:35,401" data-end="00:08:21,550">
+    She was using a cooking technique which has come out of generations and generations of errors, mistakes, probings, fallings backs, not just simply a continuous kind of story of progress, success, and forward movement. So the mistakes are clearly always a very big part of how things work in life, in any context in life, but especially of course in the context of programming and working with software and working with technologies, which we often still tend to assume are incredibly reliable, logical systems, but in fact are full of glitches and errors.
+
+    As thinkers and activists resistant to and critical of mainstream methods and cultures, this is something that we need to keep encouraging.
+    </div>
+
+    <div class="title" data-start="00:08:21,550" data-end="00:08:41,143">
+    I have for a long time been interested in textiles, and I can’t resist mentioning the fact that the word ‘recipe’ was the old word for knitting patterns: people didn’t talk about knitting patterns, but ‘recipes’ for knitting.
+    </div>
+
+    <div class="title" data-start="00:08:41,143" data-end="00:08:59,200">
+    This brings us to another interesting junction with another set of very basic, repetitive kinds of domestic and often overlooked activities, which are nevertheless absolutely basic to human existence. Just as we all eat food, so we all wear clothes.
+    </div>
+
+    <div class="title" data-start="00:08:59,200" data-end="00:09:11,732">
+    As with cooking, the production of textiles again has this same kind of sense of being very basic to our survival, very elemental in that sense, but it can also function at a high level of detailed, refined activity as well.
+    </div>
+
+    <div class="title" data-start="00:09:11,732" data-end="00:09:41,981">
+    With a piece of knitting it is difficult to see the ways in which a single thread becomes looped into a continuous textile. But if you look at a woven pattern, the program that has led to the pattern is right there in front of you, as you see the textile itself.
+    </div>
+
+    <div class="title" data-start="00:09:41,981" data-end="00:10:04,291">
+    This makes weaving a very nice, basic and early example of how this kind of immediacy can be brought into operation. What you look at in a piece of woven cloth is not just a representation of something that can happen somewhere else, but the actual instructions for producing and reproducing that piece of woven cloth as well.
+    </div>
+
+    <div class="title" data-start="00:10:04,291" data-end="00:10:12,389">
+    So that’s the kind of deep intuitive connection that it has with computer programming, as well as the more linear historical connections of which I have often spoken.
+    </div>
+
+    <div class="title" data-start="00:10:12,389" data-end="00:10:33,259">
+    There are some other nice connections between textiles, cooking and programming as well. Several times yesterday there was a lot of talk about both experts and amateurs, and developers and users. These are divisions which constantly, and often perhaps with good reason, reassert themselves, and often carry gendered connotations too.
+    </div>
+
+    <div class="title" data-start="00:10:33,259" data-end="00:10:52,538">
+    In the realm of cooking, you have the chef on the one hand, who is often male and enjoys the high status of the inventive, creative expert, and the cook on the other, who is more likely to be female and works under quite a different rubric.
+    </div>
+
+    <div class="title" data-start="00:10:52,538" data-end="00:11:13,750">
+    In reality, it might be said that the distinction is far from precise: the very practise of using computers, of cooking, of knitting, is almost inevitably one of constantly contributing to their development, because they are all relatively open systems and they all evolve through people’s constant, repetitive use of them.
+    </div>
+
+    <div class="title" data-start="00:11:13,750" data-end="00:11:24,250">
+    So it is ultimately very difficult to distinguish between the user and the developer, or the expert and the amateur.
+    </div>
+
+    <div class="title" data-start="00:11:24,250" data-end="00:11:54,658">
+    The experiment, the research, the development is always happening in the kitchen, in the bedroom, on the bus, using your mobile or using your computer. Fernand Braudel speaks about this kind of ‘micro-histories’, this sense of repetitive activity, which is done in many trades and many lines, and that really is the deep unconscious history of human activity.
+    </div>
+
+    <div class="title" data-start="00:11:54,658" data-end="00:12:12,300">
+    And arguably that’s where the most interesting developments happen, albeit in a very unsung, unseen, often almost hidden way. It is this kind of deep collectivity, this profound sense of micro-collaboration, which has often been tapped into this weekend.
+    </div>
+
+    <div class="title" data-start="00:12:12,300" data-end="00:12:40,398">
+    Still, of course, the social and conceptual divisions persist, and still, just as we have our celebrity chefs, so we have our celebrity programmers and dominant corporate software developers. And just as we have our forgotten and overlooked cooks, so we have people who are dismissed, or even dismiss themselves, as ‘just computer users’.
+
+    The technological realities are such that people are often forced into this role, with programmes that really are so fixed and closed that almost nothing remains for the user to contribute. The structural and social divisions remain, and are reproduced on gendered lines as well.
+    </div>
+
+    <div class="title" data-start="00:12:40,398" data-end="00:13:06,285">
+    In the 1940s, computer programming was considered to be extremely menial, and not at all a glamorous or powerful activity. Then of course, the business of dealing with the software was strictly women’s work, and it was with the hardware of the system that the most powerful activity lay. That was where the real solid development was done, and that was where the men were working, with what were then the real nuts and bolts of the machines.
+    </div>
+
+    <div class="title" data-start="00:13:06,285" data-end="00:13:18,485">
+    Now of course, it has all turned around. It is women who are building the chips and putting the hardware – such as it is these days – together, while the male expertise has shifted to the writing of software.
+    </div>
+
+    <div class="title" data-start="00:13:18,485" data-end="00:13:26,687">
+    In only half a century, the evolution of the technology has shifted the whole notion of where the power lies. No doubt – and not least through weekends like this – the story will keep moving on.
+    </div>
+
+    <div class="title" data-start="00:13:26,687" data-end="00:13:39,461">
+    But as the world of computing does move more and more into software and leave the hardware behind, it is accompanied by the perceived danger that the technology and, by extension, the cultures around it, tend to become more and more disembodied and intangible.
+    </div>
+
+    <div class="title" data-start="00:13:39,461" data-end="00:13:54,403">
+    This has long been seen as a danger because it tends to reinforce what have historically, in the Western world at least, been some of the more oppressive tendencies to affect women and all the other bodies that haven’t quite fitted the philosophical ideal.
+    </div>
+
+    <div class="title" data-start="00:13:54,403" data-end="00:14:15,770">
+    Both the Platonic and Christian traditions have tended to dismissing or repress the body, and with it all the kind of messy, gritty, tangible stuff of culture, as transient, difficult, and flawed. And what has been elevated is of course the much more formal, idealist, disembodied kind of activities and processes.
+    </div>
+
+    <div class="title" data-start="00:14:15,770" data-end="00:14:38,471">
+    This is a site of continual struggle, and I guess part of the purpose of a weekend like this is to keep working away, re-injecting some sense of materiality, of physicality, of the body, of geography, into what are always in danger of becoming much more formal and disembodied worlds.
+    </div>
+
+    <div class="title" data-start="00:14:38,471" data-end="00:14:49,510">
+    What Femke and Laurence have striven to remind us this weekend is that however elevated and removed our work appears to be from the matter of bodies and physical techniques, we remain bodies, complex material processes, working in a complex material work.
+    </div>
+
+    <div class="title" data-start="00:14:49,510" data-end="00:15:19,875">
+    Once again, there still tends to be something of a gendered divide. The dance workshop organised this morning by Alice Chauchat and Frédéric Gies was an inspiring but also difficult experience for many of us, unused as we are to using our bodies in such literally physical and public ways. It was not until we came out of the workshop into a space which was suddenly mixed in terms of gender, that I realised that the participants in the workshop had been almost exclusively female. It was only the women who had gone to this kind of more physical, embodied, and indeed personally challenging part of the weekend.
+    </div>
+
+    <div class="title" data-start="00:15:19,875" data-end="00:15:35,130">
+    But we all need to continually re-engage with this sense of the body, all this messiness and grittiness, which it is in many vested interests to constantly cleanse from the world.
+    </div>
+
+    <div class="title" data-start="00:15:35,130" data-end="00:15:49,655">
+    We have to make ourselves deal with all the embarrassment, the awkwardness, and the problematic side of this more tangible and physical world.
+    </div>
+
+    <div class="title" data-start="00:15:49,655" data-end="00:16:00,418">
+    For that reason it has been fantastic that we have had such strong input from people involved in dance and physical movement, people working with bodies and the real sense of space.
+
+    Sabine Prokhoris and Simon Hecquet made us think about what it means to transcribe the movements of the body; Séverine Dusollier and Valérie Laure Benabou got us to question the legal status of such movements too. And what we have gained from all of this is this sense that we are all always working with our bodies, we are always using our bodies, with more or less awareness and talent, of course, whether we are dancing or baking or knitting or slumped over our keyboards. In some ways we shouldn’t even need to say it, but the fact that we do need to remind ourselves of our embodiment shows just how easy it is for us to forget our physicality. This morning’s dance workshop really showed some of the virtues of being able to turn off one’s self-consciousness, to dismiss the constantly controlling part of one’s self and to function on a different, slightly more automatic level. Or perhaps one might say just to prioritise a level of bodily activity, of bodily awareness, of a sense of spatiality that is so easy to forget in our very cerebral society.
+    </div>
+
+    <div class="title" data-start="00:16:00,418" data-end="00:16:44,799">
+    What Frédéric and Alice showed us was not simply about using the body, but rather how to overcome the old dualism of thinking of the body as a kind of servant of the mind. Perhaps this is how we should think about our relationships to our technologies as well, not just to see them as our servants, and ourselves as the authors or subjects of the activity, but rather to perceive the interactivity, the sense of an interplay, not between two dualistic things, the body and the mind, or the agent and the tool, the producer and the user, but to try and see much more of a continuum of different levels and different kinds and different speeds of material activity, some very big and clunky, others at extremely complex micro-levels.
+    </div>
+
+</div>
+
+<div id="images" class="section">
+    <div class="title" data-start="00:01:00" data-end="00:01:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01085.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:04" data-end="00:01:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01090.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:08" data-end="00:01:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01092.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:12" data-end="00:01:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01104.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:16" data-end="00:01:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01105.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:20" data-end="00:01:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01116.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:24" data-end="00:01:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01127.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:28" data-end="00:01:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01153.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:32" data-end="00:01:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01162.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:36" data-end="00:01:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01166.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:40" data-end="00:01:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01181.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:44" data-end="00:01:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01214.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:48" data-end="00:01:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01230.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:52" data-end="00:01:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01249.JPG" />
+    </div>
+
+    <div class="title" data-start="00:01:56" data-end="00:02:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01250.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:00" data-end="00:02:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01251.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:04" data-end="00:02:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01252.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:08" data-end="00:02:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01253.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:12" data-end="00:02:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01254.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:16" data-end="00:02:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01255.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:20" data-end="00:02:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01257.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:24" data-end="00:02:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01261.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:28" data-end="00:02:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01266.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:32" data-end="00:02:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01267.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:36" data-end="00:02:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01272.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:40" data-end="00:02:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01275.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:44" data-end="00:02:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01276.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:48" data-end="00:02:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01277.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:52" data-end="00:02:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01278.JPG" />
+    </div>
+
+    <div class="title" data-start="00:02:56" data-end="00:03:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01281.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:00" data-end="00:03:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01287.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:04" data-end="00:03:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01288.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:08" data-end="00:03:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01289.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:12" data-end="00:03:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01290.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:16" data-end="00:03:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01291.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:20" data-end="00:03:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01292.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:24" data-end="00:03:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01293.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:28" data-end="00:03:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01295.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:32" data-end="00:03:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01296.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:36" data-end="00:03:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01297.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:40" data-end="00:03:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01299.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:44" data-end="00:03:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01302.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:48" data-end="00:03:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01303.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:52" data-end="00:03:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01304.JPG" />
+    </div>
+
+    <div class="title" data-start="00:03:56" data-end="00:04:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01307.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:00" data-end="00:04:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01314.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:04" data-end="00:04:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01315.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:08" data-end="00:04:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01316.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:12" data-end="00:04:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01318.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:16" data-end="00:04:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01321.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:20" data-end="00:04:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01322.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:24" data-end="00:04:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01323.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:28" data-end="00:04:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01327.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:32" data-end="00:04:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01328.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:36" data-end="00:04:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01329.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:40" data-end="00:04:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01330.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:44" data-end="00:04:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01331.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:48" data-end="00:04:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01334.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:52" data-end="00:04:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01336.JPG" />
+    </div>
+
+    <div class="title" data-start="00:04:56" data-end="00:05:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01337.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:00" data-end="00:05:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01339.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:04" data-end="00:05:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01341.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:08" data-end="00:05:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01344.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:12" data-end="00:05:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01345.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:16" data-end="00:05:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01445.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:20" data-end="00:05:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01451.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:24" data-end="00:05:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01462.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:28" data-end="00:05:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01463.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:32" data-end="00:05:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01465.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:36" data-end="00:05:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01468.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:40" data-end="00:05:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01470.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:44" data-end="00:05:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01472.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:48" data-end="00:05:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01476.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:52" data-end="00:05:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01483.JPG" />
+    </div>
+
+    <div class="title" data-start="00:05:56" data-end="00:06:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01484.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:00" data-end="00:06:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01486.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:04" data-end="00:06:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01487.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:08" data-end="00:06:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01490.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:12" data-end="00:06:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01497.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:16" data-end="00:06:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01500.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:20" data-end="00:06:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01502.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:24" data-end="00:06:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01504.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:28" data-end="00:06:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01506.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:32" data-end="00:06:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01507.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:36" data-end="00:06:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01508.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:40" data-end="00:06:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01509.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:44" data-end="00:06:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01511.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:48" data-end="00:06:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01512.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:52" data-end="00:06:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01514.JPG" />
+    </div>
+
+    <div class="title" data-start="00:06:56" data-end="00:07:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01518.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:00" data-end="00:07:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01519.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:04" data-end="00:07:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01521.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:08" data-end="00:07:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01524.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:12" data-end="00:07:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01527.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:16" data-end="00:07:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01528.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:20" data-end="00:07:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01531.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:24" data-end="00:07:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01532.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:28" data-end="00:07:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01533.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:32" data-end="00:07:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01535.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:36" data-end="00:07:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01537.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:40" data-end="00:07:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01540.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:44" data-end="00:07:48">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01541.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:48" data-end="00:07:52">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01548.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:52" data-end="00:07:56">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01551.JPG" />
+    </div>
+
+    <div class="title" data-start="00:07:56" data-end="00:08:00">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01552.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:00" data-end="00:08:04">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01554.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:04" data-end="00:08:08">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01557.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:08" data-end="00:08:12">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01558.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:12" data-end="00:08:16">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01560.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:16" data-end="00:08:20">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01561.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:20" data-end="00:08:24">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01563.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:24" data-end="00:08:28">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01564.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:28" data-end="00:08:32">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01565.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:32" data-end="00:08:36">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01566.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:36" data-end="00:08:40">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01569.JPG" />
+    </div>
+
+    <div class="title" data-start="00:08:40" data-end="00:08:44">
+    <img src="http://activearchives.org/collagecode/VJ10/DSC01570.JPG" />
+    </div>
+</div>
+
+</body>
+</html>
+    

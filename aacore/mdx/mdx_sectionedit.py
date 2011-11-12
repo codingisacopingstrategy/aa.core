@@ -9,15 +9,46 @@ Provides: sectionalize
 
 import markdown, re
 
-HASH_HEADER = r'(^|\n)(?P<level>[#]{%s})[^#](?P<header>.*?)[#]*(\n|$)'
-HASH_OR_TIMECODE_HEADER = r"""
-(^|\n)
+HASH_HEADER = r"""
+^
 ( (?P<level>[#]{%s}) [^#] (?P<header>.*?) [#]* )
-|
-( (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?) \s* --> \s* (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)? )
-(\n|$)""".strip()
+$
+""".strip()
 
-def split_re (pattern, text, returnLeading=False):
+# 7 nov 2011: today I learned to watch out that \s* matches newlines! my head hurts
+
+HASH_OR_TIMECODE_HEADER = r"""
+^
+(
+  ( (?P<level>[#]{%s}) [^#] (?P<header>.*?) [#]* )
+|
+  ( (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+  [ \t]* --> [ \t]*
+  (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+  (?P<other>.+)?
+  [ \t]*  
+  )
+)
+$
+""".strip()
+
+#def spliterator (pattern, text):
+#    """
+#    Utility function for splitting on a "header" patter
+#    yields (match, text), where text is that text between match and the next match
+#    """
+#    lastm = None
+#    cur = 0
+#    for m in pattern.finditer(text):
+#        if lastm:
+#            yield lastm, text[cur:m.start()]
+#        lastm = m
+#        cur = m.end()
+#    if lastm:
+#        yield m, text[cur:]
+
+def spliterator (pattern, text, returnLeading=False):
+    """ yields: header (can be ''), body, start, end """
     cur = None
     header = None
     start = None
@@ -33,12 +64,17 @@ def split_re (pattern, text, returnLeading=False):
         cur = match.end() 
     if cur != None:
         yield (header, text[cur:], start, len(text))
+    if returnLeading and cur == None:
+        # NO MATCHES, return whole text as "leading"
+        yield ('', text, 0, len(text))
 
 def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     '''
     Takes a wikitext and returns a list section dictionaries in form:
-    { sectionindex: 0, header: "", body: "", start: charindex, end: charindex }
+    { index: 0, header: "", body: "", start: charindex, end: charindex }
     NB: Source texts overlap depending on hierarchy of headers (see example).
+
+    NB: Guaranteed to have a "zero" section (either blank, or with any pre-header leading text) whose depth=0
 
     Takes a text, returns a list in the form [ (headerline, bodylines), ... ]
     ie [ ("# Title", "This is the title.\n\More lines"), ("# Introduction", "Intro text"), ... ]
@@ -47,23 +83,33 @@ def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     if depth == 2:
         pattern = re.compile(HASH_OR_TIMECODE_HEADER % depth, re.I | re.M | re.X)
     else:    
-        pattern = re.compile(HASH_HEADER % depth, re.I | re.M)
+        pattern = re.compile(HASH_HEADER % depth, re.I | re.M | re.X)
 
-    sectionnumber = 0
     if sections == None:
         sections = []
 
-    for header, body, start, end in split_re(pattern, wikitext):
+    for header, body, start, end in spliterator(pattern, wikitext, returnLeading = depth==1):
+        # ensure blank "zero" section
+        if depth == 1 and len(sections) == 0 and header != '':
+            sections.append(dict(index=0, start=0, end=0, header='', body='', depth=0))
+
         section = {}
-        section['sectionnumber'] = len(sections) + 1
+        section['index'] = len(sections)
         section['start'] = textstart + start
         section['end'] = textstart + end
         section['header'] = header
         section['body'] = body
-        section['depth'] = depth        
+        if len(sections) == 0:
+            d = 0
+        else:
+            d = depth
+        section['depth'] = d
         sections.append(section)
+
+        # RECURSE ON CONTENTS
         if depth < 10 and body:
             sectionalize(body, depth + 1, sections, textstart + len(header) + start)
+
     return sections
 
 
@@ -118,9 +164,11 @@ if __name__ == "__main__":
 #    sys.exit(0)
 
     text = """
-# Test{@style=left: 250px; top: 100px;}
+Hello world
 
-Hello world.
+# Section 1: Tomatoes {@style=left: 250px; top: 100px;}
+
+Tomatoes text.
 
 00:01:00 --> 00:02:17
 
@@ -130,12 +178,32 @@ This is a timed annotation
 
 At three minutes.
 
+# Section 2: Orange
+
+Orange text
+
+
 """.strip()
+
+    text = """# Hello world
+
+# One @{style=left: 250px}
+
+# Two
+
+01:23 --> {@style=left: 250px; top: 100px;}
+
+# Three"""
 
     from pprint import pprint
     sections = sectionalize(text)
     pprint(sections)
 
+    # pat = re.compile(HASH_HEADER%"1", re.I | re.M | re.X)
+#    pat = re.compile(HASH_OR_TIMECODE_HEADER%"1", re.M | re.X)
+#    for things in spliterator(pat, text, True):
+#        pprint(things)
+#        print
  
 #    html = markdown.markdown(text, ['sectionedit'])
 #    print html

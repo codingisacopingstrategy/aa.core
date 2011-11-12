@@ -1,0 +1,64 @@
+Management of:
+* Multiple files belonging to a single "item"
+* Inter-file relations such as derived from
+* File groupings such as a compilation of different resources.
+
+Guiding principle: Following the models suggested by Archive.org & Flickr (and in a way to be able to trivially incorporate these sources); but provided as a central implementation so that simpler models like ffmpeg which need not re-implement the same. Also, literally the archive provides a centralized notion of "resources" / assets with the various relations of source & collection.
+
+AHA moment: Looking at the meta & files feed from archive.org... Finally starting to get the subtleties of what something archive.org provides.
+
+Though not implemented as a proper super class, an AAModel if it existed would look like:
+(Thus this is more a template/interface than a superclass)
+
+class AAModel (models.model):
+
+    @classmethod
+    def sniff(cls, url):
+        """Check the url, returns (Matches, Exists)"""
+
+    @classmethod
+    def get_or_create_from_url(cls, url, reload=False):
+        """ Retrieve the resource, or create it -- if possible (if matching)
+            Returns object, created
+            NB: Object may be None for non-matching URLs (in which case created will always be False)
+        """
+        try:
+            ret = cls.objects.get(url=url)
+            if reload: ret.sync()
+            return ret, False
+        except cls.DoesNotExist:
+            info = utils.ffmpeg_get_info(url)
+            if info:
+                ret = Media.objects.create(url=url)
+                ret.sync()
+                return ret, True
+            return None, False
+
+    # The Public, Definitive (ought to be normalized, but that's not our problem...) URL
+    url = models.URLField()...
+
+    # get_absolute_url defines the "local" URL of the app-specific (rdfa-enhanced) view
+    @models.permalink
+    def get_absolute_url(self):
+        return ('aa-ffmpeg-media', (str(self.id), ))
+    >>> PROVIDE A DECORATOR aa_metadata_page in order to allow something other than absolute_url
+
+    # OPTIONAL (not always relevant)
+    # a wiki_reference allows short cut refs to the resource from within the aa wiki
+    def wiki_reference (self):
+        return "flickr:" + self.flickrid
+
+    # Templates (not strictly required)
+
+    def load_data(self):
+        """ Load relevant metadata from the "live" object via inspection/API """
+        # ...
+        return data
+
+    def sync (self, data=None):
+        """ take the given data and commit it to your database fields, saving the instance """
+        if data == None:
+            data = self.load_data()
+        # ...
+        self.save()
+

@@ -15,22 +15,75 @@ import mdx_sectionedit
 import mdx_addsections
 import mdx_addsectionstoolbar
 import mdx_timecodes
-from aacore.utils import wikify
+from aacore.utils import url_for_pagename
+import urlparse
 
-def make_link(rel, target, label):
+
+def make_link(rel, target, label, default_link_rel=None):
     """
     Custom implementation of the SemanticWikilinks make_link function.
     Returns ElementTree Element. 
     """
     a = markdown.etree.Element('a')
-    a.set('href', '/pages/' + wikify(target))
+    parts = urlparse.urlparse(target)
+    if parts.scheme:
+        href = target
+    else:
+        href = url_for_pagename(target)
+    a.set('href', href)
     a.text = label or target
     if rel:
         a.set('rel', rel)
+    elif default_link_rel:
+        a.set('rel', default_link_rel)
+
     return a
 
 
-def get_markdown():
+#"""
+#    <a rel="aa:link" href="/pages/Anthology_walk%2Btalk_Brussels">
+#        <span about="/pages/Anthology_walk%2Btalk_Brussels">
+#            <span property="aa:linklabel">this anthology</span>
+#            <span property="aa:linktarget" content="Anthology walk+talk Brussels"></span>
+#        </span>
+#    </a>
+#"""
+#def make_link (rel, target, label, default_link_rel=None):
+#    """ More semantically complete version, asserts linktarget and label (if different) via nested spans. """
+#    a = markdown.etree.Element('a')
+#    href = url_for_pagename(target)
+#    a.set('href', href)
+
+#    if rel:
+#        a.set('rel', rel)
+#    elif default_link_rel:
+#        a.set('rel', default_link_rel)
+
+#    label = label or target
+#    span = markdown.etree.Element('span')
+#    span.set('about', href)
+#    a.append(span)
+
+#    if label != target:
+#        label_span = markdown.etree.Element('span')
+#        label_span.set("property", "aa:linklabel")
+#        label_span.text = label
+#        span.append(label_span)
+
+#        target_span = markdown.etree.Element('span')
+#        target_span.set("property", "aa:linktarget")
+#        target_span.set("content", target)
+#        span.append(target_span)
+#    else:
+#        # Only include aa:linktarget
+#        target_span = markdown.etree.Element('span')
+#        target_span.set("property", "aa:linktarget")
+#        target_span.text = target
+#        span.append(target_span)
+
+#    return a
+
+def get_markdown(default_link_rel = "aa:link"):
     """
     This is a function to return a Active Archive markdown instance.
     Returns a Markdown instance.
@@ -39,15 +92,32 @@ def get_markdown():
             "extra",
             "meta",
             "toc",
-            mdx_semanticwikilinks.makeExtension(configs=[('make_link', make_link)]),
+            mdx_semanticwikilinks.makeExtension(configs=[
+                ('make_link', make_link),
+                ('default_link_rel', default_link_rel)]),
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
-            mdx_sectionedit.makeExtension(),
+            # mdx_sectionedit.makeExtension(),
             mdx_addsections.makeExtension(configs=[('class','section%(LEVEL)d'),]),
-            mdx_addsectionstoolbar.makeExtension(),
+            # mdx_addsectionstoolbar.makeExtension(),
             ],
         ) 
 
+def get_simple_markdown(default_link_rel = "aa:link"):
+    """
+    This is a function to return a Active Archive markdown instance.
+    Returns a Markdown instance.
+    """
+    return markdown.Markdown(extensions=[
+            "extra",
+            "meta",
+            "toc",
+            mdx_semanticwikilinks.makeExtension(configs=[
+                ('make_link', make_link),
+                ('default_link_rel', default_link_rel)]),
+            mdx_semanticdata.makeExtension(),
+            ],
+        ) 
 
 if __name__ == "__main__":
     import doctest

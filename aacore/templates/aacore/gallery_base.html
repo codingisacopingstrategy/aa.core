@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>edepot</title>
+    
+<link href='http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{STATIC_URL}}aacore/gallery.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<script src="{{STATIC_URL}}lib/jquery/jquery.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}lib/jquery/jquery-ui.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}lib/swfobject/swfobject.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}lib/shortcut.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}jquery.djangocsrf.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}jquery.delayedaction.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}jquery.timecode.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}jquery.ui.playable.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+{% block extrahead %}{%endblock %}
+</head>
+<body>
+{% block logo %}
+<div id="logo">
+    <a href="{%url aa-resources %}">
+        Active Archives
+    </a>
+</div>
+{% endblock %}
+
+{% block right %}
+<div id="right">
+    {% block userlogin %}
+    <div id="userlogin">
+        <img src="{{STATIC_URL}}images/openidlogo.png" />
+        <span class="username">{%if user.get_full_name%}{{user.get_full_name}}{%else%}{{user.email}}{%endif%}</span> |
+        <a href="{% url logout %}">Logout</a>
+    </div>
+    {% endblock userlogin%}
+    {% block search %}
+    <div id="search">
+        <input id="searchbox" type="text" name="search" value="{{ search }}" /> <span id="searchlabel">Search</span>
+    </div>
+    {% endblock search %}
+</div>
+{% endblock right %}
+
+<div id="content">
+{% block body %}
+{% endblock %}
+</div>
+<div id="footer">
+{% block footer %}
+{% endblock %}
+</div>
+
+</body>
+</html>
+

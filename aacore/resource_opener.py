@@ -109,7 +109,7 @@ class ResourceOpener():
 
     def writeToFile(self, outfile, verbose=False):
         try:
-            request = urllib2.Request(self.url)
+            request = urllib2.Request(self.original_url)
             request.add_header("User-Agent", USER_AGENT)
             requestfile = urllib2.urlopen(request)
 

@@ -108,7 +108,7 @@ class AddSectionsExtension(markdown.Extension):
         self.config = {
             'tag': ['section', 'tag name to use, default: section'],
             'class': ['section%(LEVEL)d', 'class name, may include %(LEVEL)d to reference header-level (i.e. h1, h2)'],
-            'typeof': ['aa:section', 'sets typeof attribute for rdfa']
+            'typeof': ['', 'sets typeof attribute for rdfa']
         }
         for key, value in configs:
             self.setConfig(key, value)

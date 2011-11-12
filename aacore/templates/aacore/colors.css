@@ -1,0 +1,17 @@
+.relbox_values {
+    padding: 3px;
+    border: 2px dotted gray;
+}
+
+{% for ns in namespaces %}
+.relbox.{{ns.name}} .relbox_name {
+    color: {{ns.color}};
+}
+.relbox.{{ns.name}} .relbox_values {
+    border: 2px dotted {{ns.color}};
+}
+.relbox.{{ns.name}} .relbox_value_separator {
+    border-left: 2px dotted {{ns.color}};
+}
+{% endfor %}
+

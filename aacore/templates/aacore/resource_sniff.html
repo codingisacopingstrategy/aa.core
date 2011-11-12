@@ -1,0 +1,41 @@
+{% extends "aacore/base.html" %}
+{% load aacoretags %}
+
+{% block body %}
+<div about="{{resource.url}}">
+    {% if original_url != url %}
+    <div class="redirected">
+        Redirected from <a href="{{original_url}}" property="aa:redirected_from">{{ original_url }}</a>
+    </div>
+    {% endif %}
+
+    <dl>
+        <dt>Host name</dt>
+        <dd property="http:hostname">{{ resource.url|url_hostname }}</dd>
+
+        {% if resource.content_type %}<dt>Content-type</dt>
+        <dd property="http:content_type">{{ resource.content_type }}</dd>{% endif %}
+
+        {% if resource.charset %}<dt>charset</dt>
+        <dd property="http:charset">{{ resource.charset }}</dd>{%endif%}
+
+        {% if resource.content_length %}<dt>Content-length</dt>
+        <dd property="http:content_length" content="{{resource.content_length}}">{{ resource.content_length|filesizeformat }}</dd>{% endif %}
+
+        {% if resource.last_modified %}<dt>Last modified</dt>
+        <dd property="http:last_modified" content="{{resource.last_modified|iso8601_date}}">{{ resource.last_modified|date }}</dd>{% endif %}
+
+        {% if resource.etag %}<dt>etag</dt>
+        <dd property="http:etag">{{ resource.etag }}</dd>{% endif %}
+
+        <dt>Delegates</dt>
+        <dd><ul>
+        {% for d in resource.delegates.all %}
+        <li><a rel="aa:sniffer" href="{{d.delegate.get_absolute_url}}">{{d.delegate.get_absolute_url}}</a></li>
+        {% endfor %}
+        </ul></dd>
+
+    </dl>
+</div>
+{%endblock %}
+
