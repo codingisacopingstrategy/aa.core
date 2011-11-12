@@ -1,0 +1,97 @@
+{% extends "aacore/base.html" %}
+{% load aacoretags %}
+
+{% block body %}
+<div about="{{video.get_about_url}}" id="minipage">
+<a href="{%url aa-browse %}?uri={{video.get_about_url|urlencode}}" class="backlink">{{video.get_about_url}}</a>
+<table>
+<tr>
+<td valign="top">
+    <img src="{{video.thumbnail_url}}" />
+    <a rel="foaf:thumbnail" href="{{video.thumbnail_url}}"></a>
+
+    <div>
+    Thumbnails:<ul>
+        {% for thumb in video.thumbnails.all %}
+        <li><a rel="dc:relation" href="{{ thumb.url }}">
+            <img src="{{thumb.url}}" />
+            <span property="dc:type" content="Image"></span>
+            (<span property="aa:width">{{thumb.width}}</span>&#x00D7;<span property="aa:height">{{thumb.height}}</span> @ <span property="aa:time">{{thumb.time}}</span>)</a>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+    Available formats:<ul>
+        {% for format in video.formats.all %}
+        <li><a rel="dc:relation" href="{{ format.url }}">
+            <span property="dc:type" content="Video"></span>
+            <span property="dc:format">{{format.ftype}}</span></a>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+</td>
+<td valign="top">
+    <h2 property="dc:title">{{video.title}}</h2>
+    <p property="dc:description">{{video.description|safe}}</p>
+    <dl>
+        <dt>Youtube page</dt>
+        <dd><a href="{{video.watch_url}}">{{video.watch_url}}</a></dd>
+
+        <dt>Reference</dt>
+        <dd><span property="aa:reference">youtube:{{video.youtubeid}}</span></dd>
+
+        <dt>Duration</dt>
+        <dd><span property="aa:duration" content="{{video.duration}}">{{video.duration}}</span></dd>
+
+        <dt>Date</dt>
+        <dd><span property="dc:date" content="{{video.published|iso8601_date}}">{{video.published}}</span></dd>
+
+        <dt>Category</dt>
+        <dd><span property="dc:subject" content="{{video.category}}">{{video.category}}</span></dd>
+
+        {% if video.location %}
+        <dt>Location</dt>
+        <dd>{{video.location}}</dd>
+        {% endif %}
+
+        <dt>Author</dt>
+        <dd><a rel="dc:creator" href="{{video.author.url}}">{{video.author.username}}</a></dd>
+
+        <dt>License</dt>
+        <dd>
+            {%if video.license.url%}
+                <a rel="dc:license" href="{{video.license.url}}">{{video.license.url}}</a>
+            {% else %}
+                &mdash;
+            {% endif %}
+        </dd>
+
+        {% if video.view_count %}
+        <dt>View count</dt>
+        <dd>{{video.view_count}}</dd>
+        {% endif %}
+
+        {% if video.rating %}
+        <dt>Rating</dt>
+        <dd>{{video.rating}}</dd>
+        {% endif %}
+
+        <dt class="tags">Tags</dt>    
+        <dd class="tags">
+            <ul>
+            {% for tag in video.tags.all %}<li><a rel="foaf:topic" href="{{tag.get_full_url}}"><span about="{{video.get_about_url}}" property="dc:subject">{{tag.name}}</span></a></li>{% endfor %}
+            </ul>
+        </dd>
+
+    </dl>
+
+
+</td>
+</tr>
+</table>
+</div>
+{% endblock %}
+
