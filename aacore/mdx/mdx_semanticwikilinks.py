@@ -18,7 +18,7 @@ Basic usage:
 
 Define a custom URL builder:
 
-    >>> def make_rdfa(rel, target, label):
+    >>> def make_rdfa(rel, target, label, default_link_rel=None):
     ...     elt = markdown.etree.Element("span")
     ...     elt.set("property", rel)
     ...     elt.set("value", target)
@@ -49,21 +49,41 @@ wikilink_pattern = r"""
     (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
     (?P<target>.+?) \s*
     (?:\| \s* (?P<label>[^\]]+?) \s*)?
-\]\]
+\]\](?!\])
 """.strip()
 
-def make_link (rel, target, label):
+wikilink_pattern = r"""
+\[\[\s*
+    (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
+    (?P<target>.+?) \s*
+    (?:\| \s* (?P<label>.+?) \s*)?
+\]\](?!\])
+""".strip()
+
+"""
+    <a rel="aa:link" href="/pages/Anthology_walk%2Btalk_Brussels">
+        <span about="/pages/Anthology_walk%2Btalk_Brussels">
+            <span property="aa:linklabel">this anthology</span>
+            <span property="aa:linktarget" content="Anthology walk+talk Brussels"></span>
+        </span>
+    </a>
+"""
+
+def make_link (rel, target, label, default_link_rel=None):
     a = markdown.etree.Element('a')
     a.set('href', target)
     a.text = label or target
     if rel:
         a.set('rel', rel)
+    elif default_link_rel:
+        a.set('rel', default_link_rel)
     return a
 
 class WikiLinkExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
             'make_link' : [make_link, 'Callback to convert link parts into an HTML/etree element (<a></a>)'],
+            'default_link_rel' : [None, 'Default link rel'],
             'namespace' : ['aa', 'Default namespace'],
         }
         # Override defaults with user settings
@@ -96,7 +116,7 @@ class WikiLinkPattern(markdown.inlinepatterns.Pattern):
         rel = d.get("rel")
         if rel:
             rel = "%s:%s" % (namespace, d.get("rel"))
-        return fn(rel, d.get("target"), d.get("label"))
+        return fn(rel, d.get("target"), d.get("label"), self.config['default_link_rel'][0])
 
 def makeExtension(configs={}) :
     return WikiLinkExtension(configs=configs)

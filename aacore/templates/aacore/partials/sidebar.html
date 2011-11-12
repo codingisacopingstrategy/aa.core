@@ -1,0 +1,15 @@
+{% load aacoretags %}
+<div id="box" class="main" about="http://sarma.be/pages/Sidebar">
+    <div class="menu">
+        {{sidebar.content|aasimplemarkdown|html5tidy}}
+
+        <div class="search">
+            <h3>Search</h3>
+		    <form action="/sarma/search/" method="post">{%csrf_token%}
+		    <input type="text" name="search" id="searchbox" />
+		    </form>
+	    </div>
+
+    </div>
+</div>
+

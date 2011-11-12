@@ -11,3 +11,8 @@ USER_AGENT = getattr(settings, 'AA_USER_AGENT', "Mozilla/5.0 (X11; U; Linux i686
 DEFAULT_REL_NAMESPACE = getattr(settings, 'AA_DEFAULT_REL_NAMESPACE', "aa")
 RDF_STORAGE_NAME = getattr(settings, 'AA_RDF_STORAGE_NAME', "aa")
 RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
+INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Relationship", "aacore.models.Page"))
+
+import os
+CACHE_DIR = os.path.join(settings.MEDIA_ROOT, "cache")
+

@@ -16,41 +16,199 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 """
-docstring please :)
+Thin wrapper functions to work with an RDF store based on the Redland C library & Python bindings
+(librdf, python-librdf (python module name: RDF))
+
+Requires: RDF, urlparse
+
 """
 
-import RDF
+import RDF, urlparse
 
-from settings import *
-
-
-# if model is None: raise Exception("new RDF.model failed")
-
-
-def put_url(theuri):
+def get_model (storagename, storagedir):
     """
-    docstring please :)
+    Open/Create and return the default RDF Store (RDF.Model in bdb hashes format, contexts enabled)
+    File Name(s) set by settings.RDF_STORAGE_DIR & RDF_STORAGE_NAME
     """
-    storage = RDF.HashStorage(RDF_STORAGE_NAME, options="hash-type='bdb',contexts='yes',dir='" + RDF_STORAGE_DIR + "'")  # dir='.'
-    # if storage is None: raise Exception("open RDF.Storage failed")
-    model = RDF.Model(storage)
-    # open the url
-    # parse as rdf(a)
-    # push into the hashes store with context=url
-    if not theuri.startswith("http") and not theuri.startswith("file:"):
-        theuri = "file:" + theuri
-    uri = RDF.Uri(theuri)
-    parser = RDF.Parser('rdfa')
-    # if parser is None: raise Exception("Failed to create RDF.Parser")
-    stream = parser.parse_as_stream(uri, uri)  # 2nd is base uri
-    cnode = RDF.Node(uri)
-    model.add_statements(stream, context=cnode)
-    # model.sync()  # not sure if this is necessary
-
-
-def get_model():
-    """
-    docstring please :)
-    """
-    storage = RDF.HashStorage(RDF_STORAGE_NAME, options="hash-type='bdb',contexts='yes',dir='" + RDF_STORAGE_DIR + "'")  # dir='.'
+    storage = RDF.HashStorage(storagename, options="hash-type='bdb',contexts='yes',dir='"+storagedir+"'") # dir='.'
     return RDF.Model(storage)
+
+def groupby (results, groupbyvar, collectvar):
+    """
+    Reorganizes a SPARQL query result object to gather repeating values as a list of dictionaries.
+    Returns a list of dictionaries d, in result order, such that d[collectvar] = [value, value, ...]
+    NB: other keys in d only reflect the values of the first result/row with the new groupbyvar value.
+    """
+    ret = []
+    last = None
+    accum = None
+    for r in results:
+        cur = r.get(groupbyvar)
+        if cur != last:
+            last = cur
+            accum = []
+            item = {}
+            for key in r.keys():
+                if key != collectvar:
+                    item[key] = r.get(key)
+            item[collectvar] = accum
+            ret.append(item)
+        accum.append(r.get(collectvar))
+    return ret
+
+def rdfnode (n):
+    """
+    Unpeel an RDF.Node object to a displayable string
+    """
+    if n == None: return ""
+    ret = n
+    if type(n) == str or type(n) == unicode: return n
+    if n.is_resource():
+        ret = str(n.uri)
+    elif n.is_literal():
+        ret = n.literal_value.get("string")
+    return ret
+
+def query (q, rdfmodel, lang="sparql"):
+    """
+    Perform the Query q against the model rdfmodel, in the given language
+    (basically just ensures that the query is encoded bytes as RDF.Query can't
+    deal with unicode)
+    """
+    if (type(q) == unicode): q = q.encode("utf-8")
+    return RDF.Query(q, query_language=lang).execute(rdfmodel)
+
+class BindingsIterator:
+    """Convenience iterator for RDF.Query results as lists of bindings (not dictionaries)"""
+    def __init__(self, results):
+        self.results = results
+        self.bindings = []
+        for i in range(results.get_bindings_count()):
+            self.bindings.append(results.get_binding_name(i))
+    def __iter__(self):
+        return self
+    def next(self):
+        next = self.results.next()
+        r = []
+        for name in self.bindings:
+            r.append(next.get(name))
+        return r
+
+def prep_uri (uri):
+    """Turns a uri string (including raw file paths) into an RDF.Uri object"""
+    if not uri.startswith("http") and not uri.startswith("file:"):
+        return RDF.Uri(string="file:" + uri)
+    else:
+        return RDF.Uri(uri)
+
+def rdf_parse_into_model (model, uri, format=None, baseuri=None, context=None):
+    """
+    Parse the given URI into the default store.
+    Format, baseuri, and context are all optional.
+    (Default context is uri itself)
+    Format = "rdfa", "rdfxml (default)", ... (other values supported by RDF)
+    """
+
+    uri = prep_uri(uri)
+
+    if format:
+        parser=RDF.Parser(format)
+    else:
+        parser=RDF.Parser()
+
+    if baseuri != None:
+        baseuri = prep_uri(baseuri)
+    else:
+        baseuri = uri
+
+    if context != None:
+        context = RDF.Node(prep_uri(context))
+    else:
+        context = RDF.Node(uri)
+
+    stream = parser.parse_as_stream(uri, baseuri)
+    model.context_remove_statements(context=context)
+    model.add_statements(stream, context=context)
+    # model.sync() # better not to do this
+
+def rdf_context_remove_statements (context):
+    """ Remove all statements related to context in the default store """
+    model = get_model()
+    context = RDF.Node(prep_uri(context))
+    model.context_remove_statements(context=context)
+
+#####################################
+
+class SparqlQuery (object):
+    """ Thin SPARQL query builder, text only (not RDF specific)
+
+    Example of use:
+
+    q = SparqlQuery()
+    q.prefix("dc:<http://purl.org/dc/elements/1.1/>")
+    q.prefix("sarma:<http://sarma.be/terms/>")
+    q.select("?value ?label ?doc")
+    q.where("?doc <%s> ?value." % relurl)
+    q.where("?value dc:title ?label.")
+    q.orderby("?label ?value")
+    querytext = q.render()
+    # to actually perform the query using RDF:
+    rdfquery = RDF.Query(querytext.encode("utf-8"), query_language="sparql")
+    results = rdfquery.execute(rdfmodel)
+
+    """
+    def __init__(self):
+        self._prefixes = ["rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"]
+        self._select = None
+        self._wheres = []
+        self._whereclauses = None
+        self._orderby = None
+        self._filters = []
+        
+    def prefix (self, val):
+        if not val in self._prefixes:
+            self._prefixes.append(val)
+
+    def select (self, vals, distinct=False):
+        self._select = vals
+        self._selectdistinct = distinct
+        
+    def where (self, val):
+        val = "  " + val
+        self._wheres.append(val)
+
+    def filter (self, val):
+        self._filters.append(val)
+        
+    def orderby(self, val):
+        self._orderby = val
+
+    def where_clause(self, clause):
+        if self._whereclauses == None:
+            self._whereclauses = []
+        clause = "    {%s}\n" % clause
+        self._whereclauses.append(clause)
+
+    def where_clause_end(self):
+        self.where("{\n" + "    UNION\n".join(self._whereclauses) + "  }")
+        self._whereclauses = None
+
+    def render(self):
+        ret = ""
+        ret += "".join(["PREFIX %s\n" % x for x in self._prefixes])
+        if self._select:
+            if self._selectdistinct:
+                ret += "SELECT DISTINCT %s\n" % self._select
+            else:
+                ret += "SELECT %s\n" % self._select
+        if self._wheres:
+            ret += "WHERE {\n"
+            ret += "".join(["%s\n" % x for x in self._wheres])
+            if self._filters:
+                ret += "".join(["  FILTER %s\n" % x for x in self._filters])
+            ret += "}\n"
+        if self._orderby:
+            ret += "ORDER BY %s\n" % self._orderby
+        
+        return ret
+

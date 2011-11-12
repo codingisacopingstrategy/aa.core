@@ -7,4 +7,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for arg in args:
-            aacore.rdfutils.put_url(arg)
+            # print arg
+            aacore.utils.add_resource(arg)

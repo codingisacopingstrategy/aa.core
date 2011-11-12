@@ -1,33 +1,156 @@
+function post_styles (elt) {
+    /*
+     * Updates and posts the annotation style
+     */
+    // RegExp
+    var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
+    var STYLE_ATTR_RE = /{@style=.*?}/; 
+    var start;
+    var end;
+    var content = "";
+
+    var style = "{@style=" + $.trim($(elt).attr('style')) + "}";
+
+    var section = $(elt).attr("data-section");
+    $.get("edit/", {
+        section: section,
+        type: 'ajax', 
+    }, function(data) {
+        // Searches for Header
+        var header_match = HASH_HEADER_RE.exec(data);
+        if (header_match) {
+            // Defines the substring to replace
+            var style_match = STYLE_ATTR_RE.exec(header_match[0]);
+            if (style_match) {
+                start = header_match.index + style_match.index;
+                end = start + style_match[0].length;
+            } else {
+                start = header_match.slice(1,3).join('').length;
+                end = start;
+            };
+            var before = data.substring(0, start);
+            var after = data.substring(end, data.length)
+            content = before + style + after;
+            
+            $.post("edit/", {
+                content: content,
+                section: section,
+                type: 'ajax', 
+            });
+        }
+    });
+}
+
+function resetTimelines() {
+    // RESET (ALL) TIMELINES
+    $(".player").each(function(){
+        var url = $(this).attr('src') || $("[src]:first", this).attr('src');
+        $(this).timeline({
+            show: function (elt) {
+                $(elt).addClass("active")
+                    .closest('section.section1')
+//                        .find('div.wrapper:first')
+                            .autoscrollable("scrollto", elt);
+            },
+            hide: function (elt) {
+                $(elt).removeClass("active");
+            },
+            start: function (elt) { return $(elt).attr('data-start') },
+            end: function (elt) { return $(elt).attr('data-end') }
+        }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
+    });
+}
+
 (function($) {
 
 var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
-$(document).ready(function() {
-    // in a sense resetting timelines should happen whenever the page has changed (throttled?)
+function ffind (selector, context, each) {
+    // "filter find", like $.find but it also checks the context element itself
+    return $(context).filter(selector).add(selector, context);
+}
 
-    function resetTimelines () {
-        /* Connect players to timed sections */
-        $(".player").each(function(){
-            var url = $(this).attr('src') || $("[src]:first", this).attr('src');
-            $(this).timeline({
-                show: function (elt) {
-                    $(elt).addClass("active")
-                        .closest('section.section1')
-                            .find('div.wrapper:first')
-                                .autoscrollable("scrollto", elt);
-                },
-                hide: function (elt) {
-                    $(elt).removeClass("active");
-                },
-                start: function (elt) { return $(elt).attr('data-start') },
-                end: function (elt) { return $(elt).attr('data-end') }
-            }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
+//
+// The refresh event gets fired on body initially
+// then on any <section> or other dynamically loaded/created element to "activate" it
+//
+$(document).bind("refresh", function (evt) {
+    // console.log("refreshing", evt.target);
+    var context = evt.target;
+
+    // Draggable Sections
+    $("section.section1").draggable({
+        handle: 'h1',
+        stop: function () { post_styles(this) }
+    }).resizable({
+        stop: function () { post_styles(this) }
+    });
+
+    // RENUMBER ALL SECTIONS
+    // console.log("renumber sections");
+    $("section").each(function (i) {
+        $(this).attr("data-section", (i+1));
+    });
+
+    // SECTION EDIT LINKS
+    // Create & insert edit links in every section's Header that trigger the section's "edit" event
+    ffind('section', context).each(function () {
+        // console.log("adding edit link");
+        var editlink = $("<span>edit</span>").addClass("section_edit_link").click(function () {
+            $(this).closest("section").trigger("edit");
+        }).appendTo($(":header:first", this));
+    });
+
+    // IN-PLACE EDITING
+    ffind('section', context).bind("edit", function (evt) {
+        evt.stopPropagation();
+        // console.log("commencing section edit...");
+        var that = this;
+        $.ajax("edit/", {
+            data: {
+                section: $(this).attr("data-section"),
+                type: 'ajax'
+            },
+            success: function (data) {
+                var position = $(that).css("position");
+                var section_height = Math.min($(window).height() - 20, $(that).height());
+                var use_height = (position == "absolute") ? (section_height - 36) : section_height;
+                var f = $("<div></div>").addClass("section_edit").appendTo(that);
+                var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
+                $(that).addClass("editing");
+                $("<button>save</button>").click(function () {
+                    // console.log("commencing section edit save...");
+                    $.ajax("edit/", {
+                        type: 'post',
+                        data: {
+                            section: $(that).attr("data-section"),
+                            type: 'ajax',
+                            content: textarea.val()
+                        },
+                        success: function (data) {
+                            // console.log("resetting contents of section to: ", data);
+                            var new_content = $(data);
+                            $(that).replaceWith(new_content);
+                            new_content.trigger("refresh");
+                        }
+                    });
+                }).appendTo(f);
+                $("<button>cancel</button>").click(function () {
+                    // console.log("cancelling section edit save...");
+                    f.remove();
+                    $(that).removeClass("editing");
+                }).appendTo(f);
+            }
         });
-    }
+    });
+    // end of IN-PLACE EDITING
+
+    /* Connect players to timed sections */
+    resetTimelines();
 
     /// CLICKABLE TIMECODES
-    $('span[property="aa:start"],span[property="aa:end"]').live("click", function () {
+    $('span[property="aa:start"],span[property="aa:end"]', context).bind("click", function () {
         var t = $.timecode_tosecs_attr($(this).attr("content"));
         var about = $(this).parents('*[about]').attr('about');
         var player = $('[src="' + about + '"]')[0] 
@@ -37,82 +160,32 @@ $(document).ready(function() {
             player.play();
         }
     });
+    
 
-    $("section").draggable({
-        'helper' : 'clone',
-        start: function () {
-            // $(this).css({background: "black", color: "white"});
-        },
-        'containment': 'window'
-    });
+});
 
-    var post_styles = function(event, ui) {
-        /*
-         * Updates and posts the annotation style
-         */
-        // RegExp
-        var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-        var STYLE_ATTR_RE = /{@style=.*?}/; 
-        var start;
-        var end;
-        var content = "";
+$(document).ready(function() {
 
-        var style = "{@style=" + $.trim($(this).attr('style')) + "}";
+    /* INIT */
+    $(document).trigger("refresh");
 
-        var section = $(this).attr("data-section");
-        $.get("edit/", {
-            section: section,
-            type: 'ajax', 
-        }, function(data) {
-            // Searches for Header
-            var header_match = HASH_HEADER_RE.exec(data);
-            if (header_match) {
-                // Defines the substring to replace
-                var style_match = STYLE_ATTR_RE.exec(header_match[0]);
-                if (style_match) {
-                    start = header_match.index + style_match.index;
-                    end = start + style_match[0].length;
-                } else {
-                    start = header_match.slice(1,3).join('').length;
-                    end = start;
-                };
-                var before = data.substring(0, start);
-                var after = data.substring(end, data.length)
-                content = before + style + after;
-                
-                $.post("edit/", {
-                    content: content,
-                    section: section,
-                    type: 'ajax', 
-                });
-            }
-        });
-    }
+    /////////////////////
+    /////////////////////
+    /////////////////////
+    // Once-only page inits
 
-    /* Activate level-1 sections as (editable) playlists */
-    $('section.section1').aaplaylist({
-        post_draggable: post_styles,
-        post_resizable: post_styles,
-    });
-    $("section.section1 > div.wrapper").autoscrollable();
-
-    resetTimelines();
-
-    $("section textarea").live("focus", function () {
-        currentTextArea = this;
-        // ENSURE TEXTAREA HEIGHT IS OK HACK
-        var $this = $(this);
-        var textareaheight = $this.height();
-        var sectionheight = $this.closest(".section1").height();
-        if (textareaheight + TEXTAREA_MIN_PADDING_BOTTOM > sectionheight) {
-            $this.css("height", (sectionheight - TEXTAREA_MIN_PADDING_BOTTOM) + "px");
-        }
-    }).live("blur", function () {
-        currentTextArea = undefined;
-    });
+    // $("section.section1 > div.wrapper").autoscrollable();
+    $("section.section1").autoscrollable();
 
     /////////////////////////
     // SHORTCUTS
+
+    // maintain variable currentTextArea
+    $("section textarea").live("focus", function () {
+        currentTextArea = this;
+    }).live("blur", function () {
+        currentTextArea = undefined;
+    });
 
     function firstPlayer () {
         /*
@@ -125,7 +198,6 @@ $(document).ready(function() {
         var vids = $(".player:first");
         if (vids.length) return vids[0];
     }
-
     shortcut.add("Ctrl+Shift+Down", function () {
         if (currentTextArea) {
             var player = firstPlayer();
@@ -135,13 +207,11 @@ $(document).ready(function() {
             }
         }
     });
-
     shortcut.add("Ctrl+Shift+Left", function () {
         $(".player").each(function () {
             this.currentTime = this.currentTime - 5;
         });
     });
-
     shortcut.add("Ctrl+Shift+Right", function () {
         $(".player").each(function () {
             this.currentTime = this.currentTime + 5;
@@ -152,8 +222,8 @@ $(document).ready(function() {
             var foo = this.paused ? this.play() : this.pause();
         });
     });
-    /* }}} End shortcuts */
-
+    /////////////////////////
+    // LAYERS
     $('div#tabs-2').aalayers({
         selector: 'section.section1',
         post_reorder: function(event, ui, settings) {
@@ -163,15 +233,15 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    post_styles.apply($(target), [event, ui]);
+                    post_styles($(target));
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            post_styles.apply(target, [event]);
+            post_styles(target);
         },
     });
-
+    /////////////////////
 	// Animate scrolls
     $("a").click(function(event){
 		//prevent the default action for the click event
@@ -188,18 +258,36 @@ $(document).ready(function() {
                     .autoscrollable("scrollto", target);
         };
 	});
-$('.foldable').hide();
- 
-$('.foldable_toggle').each(function() {
-	$(this).append('<span class="toggle">&nbsp;</span>');
-	$(this).wrapInner('<a href="#"></a>');
-});
- 
-$('.foldable_toggle a').click(function() {
-	$(this).parent().next('.foldable').slideToggle('slow');
-	$(this).toggleClass('unfolded');
-	return false;
-});
+    /////////////////////
+    $('.foldable').hide();
+    $('.foldable_toggle').each(function() {
+	    $(this).append('<span class="toggle">&nbsp;</span>');
+	    $(this).wrapInner('<a href="#"></a>');
+    });
+    $('.foldable_toggle a').click(function() {
+	    $(this).parent().next('.foldable').slideToggle('slow');
+	    $(this).toggleClass('unfolded');
+	    return false;
+    });
+    /////////////////////
+    // LAYOUT
+    $("nav#east-pane").tabs();
+    $('body').layout({
+        applyDefaultStyles: false,
+        enableCursorHotkey: false,
+        east: {
+            size: 360,
+            fxSpeed: "slow",
+            initClosed: true
+        },
+        south: {
+            fxName: "slide",
+            fxSpeed: "slow",
+            size: 200,
+            initClosed: true
+        }           
+    });
+    // $("nav#south-pane").tabs();
 
 });
 })(jQuery);

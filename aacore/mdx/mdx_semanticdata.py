@@ -21,26 +21,35 @@ Basic usage:
 import markdown
 import re
 
+#pattern = r"""
+#\%\%\s*
+#    (?:(?P<property>[^\]#]+?) \s* ::) \s*
+#    (?P<value>.+?) \s*
+#    (?:\| \s* (?P<display>[^\]]+?) \s*)?
+#\%\%
+#""".strip()
+
 pattern = r"""
 \%\%\s*
-    (?:(?P<property>[^\]#]+?) \s* ::) \s*
-    (?P<value>.+?) \s*
-    (?:\| \s* (?P<display>[^\]]+?) \s*)?
+    (?:((?P<namespace>\w+):)?(?P<rel>[^\%#]+?) \s* ::)? \s*
+    (?P<target>.+?) \s*
+    (?:\| \s* (?P<label>[^\]]+?) \s*)?
 \%\%
 """.strip()
 
-def make_elt (prop, value, display):
+def make_elt (rel, target, label):
     elt = markdown.etree.Element('span')
-    elt.set('content', value)
-    elt.text = display or value
-    if prop:
-        elt.set('property', prop)
+    elt.set('content', target)
+    elt.text = label or target
+    if rel:
+        elt.set('property', rel)
     return elt
 
 class SemanticDataExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
             'make_elt' : [make_elt, 'Callback to convert parts into an HTML/etree element (default <span>)'],
+            'namespace' : ['aa', 'Default namespace'],
         }
         # Override defaults with user settings
         for key, value in configs :
@@ -65,10 +74,20 @@ class SemanticDataPattern(markdown.inlinepatterns.Pattern):
         return self.compiled_re
   
     def handleMatch(self, m):
-        """ return etree """
+        """ Returns etree """
         d = m.groupdict()
         fn = self.config['make_elt'][0]
-        return fn(d.get("property"), d.get("value"), d.get("display"))    
+        namespace = d.get("namespace") or self.config['namespace'][0]
+        rel = d.get("rel")
+        if rel:
+            rel = "%s:%s" % (namespace, d.get("rel"))
+        return fn(rel, d.get("target"), d.get("label"))
+
+#    def handleMatch(self, m):
+#        """ return etree """
+#        d = m.groupdict()
+#        fn = self.config['make_elt'][0]
+#        return fn(d.get("property"), d.get("value"), d.get("display"))    
 
 def makeExtension(configs={}) :
     return SemanticDataExtension(configs=configs)

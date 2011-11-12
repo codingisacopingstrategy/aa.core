@@ -7,12 +7,8 @@
 body {
     background: gray;
 }
-a {
-    color: black; text-decoration: none; border-bottom: 1px dotted black
-}
-a:hover {
-    color: blue;
-}
+a { color: black; text-decoration: none; border-bottom: 1px dotted black}
+a:hover { color: blue; }
 video {
     float: left;
 }
@@ -39,6 +35,8 @@ video {
 <script src="../jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../../lib/jquery/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
 <script src="../jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="../../../lib/jquery/jquery-ui.css" type="text/css" charset="utf-8" />
+<script src="../jquery.timelayers.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function () {
@@ -75,6 +73,17 @@ $(document).ready(function () {
         video.currentTime = t;
         video.play();
     });
+
+
+    $("<div></div>").appendTo("body").css({
+        position: 'absolute',
+        left: '5px',
+        bottom: '5px',
+        width: '980px',
+        height: '100px',
+        background: '#444',
+    }).timelayers();
+
 });
 </script>
 </head>
@@ -91,7 +100,7 @@ Click on a title to jump to that section.</p>
 
 <video controls src="http://video.constantvzw.org/vj10/sadie-plant.ogg">video</video>
 
-<div id="subtitles">
+<div id="subtitles" class="section">
 
     <div class="title" data-start="00:02:21,766" data-end="00:03:19,393">
     I have to begin with many thanks to Femke and Laurence, because it really has been a great pleasure for me to have been here this weekend. It’s nearly five years since I came to an event like this, believe it or not, and I really cannot say enough how much I have enjoyed it, and how stimulating I have found it. So yes, a big thank you to both for getting me here. And as you say, it’s ten years since I wrote Zeros + Ones, and you are marking ten years of this festival too, so it’s an interesting moment to think about a lot of the issues that have come up over the weekend. This is a more or less spontaneous report, very much an ‘open performance’, to use Simon Yuill’s words, and not to be taken as any kind of definitive account of what has happened this weekend. But still I hope it can bring a few of the many and varied strands of this event together, not to form a true conclusion, but perhaps to provide some kind of digestif after a wonderful meal.
@@ -253,7 +262,7 @@ Click on a title to jump to that section.</p>
 
 </div>
 
-<div id="images">
+<div id="images" class="section">
     <div class="title" data-start="00:01:00" data-end="00:01:04">
     <img src="http://activearchives.org/collagecode/VJ10/DSC01085.JPG" />
     </div>

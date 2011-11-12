@@ -16,26 +16,255 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-import RDF
+import RDF, urllib
+try: import simplejson as json
+except ImportError: import json
 
-from django.shortcuts import (render_to_response, redirect)
-from django.http import HttpResponse
+from django.shortcuts import (render_to_response, redirect, get_object_or_404)
+from django.http import (HttpResponse, HttpResponseRedirect)
 from django.template import (RequestContext, Template, Context)
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
+from django.conf import settings as projsettings
+from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 
 from aacore.spider import spider
 from plugins import sniffer
 from models import *
-from rdfutils import get_model
-from utils import (dewikify, convert_line_endings)
+from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename, convert_line_endings, pagename_for_url, add_resource)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
+import rdfutils
 
+
+#### RDFSource
+def rdf_source (request, id):
+    context = {}
+    source = get_object_or_404(RDFSource, pk=id)
+    context['source'] = source
+    # context['namespaces'] = Namespace.objects.all()
+    return render_to_response("aacore/rdf_source.html", context, context_instance=RequestContext(request))
+
+def colors_css (request):
+    context = {}
+    context['namespaces'] = Namespace.objects.all()
+    return render_to_response("aacore/colors.css", context, context_instance=RequestContext(request), mimetype="text/css")
+
+def resources (request):
+    context = {}
+    context['resources'] = Resource.objects.all()
+    return render_to_response("aacore/resources.html", context, context_instance = RequestContext(request))
+
+def get_embeds (uri, model, request):
+    """ Example get_embeds for basic HTML(5) types """
+
+    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+PREFIX aa:<http://activearchives.org/terms/>
+PREFIX http:<http://www.w3.org/Protocols/rfc2616/>
+PREFIX media:<http://search.yahoo.com/mrss/>
+
+SELECT ?ctype ?format ?audiocodec ?videocodec
+WHERE {{
+  OPTIONAL {{ <{0}> http:content_type ?ctype . }}
+  OPTIONAL {{ <{0}> dc:format ?format . }}
+  OPTIONAL {{ <{0}> media:audio_codec ?audiocodec . }}
+  OPTIONAL {{ <{0}> media:video_codec ?videocodec . }}
+}}
+""".strip().format(uri)
+
+    b = {}
+    for row in rdfutils.query(q, model):
+        for name in row:
+            b[name] = rdfutils.rdfnode(row.get(name))
+        break
+
+    ret = []
+
+    if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
+        ret.append('<img src="{0}" />'.format(uri))
+    elif b.get('ctype') in ("video/ogg", "video/webm") or (b.get('videocodec') in ("theora", "vp8")):
+        ret.append('<video class="player" controls src="{0}" />'.format(uri))
+    elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
+        ret.append('<audio class="player" controls src="{0}" />'.format(uri))
+
+    return ret
+
+def embed_js (request):
+    context = {}
+    context['embed_url'] = full_site_url(reverse("aa-embed"))
+    return render_to_response("aacore/embed.js", context, context_instance = RequestContext(request), mimetype="application/javascript")
+
+def embed (request):
+    url = request.REQUEST.get("url")
+    # ALLOW (authorized users) to trigger a resource to be added...
+    model = get_rdf_model()
+    if url.startswith("http"):
+        # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
+        add_resource(url, model, request)
+
+    ### APPLY FILTERS (if any)
+    filterstr = request.REQUEST.get("filter", "").strip()
+    if filterstr and not filterstr.startswith("http:"):
+        filters = [x.strip() for x in filterstr.split("|")]
+        rendered = ""
+        for fcall in filters:
+            if ":" in fcall:
+                (fname, fargs) = fcall.split(":", 1) 
+            else:
+                fname = fcall.strip()
+                fargs = ""
+            f = get_filter_by_name(fname)
+            if f:
+                rendered = f(fargs, url, rendered, rdfmodel=model)
+    else:
+        embeds = get_embeds(url, model, request)
+        if len(embeds):
+            rendered = embeds[0]
+        else:
+            rendered = url
+
+    browseurl = reverse("aa-browse") + "?" + urllib.urlencode({'uri': url})
+    ret = """
+<div class="aa_embed">
+    <div class="links">
+        <a class="directlink" href="{0[url]}">URL</a>
+        <a class="browselink" target="browser" href="{0[browseurl]}">browse</a>
+    </div>
+    <div class="body">{0[embed]}</div>
+</div>""".strip()
+
+    content = ret.format({'url': url, 'browseurl': browseurl, 'embed': rendered})
+    return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
+
+def browse (request):
+    """ Main "browser" view """
+
+    model = get_rdf_model()
+    uri = request.REQUEST.get("uri", "")
+
+    this = "http://"+Site.objects.get_current().domain
+    if uri.startswith(this):
+        return HttpResponseRedirect(uri)
+
+    submit = request.REQUEST.get("_submit", "")
+
+    if submit == "direct":
+        return HttpResponseRedirect(uri)
+    elif submit == "remove":
+        return HttpResponse('not implemented')
+    elif submit == "reload":
+        add_resource(uri, model, request, reload=True)
+#    elif submit == "sniff":
+#        add_resource(uri, model, request)
+    else:
+        # force every (http) resource to be added
+        if uri.startswith("http"):
+            # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
+            add_resource(uri, model, request)
+
+    literal = None
+    if not uri.startswith("http:"):
+        literal = uri
+
+    context = {}
+    context['embeds'] = [] # get_embeds(uri, model, request)
+    context['namespaces'] = Namespace.objects.all()
+
+    context['uri'] = uri
+    context['literal'] = literal
+
+    if literal:
+        node_stats, links_out, links_in, as_rel = load_links(model, context, literal=uri)
+    else:
+        node_stats, links_out, links_in, as_rel = load_links(model, context, uri=uri)
+
+    context['node_stats'] = node_stats
+    context['links_out'] = links_out
+    context['links_in'] = links_in
+    context['links_as_rel'] = as_rel
+
+    # literals (by rel, by context)
+    # links in/out (left/right) (by rel, by context)
+
+    ###
+    # is this resource starred by the current user
+    if request.user:
+        pass
+
+    ###
+    if not literal:
+        try:
+            resource = Resource.objects.get(url=uri)
+            context['resource'] = resource
+        except Resource.DoesNotExist:
+            pass
+
+    return render_to_response("aacore/browse.html", context, context_instance = RequestContext(request))
+
+def load_links (model, context, uri=None, literal=None):
+    links_in = []
+    links_out = []
+    node_stats = []
+    as_rel = None
+
+    if literal:
+        s = '"{0}"'.format(literal)
+    else:
+        s = "<{0}>".format(uri)
+
+    q = "SELECT DISTINCT ?relation ?object WHERE {{ {0} ?relation ?object . }} ORDER BY ?relation".format(s)
+    for b in rdfutils.query(q, model):
+        if b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/title":
+            context['title'] = b['object'].literal_value.get("string")
+        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/description":
+            context['description'] = b['object'].literal_value.get("string")
+        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://xmlns.com/foaf/0.1/thumbnail":
+            context['thumbnail'] = str(b['object'].uri)
+        elif b['object'].is_resource():
+            links_out.append(b)
+        else:
+            node_stats.append(b)
+
+    q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation {0} . }} ORDER BY ?relation".format(s)
+    for b in rdfutils.query(q, model):
+        links_in.append(b)
+
+    if not literal:
+        q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject {0} ?object . }} ORDER BY ?subject".format(s)
+        as_rel = [x for x in rdfutils.query(q, model)]
+    else:
+        as_rel = ()
+
+    return node_stats, links_out, links_in, as_rel
+
+def mini (request):
+    pass
+
+def mini_res (request, id):
+    res = get_object_or_404(Resource, pk=id)
+    load_resource_links(res, model)
+
+####################################
+### Resource Main Sniff Page (http)
+
+def resource_sniff (request, id):
+    """
+    This is the generic sniff view for Resources,
+    it provides the basic resource data (from HTTP, etc) data as RDFa for indexing
+    """
+    context = {}
+    context['namespaces'] = Namespace.objects.all()
+    context['resource'] = get_object_or_404(Resource, pk=id)
+    return render_to_response("aacore/resource_sniff.html", context, context_instance = RequestContext(request))
+
+
+############################################################
+# WIKI
 
 def page_detail(request, slug):
     """
-    Displays a wiki page :model:`aacore.Page`.
+    Displays a wiki page :model:`core.Page`.
 
     **Context**
 
@@ -43,13 +272,15 @@ def page_detail(request, slug):
         Request context
 
     ``page``
-        An instance of :model:`aacore.Page`.
+        An instance of :model:`core.Page`.
 
     **Template:**
 
     :template:`aacore/page.html`
     """
     context = {}
+    context['namespaces'] = Namespace.objects.all()
+    context['rels'] = Relationship.objects.filter(facet=True)
     name = dewikify(slug)
 
     try:
@@ -60,20 +291,23 @@ def page_detail(request, slug):
         return redirect(url)
 
     context['page'] = page
-    md = get_markdown()
-    rendered = md.convert(page.content)
-    t = Template("{% load filters aatags %}" + rendered)
-    c = RequestContext(request)
-    if 'css' in md.Meta:
-        context['extra_css'] = md.Meta['css']
-    context['content'] = mark_safe(t.render(c))
+#    md = get_markdown()
+#    rendered = md.convert(page.content)
+#    t = Template("{% load aacoretags %}" + rendered)
+#    c = RequestContext(request)
+#    if 'css' in md.Meta:
+#        context['extra_css'] = md.Meta['css']
+#    context['content'] = mark_safe(t.render(c))
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
 
 def page_edit(request, slug):
     """
-    Page edition view
+    Page edit
+
+    GET: Either the edit form, OR provides Markdown source via AJAX call
+    POST: Receives/commits edits on POST (either via form or AJAX)
 
     template
         :template:`aacore/edit.html`
@@ -89,27 +323,27 @@ def page_edit(request, slug):
     except Page.DoesNotExist:
         page = None
 
-    # TODO: Use django form?
-    # Gets the edit form
     if request.method == "GET":
         if page:
             context['page'] = page
             if section:
                 sections = sectionalize(page.content)
-                sectiondict = sections[section - 1]
+                sectiondict = sections[section]
                 context['content'] = sectiondict['header'] + sectiondict['body']
                 context['section'] = section
             else:
                 context['content'] = page.content
+            # trim leading newlines
+            # context['content'] = context['content'].lstrip()
             if is_ajax:
                 return HttpResponse(context['content'])
         return render_to_response("aacore/edit.html", context, \
                 context_instance=RequestContext(request))
 
-    # Posts the edit form
     elif request.method == "POST":
         content = request.POST.get('content', '')
         content = convert_line_endings(content, 0)  # Normalizes EOL
+        content = content.strip() + "\n\n" # Normalize whitespace around the markdown
 
         button = request.POST.get("_button", "")
         if button.lower() == "cancel":
@@ -118,7 +352,7 @@ def page_edit(request, slug):
 
         if page:
             if section:  # section edit
-                page.content = sectionalize_replace(page.content, (section - 1), content)
+                page.content = sectionalize_replace(page.content, section, content)
                 page.save()
             else:
                 if content == "delete":
@@ -136,40 +370,13 @@ def page_edit(request, slug):
         if is_ajax:
             md = get_markdown()
             rendered = md.convert(content)
-            t = Template("{% load filters aatags %}" + rendered)
-            c = RequestContext(request)
-            return HttpResponse(mark_safe(t.render(c)))
+            # t = Template("{% load aacoretags %}" + rendered)
+            # c = RequestContext(request)
+            # return HttpResponse(mark_safe(t.render(c)))
+            return HttpResponse(rendered)
         #else:
         url = reverse('aa-page-detail', kwargs={'slug': slug})
         return redirect(url)
-
-
-def sniff(request):
-    """
-    Main URL sniffer view, collects all annotations from the sniffer plugins and displays them in a single page.
-    Options: 'url' parameter
-    Sniffing only displays information, it should not alter the database / create new resources
-    """
-    context = {}
-    url = request.REQUEST.get('url', '')
-    if url:
-        data, annotations = sniffer.sniff(url)
-        context['original_url'] = url
-        context['data'] = data
-        context['annotations'] = annotations
-        context['url'] = data.url
-    return render_to_response("aacore/sniff.html", context, context_instance=RequestContext(request))
-
-
-##### RDF VIEWS #################
-
-
-def rdfdump(request):
-    """ debug view to see the contents of the RDF store (in turtle/text format) """
-    model = get_model()
-    ser = RDF.Serializer(name="turtle")
-    return HttpResponse(ser.serialize_model_to_string(model), mimetype="text/plain")
-
 
 def sandbox(request):
     """
@@ -190,24 +397,657 @@ def sandbox(request):
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
 
+############################################################
 
-def _import(request):
-    """
-    Import view
-    """
+def getLinks (rdfmodel, url, norels=None):
+    """ formerly getTag """
+    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+SELECT DISTINCT ?rel ?doc ?title ?author ?date
+WHERE {
+?doc dc:title ?title .
+?doc ?rel <%s> .
+OPTIONAL { ?doc dc:creator ?author }
+OPTIONAL { ?doc dc:date ?date }
+}
+ORDER BY ?rel ?title""".strip() % url
+    return rdfutils.query(q, rdfmodel)
+
+def getLinksFaceted (rdfmodel, url):
+    q = """
+PREFIX dc:<http://purl.org/dc/elements/1.1/>
+PREFIX sarma:<http://sarma.be/terms/>
+
+SELECT ?doc ?rel ?tag
+WHERE {
+  ?doc ?rel ?tag .
+  ?doc ?tagrel <%s> .
+}
+ORDER BY ?doc ?rel
+""".strip() % url
+    # groupby(res, "doc", "rel")
+    links = rdfutils.query(q, rdfmodel)
+    curdoc = None
+    doc = None
+    docs = []
+    for rec in links:
+        if curdoc != rec['doc']:
+            curdoc = rec['doc']
+            doc = {'doc': rdfnode(rec['doc']), 'tagsbyrel' : {}}
+            docs.append(doc)
+        rel = rdfnode(rec['rel'])
+        if not rel in doc['tagsbyrel']:
+            doc['tagsbyrel'][rel] = []
+        doc['tagsbyrel'][rel].append(rdfnode(rec['tag']))
+    return docs
+
+import re
+h2pat = re.compile(r"^##\s+(?P<title>.+)$", re.I | re.M)
+
+def page_sarma (request, slug):
     context = {}
+    context['slug'] = slug
+    name = dewikify(slug)
+    try:
+        page = Page.objects.get(name=name)
+        context['page'] = page
+        context['text'] = page.content
+        # context['title'] = page.display_name or page.name
+        tmatch = h2pat.search(page.content)
+        if tmatch:
+            # SET TITLE FROM H2, and REMOVE IT FROM THE PAGE
+            context['title'] = tmatch.groupdict().get("title")
+            text = page.content
+            text = text[:tmatch.start()] + text[tmatch.end():]
+            context['text'] = text
+        else:        
+            context['title'] = page.name
+        if request.user and request.user.is_staff:
+            context['editlink'] = reverse('admin:core_page_change', args=(page.id,))
+    except Page.DoesNotExist:
+        if request.user and request.user.is_staff:
+            createlink = reverse('admin:core_page_add') + "?name=" + urllib.quote(name)
+            # return HttpResponseRedirect(createlink)
+            context['editlink'] = createlink
+        context['page'] = None
+        context['title'] = name
 
-    url = request.REQUEST.get("url", "")
-    context['url'] = url
+#        else:
+#            raise Http404
+#    page = get_object_or_404(Page, title = dewikify(name))
 
-    if url:
-        context['spider'] = spider(url)
+    # context['sidebar'] = Page.objects.get(name = "Sidebar")
+    context['namespaces'] = Namespace.objects.all()
+    context['rels'] = Relationship.objects.filter(facet=True)
+    
+#    if name != "Sidebar":
+#        context["defaultrel"] = "sarma:link"
+#    else:
+#        context["defaultrel"] = None
+    
+    model = get_rdf_model()
+    pageurl = url_for_pagename(name)
+    fullpageurl = full_site_url(pageurl)
+    context['links'] = getLinks(model, fullpageurl)
+    # context['flinks'] = getLinksFaceted(model, fullpageurl)
 
+    # model = aardf.utils.get_model()
+    # context['rels'] = get_rels(model)
+
+    return render_to_response("aacore/page_sarma.html", context, context_instance = RequestContext(request))
+
+
+########################
+# REL 
+########################
+
+def getRelationValues(model, relurl):
+    query = """
+SELECT DISTINCT ?o
+WHERE {
+  ?s <%s> ?o .
+}
+ORDER BY ?o
+""".strip() % relurl
+    return rdfutils.query(query, model)
+
+def rel (request, id):
+    context = {}
+    rel = get_object_or_404(Relationship, pk=id)
+    context['rel'] = rel
+    context['namespaces'] = Namespace.objects.all()
+    context['rels'] = Relationship.objects.filter(facet=True)
+    model = get_rdf_model()
+    # vals = rdfutils.groupby(vals, "value", "doc")
+    results = [x for x in getRelationValues(model, rel.url)]
+    context['results'] = results
+
+#    tagvalues = query(q.render(), model)
+#    results = groupby(tagvalues, "doc", "value")
+#    context['vals'] = results
+
+    return render_to_response("aacore/rel.html", context, context_instance = RequestContext(request))
+
+
+#####################################
+# GRAPH (currently specific to sarma... but...
+####################################
+
+from rdfutils import rdfnode
+
+def tabularize(results):
+    subject = None
+    row = None
+    rows = []
+    allrelnames = {}
+
+    for result in results:
+        cursubject = rdfnode(result['doc'])
+        if cursubject != subject:
+            row = {'url': rdfnode(cursubject)}
+            rows.append(row)
+        subject = cursubject
+        # print subject
+        relname = rdfnode(result['relname'])
+
+        if relname == "Stylesheet": continue
+        o = rdfnode(result['o'])
+        otitle = rdfnode(result['otitle'])
+        allrelnames[relname] = True
+        if relname not in row:
+            row[relname] = {}
+        row[relname][(o, otitle)] = True
+
+    for row in rows:
+        for key in row:
+            if type(row[key]) == dict:
+                vals = row[key].keys()
+                row[key] = vals
+#                if len(vals) == 1:
+#                    row[key] = vals[0]
+
+    keys = allrelnames.keys()
+    keys.sort()
+    
+    ret = []
+    for row in rows:
+        listrow = []
+        for key in keys:
+            if key in row:
+                listrow.append(row[key])
+            else:
+                listrow.append(None)
+        ret.append(listrow)
+
+    return (keys, ret)
+
+def tag_table (request, slug):
+
+    tagurl = full_site_url(url_for_pagename(dewikify(slug)))
+    model = get_rdf_model()
+
+    q = """
+PREFIX dc:<http://purl.org/dc/elements/1.1/>
+PREFIX aa:<http://activearchives.org/terms/>
+SELECT DISTINCT ?doc ?relname ?o ?otitle
+WHERE {
+  ?doc ?rel ?o .
+  ?rel dc:title ?relname .
+  ?doc ?p <%s> .
+  OPTIONAL { ?o dc:title ?otitle }
+}
+ORDER BY ?doc ?relname
+""".strip() % tagurl
+
+    results = rdfutils.query(q, model)
+    rows = tabularize(results)
+    context = {}
+    context['headers'] = rows[0]
+    context['rows'] = rows[1]
+
+    context['namespaces'] = Namespace.objects.all()
+    context['rels'] = Relationship.objects.filter(facet=True)
+
+    return render_to_response("aacore/table.html", context, context_instance = RequestContext(request))
+
+#    samplepageurl = full_site_url(Page.objects.all()[0].get_absolute_url())
+#    samplepageurl = samplepageurl.rstrip("/")
+#    basepageurl = samplepageurl[:samplepageurl.rindex('/')] + "/"
+
+import StringIO
+import pygraphviz as pgv
+#from sarmadocs.models import Document
+
+#def doc_graph (request, docid, relid):
+#    doc = get_object_or_404(Document, pk=docid)
+#    rel = get_object_or_404(Relationship, pk=relid)
+#    fulldocurl = full_site_url(doc.get_absolute_url())
+
+##    return HttpResponse("doc_graph")
+
+#    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+#PREFIX aa:<http://activearchives.org/terms/>
+#SELECT DISTINCT ?doc ?doctitle ?docdate ?docauthor ?o ?otitle
+#WHERE {
+#    ?doc <%s> ?o .
+#    <%s> ?rel ?o .
+#    ?doc dc:date ?docdate .
+#    ?doc dc:creator ?docauthor .
+#    OPTIONAL { ?doc dc:title ?doctitle }
+#    OPTIONAL { ?o dc:title ?otitle }
+#}""".strip() % (rel.url, fulldocurl)
+#    
+#    model = get_rdf_model()
+#    rows = rdfutils.query(q, model)
+#    g = pgv.AGraph()
+
+#    nodecount = 0
+#    objectnodecount = 0
+#    nodenames_by_title = {}
+#    objectnodes = {}
+#    for row in rows:
+#        doctitle = rdfnode(row['doctitle'])
+#        docdate = rdfnode(row['docdate'])
+#        docauthor = pagename_for_url(rdfnode(row['docauthor'])).decode("utf-8")
+#        if doctitle not in nodenames_by_title:
+#            nodecount += 1
+#            nn = "node%d" % nodecount
+#            label = doctitle + u"\\n" + docauthor + " (" + docdate[:4] + ")"                
+#            g.add_node(nn, label=label.encode("utf-8"), shape="box", URL=rdfnode(row['doc']))
+#            nodenames_by_title[doctitle] = nn
+#        else:
+#            nn = nodenames_by_title[doctitle]
+#        
+#        o = rdfnode(row['o'])
+#        o = pagename_for_url(o) #.decode("utf-8")
+#        if o in objectnodes:
+#            onn = objectnodes[o]
+#        else:
+#            objectnodecount += 1
+#            onn = "object%d" % objectnodecount
+#            g.add_node(onn, label=o, URL=rdfnode(row['o']))
+#            objectnodes[o] = onn
+
+#        g.add_edge(nn, onn)
+
+#    # print g.to_string()
+#    output = StringIO.StringIO()    
+#    g.draw(path=output, format="svg", prog="fdp")
+
+#    return HttpResponse(output.getvalue(), mimetype="image/svg+xml")
+
+
+
+def link_graph (request, slug, relid):
+    name = dewikify(slug)
+    # page = get_object_or_404(Page, name=name)
+
+    rel = get_object_or_404(Relationship, pk=relid)
+
+    pageurl = url_for_pagename(name)
+    fullpageurl = full_site_url(pageurl)
+
+#    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+#PREFIX aa:<http://activearchives.org/terms/>
+#SELECT DISTINCT ?doc ?doctitle ?docdate ?docauthor ?relname ?o ?otitle
+#WHERE {
+#?doc aa:person ?o .
+#?doc dc:title ?doctitle.
+#?doc dc:date ?docdate.
+#?doc dc:creator ?docauthor.
+#aa:person dc:title ?relname .
+#?doc ?p <%s> .
+#OPTIONAL { ?o dc:title ?otitle }
+#}
+#ORDER BY ?doc ?relname""".strip() % (fullpageurl)
+
+    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
+PREFIX aa:<http://activearchives.org/terms/>
+SELECT DISTINCT ?doc ?doctitle ?docdate ?docauthor ?o ?otitle
+WHERE {
+?doc <%s> ?o .
+?doc dc:title ?doctitle.
+?doc dc:date ?docdate.
+?doc dc:creator ?docauthor.
+?doc ?p <%s> .
+OPTIONAL { ?o dc:title ?otitle }
+}
+ORDER BY ?doc""".strip() % (rel.url, fullpageurl)
+
+    model = get_rdf_model()
+    rows = rdfutils.query(q, model)
+    g = pgv.AGraph()
+
+    nodecount = 0
+    objectnodecount = 0
+    nodenames_by_title = {}
+    objectnodes = {}
+    for row in rows:
+        doctitle = rdfnode(row['doctitle'])
+        docdate = rdfnode(row['docdate'])
+        docauthor = pagename_for_url(rdfnode(row['docauthor'])).decode("utf-8")
+        if doctitle not in nodenames_by_title:
+            nodecount += 1
+            nn = "node%d" % nodecount
+            label = doctitle + u"\\n" + docauthor + " (" + docdate[:4] + ")"                
+            g.add_node(nn, label=label.encode("utf-8"), shape="box", URL=rdfnode(row['doc']))
+            nodenames_by_title[doctitle] = nn
+        else:
+            nn = nodenames_by_title[doctitle]
+        
+        o = rdfnode(row['o'])
+        o = pagename_for_url(o) #.decode("utf-8")
+        if o in objectnodes:
+            onn = objectnodes[o]
+        else:
+            objectnodecount += 1
+            onn = "object%d" % objectnodecount
+            g.add_node(onn, label=o, URL=rdfnode(row['o']))
+            objectnodes[o] = onn
+
+        g.add_edge(nn, onn)
+
+    # print g.to_string()
+    output = StringIO.StringIO()    
+    g.draw(path=output, format="svg", prog="fdp")
+
+    return HttpResponse(output.getvalue(), mimetype="image/svg+xml")
+
+############################################################
+# Embed
+############################################################
+
+# map filter args to template context...
+
+from django.template.loader import render_to_string
+
+# USER_AGENT + MIME_TYPE
+
+def embed_filter (fargs, res, cur, rdfmodel=None):
+    contenttypes = res.getMetadata(rel="http://activearchives.org/terms/content_type")
+    if "image/jpeg" in contenttypes:
+        return render_to_string('aacore/embeds/image.html', { 'resource': res })
+    return ""
+
+def path_to_url (p):
+    if p.startswith(projsettings.MEDIA_ROOT):
+        return full_site_url(projsettings.MEDIA_URL + p[len(projsettings.MEDIA_ROOT):])
+    return p
+
+def thumbnail_filter (fargs, res, cur, rdfmodel=None):
+    sizepat = re.compile(r"(?P<width>\d+)px", re.I)
+    m = sizepat.search(fargs)
+    if m:
+        width = m.groupdict()['width']
+        fpath = res.getLocalFile()
+        (dname, fname) = os.path.split(fpath)
+        tpath = os.path.join(dname, "thumbnail_{}px.jpg".format(width))
+        if not os.path.exists(tpath):
+            cmd = 'convert -resize {0}x "{1}" "{2}"'.format(width, fpath, tpath)
+            os.system(cmd)
+        return '<img src="{}" />'.format(path_to_url(tpath))
+
+import urlparse, html5lib, urllib2, lxml.cssselect
+
+def xpath_filter (fargs, url, cur, rdfmodel=None):
+    """ Takes a url as input value and an xpath as argument.
+    Returns a collection of html elements
+    usage:
+        {{ "http://fr.wikipedia.org/wiki/Antonio_Ferrara"|xpath:"//h2" }}
+    """
+    def absolutize_refs (baseurl, lxmlnode):
+        for elt in lxml.cssselect.CSSSelector("*[src]")(lxmlnode):
+            elt.set('src', urlparse.urljoin(baseurl, elt.get("src")))
+        return lxmlnode
+    request = urllib2.Request(url)
+    request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.1.5) Gecko/20091109 Ubuntu/9.10 (karmic) Firefox/3.5.5")
+    stdin = urllib2.urlopen(request)
+    htmlparser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), namespaceHTMLElements=False)
+    page = htmlparser.parse(stdin)
+    p = page.xpath(fargs)
+    if p:
+        return "\n".join([lxml.etree.tostring(absolutize_refs(url, item), encoding='utf-8') for item in p])
+    else:
+        return None
+
+def get_filter_by_name (n):
+    if n == "thumbnail":
+        return thumbnail_filter
+    elif n == "xpath":
+        return xpath_filter
+    elif n == "embed":
+        return embed_filter
+
+def embed_jsonp_js (request):
+    context = {}
+    context['embed_url'] = full_site_url(reverse("aa-embed-jsonp"))
+    return render_to_response("aacore/embed_jsonp.js", context, context_instance = RequestContext(request), mimetype="application/javascript")
+
+# embed could always return a dictionary with content + an eventual polling url
+# or test returned content that itself triggers polling (better?)
+
+def embed_jsonp (request):
+    url = request.REQUEST.get("url")
+    # ALLOW (authorized users) to trigger a resource to be added...
+    rdfmodel = get_rdf_model()
+    try:
+        res = Resource.objects.get(url=url)
+    except Resource.DoesNotExist:
+        add_resource(url, rdfmodel=rdfmodel)
+        res = get_object_or_404(Resource, url=url)
+
+    filterstr = request.REQUEST.get("filter", "embed").strip()
+    filters = [x.strip() for x in filterstr.split("|")]
+    rendered = ""
+    for fcall in filters:
+        if ":" in fcall:
+            (fname, fargs) = fcall.split(":", 1) 
+        else:
+            fname = fcall.strip()
+            fargs = ""
+        f = get_filter_by_name(fname)
+        if f:
+            rendered = f(fargs, res, rendered, rdfmodel=rdfmodel)
+
+    callback = request.REQUEST.get("callback", "callback")
+    response = callback + "(" + json.dumps(rendered) + ");"
+
+    return HttpResponse(response, mimetype="application/javascript")
+
+############################################################
+# BROWSE
+############################################################
+
+#def resource (request, id=None, url=None):
+#    if id:
+#        resource = get_object_or_404(Resource, pk=id)
+#    else:
+#        try:    
+#            resource = Resource.objects.get(url=url)
+#        except Resource.DoesNotExist:
+#            return HttpResponseRedirect(reverse("aa-404", (), url=url))
+
+#    context = {}
+#    context['resource'] = resource
+#    context['collections'] = resource.collections.exclude(star=True)
+
+#    # check if resource is starred by this user
+#    try:
+#        collection = Collection.objects.get(star=True, owner=request.user)
+#        try:
+#            citem = collection.items.get(asset=asset)
+#            context['star'] = True
+#        except CollectionItem.DoesNotExist:
+#            pass
+#    except Collection.DoesNotExist:
+#        pass
+
+#    ### LOAD ALL METADATA
+#    model = get_rdf_model()
+#    uri = resource.url
+#    context['namespaces'] = Namespace.objects.all()
+#    context['uri'] = uri
+#    q = "SELECT DISTINCT ?relation ?object WHERE { <%s> ?relation ?object . } ORDER BY ?relation" % uri
+#    context['results_as_subject'] = rdfutils.query(q, model)
+#    q = "SELECT DISTINCT ?subject ?object WHERE { ?subject <%s> ?object . } ORDER BY ?subject" % uri
+#    context['results_as_relation'] = rdfutils.query(q, model)
+#    q = "SELECT DISTINCT ?subject ?relation WHERE { ?subject ?relation <%s> . } ORDER BY ?relation" % uri
+#    context['results_as_object'] = rdfutils.query(q, model)
+
+
+#    return render_to_response("aacore/browse_resource.html", context, context_instance = RequestContext(request))
+
+@login_required
+def resource_meta (request, id):
+    context = {}
+    context['resource'] = get_object_or_404(Resource, pk=id)
+    return render_to_response("resource_meta.html", context, context_instance = RequestContext(request))
+
+@login_required
+def resource_export (request, id):
+    context = {}
+    context['resource'] = get_object_or_404(Resource, pk=id)
+    return render_to_response("resource_export.html", context, context_instance = RequestContext(request))
+
+@login_required
+def resource_star (request, id):
+    context = {}
+    resource = get_object_or_404(Resource, pk=id)
+    context['resource'] = resource
     if request.method == "POST":
-        submit = request.REQUEST.get("_submit")
-        if submit == "import":
-            for importurl in request.REQUEST.getlist("importurl"):
-                (res, created) = Resource.objects.get_or_create(url=importurl)
-            return HttpResponse("ok")
+        if request.POST.get("star") == "true":
+            # Add this resource to this users starred resources
+            (collection, created) = Collection.objects.get_or_create(star=True, owner=request.user)
+            try:
+                citem = collection.items.get(resource=resource)
+            except CollectionItem.DoesNotExist:
+                citem = CollectionItem(collection=collection, resource=resource, author=request.user)
+                citem.save()
+                return HttpResponse(json.dumps({'star': True}));
+        else:
+            # Remove this resource from users starred resources
+            try:
+                collection = Collection.objects.get(star=True, owner=request.user)
+                item = collection.items.get(resource=resource)
+                item.delete()
+            except Collection.DoesNotExist:
+                pass
+            except CollectionItem.DoesNotExist:
+                pass
 
-    return render_to_response("aacore/import.html", context, context_instance=RequestContext(request))
+            return HttpResponse(json.dumps({'star': False}));
+
+from django import forms
+class AddToCollectionForm (forms.Form):
+    name = forms.CharField(max_length=255, required=True, label="Name of collection")
+
+def resource_addtocollection (request, id):
+    resource = get_object_or_404(Resource, pk=id)
+    context = {}
+    context['resource'] = resource
+    context['form'] = AddToCollectionForm()
+    collections = Collection.objects.filter(owner=request.user).exclude(star=True).order_by("name")
+    
+    if request.method == "POST":
+        form = AddToCollectionForm(request.POST)
+        if form.is_valid():
+            cname = form.cleaned_data.get('name').strip()
+            if cname:
+                (collection, created) = Collection.objects.get_or_create(owner=request.user, name=cname)
+                (citem, created) = CollectionItem.objects.get_or_create(collection=collection, asset=asset)
+                next = reverse('asset', args=[asset.id])
+                return HttpResponseRedirect(next)
+    else:
+        form = AddToCollectionForm()
+
+    context['form'] = form        
+    context['collections'] = collections
+    return render_to_response("resource_addtocollection.html", context, context_instance = RequestContext(request))
+
+@login_required
+def starred (request):
+    context={}
+    context['star'] = True
+    try:
+        c = Collection.objects.get(owner=request.user, star=True)
+        context['collection'] = c
+        context['items'] = c.items.all()
+    except Collection.DoesNotExist:
+        pass
+    return render_to_response("star.html", context, context_instance = RequestContext(request))
+
+@login_required
+def collections (request):
+    context={}
+    context['collections'] = Collection.objects.filter(owner=request.user).exclude(star=True)
+    context['allcollections'] = Collection.objects.exclude(owner=request.user).exclude(star=True)
+    return render_to_response("collections.html", context, context_instance = RequestContext(request))
+
+@login_required
+def collection (request, id):
+    context={}
+    c = get_object_or_404(Collection, pk=id)
+    context['collection'] = c
+    context['items'] = c.items.all()
+    return render_to_response("collection.html", context, context_instance = RequestContext(request))
+
+@login_required
+def collection_order (request, id):
+    context={}
+    c = get_object_or_404(Collection, pk=id)
+    if request.method == "POST":
+        ordered_ids = request.POST.getlist("citem[]")
+        for x, citem_id in enumerate(ordered_ids):
+            citem = CollectionItem.objects.get(pk=citem_id)
+            if citem.collection == c:
+                citem.order = x
+                citem.save()
+        return HttpResponse(json.dumps({'result': True}));
+    return HttpResponseNotAllowed(['POST'])
+
+@login_required
+def collection_delete (request, id):
+    context={}
+    c = get_object_or_404(Collection, pk=id)
+    context['collection'] = c
+    if request.method == "POST":
+        if request.POST.get("_submit", "").lower() == "cancel":
+            return HttpResponseRedirect(reverse('collection', args=[c.id]))
+        c.delete()
+        return HttpResponseRedirect(reverse('collections'))
+    return render_to_response("collection_delete.html", context, context_instance = RequestContext(request))
+
+@login_required
+def tags (request):
+    context={}
+    context['tags'] = Tag.objects.all()
+    return render_to_response("tags.html", context, context_instance = RequestContext(request))
+
+@login_required
+def tag (request, id):
+    context={}
+    tag = get_object_or_404(Tag, pk=id)
+    context['tag'] = tag
+    context['resources'] = tag.assets.all()
+    return render_to_response("tag.html", context, context_instance = RequestContext(request))
+
+@login_required
+def users (request):
+    context={}
+    context['users'] = User.objects.filter(is_active=True)
+    return render_to_response("users.html", context, context_instance = RequestContext(request))
+
+@login_required
+def user (request, id):
+    context={}
+    u = get_object_or_404(User, pk=id)
+    context['user'] = u
+    context['assets'] = [] # u.assets.all()
+    context['collections'] = u.collections.exclude(favorites=True)
+    return render_to_response("user.html", context, context_instance = RequestContext(request))
+
+@login_required
+def search (request, id):
+    context={}
+    return render_to_response("search.html", context, context_instance = RequestContext(request))
+
+

@@ -1,36 +1,23 @@
-{% extends "aacore/base.html" %}
-
+{% extends "aacore/base_wiki.html" %}
+{% load aacoretags %}
 {% block extrahead %}
-<!-- Page specific javascript -->
-<!-- z-index + visibility -->
-<script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
-<script src="{{ STATIC_URL }}aacore/js/jquery.aalayers.js"></script>   
-
-<script> 
-$(document).ready(function() {
-    $('body').layout({
-        applyDefaultStyles: false,
-        enableCursorHotkey: false,
-    }).close("east");
-
-    $("nav#east-pane").tabs();
-});
-</script> 
-
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
-<script src="{{ STATIC_URL }}lib/jquery.jeditable.mini.js"></script>
+<script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
+
+<script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
+<script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
+<script src="{{ STATIC_URL }}aacore/js/jquery.aalayers.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}aacore/js/jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}aacore/js/jquery.ui.playlist.js"></script>
+
 <script src="{{ STATIC_URL }}aacore/js/aa.view.js"></script>
-<script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
-<script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
+<script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
+<script src="{% url aa-embed-js %}"></script>   
 
 {% for css in extra_css %}
-<link rel="stylesheet" href="{{ css }}" type="text/css" media="screen" charset="utf-8">
+<link rel="stylesheet" href="{{ css }}" type="text/css" media="screen" charset="utf-8" />
 {% endfor %}
 {% endblock %}
-
 
 {% block body %}
 <nav id="toolbar">
@@ -44,7 +31,7 @@ $(document).ready(function() {
 </nav>
 
 <article>
-    {{ content|safe }}
+    {{ page.content|aamarkdown|safe }}
 </article>
 {% endblock %}
 
@@ -59,5 +46,10 @@ $(document).ready(function() {
     </div>
     <div id="tabs-2">
     </div>
+</nav>
+<nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> 
+<div id="browser">
+    <div class="minipage"></div>
+</div>
 </nav>
 {% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    {% for ns in namespaces%}xmlns:{{ns.name}}="{{ns.url}}" {%endfor %}
+    version="HTML+RDFa 1.1">
+<head>
+{% block head %}
+<meta charset="utf-8" />
+<title>{% block title %}active archives{% endblock %}</title>
+<!--<link rel="stylesheet" href="{{ STATIC_URL }}lib/css/reset.css" type="text/css" />-->
+<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/layout-default-latest.css" type="text/css" />
+{% block jquery %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery.js"></script>
+<script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    
+<script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
+<script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css"/>
+<link rel="stylesheet" href="{% url aa-colors-css %}" type="text/css" charset="utf-8" />
+{% endblock jquery %}
+<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" type="text/css"/>
+{% block extrahead %}{% endblock %}
+{% endblock head %}
+</head>
+
+<body>
+
+{% block prebody %}
+<!--<nav id="west-pane" class="ui-layout-west" style="display:none" > -->
+    <!--<input type="search" name="some_name" value="" />-->
+    <!--<input type="submit" name="some_name" value="Search" />-->
+<!--</nav>-->
+{% endblock %}
+
+<div id="center" class="ui-layout-center"> 
+{% block body %}{% endblock body %} 
+</div>
+
+{% block postbody %}{% endblock %}
+
+</body>
+</html>
