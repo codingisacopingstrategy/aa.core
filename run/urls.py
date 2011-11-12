@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     # (r'^docs/', include('sarmadocs.urls')),
 
-    url(r'^openid/', include('django_openid_auth.urls')),
+    #url(r'^openid/', include('django_openid_auth.urls')),
     url(r'^logout/', 'django.contrib.auth.views.logout_then_login', {}, 'logout'),
 
     (r'^flickr/', include('flickr.urls')),
