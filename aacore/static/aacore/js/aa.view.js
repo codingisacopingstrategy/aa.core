@@ -66,7 +66,7 @@ function resetTimelines() {
 var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
-function ffind (selector, context, each) {
+function ffind (selector, context) {
     // "filter find", like $.find but it also checks the context element itself
     return $(context).filter(selector).add(selector, context);
 }
@@ -89,7 +89,7 @@ $(document).bind("refresh", function (evt) {
 
     // RENUMBER ALL SECTIONS
     // console.log("renumber sections");
-    $("section").each(function (i) {
+    $("section:not([data-section='-1'])").each(function (i) {
         $(this).attr("data-section", (i+1));
     });
 
@@ -104,45 +104,58 @@ $(document).bind("refresh", function (evt) {
 
     // IN-PLACE EDITING
     ffind('section', context).bind("edit", function (evt) {
-        evt.stopPropagation();
-        // console.log("commencing section edit...");
-        var that = this;
-        $.ajax("edit/", {
-            data: {
-                section: $(this).attr("data-section"),
-                type: 'ajax'
-            },
-            success: function (data) {
-                var position = $(that).css("position");
-                var section_height = Math.min($(window).height() - 20, $(that).height());
-                var use_height = (position == "absolute") ? (section_height - 36) : section_height;
-                var f = $("<div></div>").addClass("section_edit").appendTo(that);
-                var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
-                $(that).addClass("editing");
-                $("<button>save</button>").click(function () {
-                    // console.log("commencing section edit save...");
-                    $.ajax("edit/", {
-                        type: 'post',
-                        data: {
-                            section: $(that).attr("data-section"),
-                            type: 'ajax',
-                            content: textarea.val()
-                        },
-                        success: function (data) {
-                            // console.log("resetting contents of section to: ", data);
-                            var new_content = $(data);
-                            $(that).replaceWith(new_content);
-                            new_content.trigger("refresh");
-                        }
-                    });
-                }).appendTo(f);
-                $("<button>cancel</button>").click(function () {
-                    // console.log("cancelling section edit save...");
+
+        function edit (data) {
+            var position = $(that).css("position");
+            var section_height = Math.min($(window).height() - 20, $(that).height());
+            var use_height = (position == "absolute") ? (section_height - 36) : section_height;
+            var f = $("<div></div>").addClass("section_edit").appendTo(that);
+            var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
+            $(that).addClass("editing");
+            $("<button>save</button>").click(function () {
+                // console.log("commencing section edit save...");
+                $.ajax("edit/", {
+                    type: 'post',
+                    data: {
+                        section: $(that).attr("data-section"),
+                        type: 'ajax',
+                        content: textarea.val()
+                    },
+                    success: function (data) {
+                        // console.log("resetting contents of section to: ", data);
+                        var new_content = $(data);
+                        $(that).replaceWith(new_content);
+                        new_content.trigger("refresh");
+                    }
+                });
+            }).appendTo(f);
+            $("<button>cancel</button>").click(function () {
+                // console.log("cancelling section edit save...");
+                if (new_section) {
+                    // removes the annotation
+                    $(that).remove(); 
+                } else {
                     f.remove();
                     $(that).removeClass("editing");
-                }).appendTo(f);
-            }
-        });
+                }
+            }).appendTo(f);
+        }
+
+        evt.stopPropagation();
+        var that = this;
+        var new_section = false;
+        if ($(this).attr('data-section') == "-1") {
+            new_section = true;
+            edit("# New section");
+        } else {
+            $.ajax("edit/", {
+                data: {
+                    section: $(this).attr("data-section"),
+                    type: 'ajax'
+                },
+                success: edit,
+            });
+        }
     });
     // end of IN-PLACE EDITING
 
@@ -241,34 +254,36 @@ $(document).ready(function() {
             post_styles(target);
         },
     });
-    /////////////////////
-	// Animate scrolls
-    $("a").click(function(event){
-		//prevent the default action for the click event
-        if ($(this).attr('href').match('^#')) {
-            event.preventDefault();
-            //get the full url - like mysitecom/index.htm#home
-            var full_url = this.href;
-
-            //split the url by # and get the anchor target name - home in mysitecom/index.htm#home
-            var parts = full_url.split("#");
-            var target = $('#' + parts[1]);
-            target.closest('section.section1')
-                .find('div.wrapper:first')
-                    .autoscrollable("scrollto", target);
-        };
-	});
-    /////////////////////
-    $('.foldable').hide();
-    $('.foldable_toggle').each(function() {
-	    $(this).append('<span class="toggle">&nbsp;</span>');
-	    $(this).wrapInner('<a href="#"></a>');
-    });
-    $('.foldable_toggle a').click(function() {
-	    $(this).parent().next('.foldable').slideToggle('slow');
-	    $(this).toggleClass('unfolded');
-	    return false;
-    });
+/*
+ *    /////////////////////
+ *    // Animate scrolls
+ *    $("a").click(function(event){
+ *        //prevent the default action for the click event
+ *        if ($(this).attr('href').match('^#')) {
+ *            event.preventDefault();
+ *            //get the full url - like mysitecom/index.htm#home
+ *            var full_url = this.href;
+ *
+ *            //split the url by # and get the anchor target name - home in mysitecom/index.htm#home
+ *            var parts = full_url.split("#");
+ *            var target = $('#' + parts[1]);
+ *            target.closest('section.section1')
+ *                .find('div.wrapper:first')
+ *                    .autoscrollable("scrollto", target);
+ *        };
+ *    });
+ *    /////////////////////
+ *    $('.foldable').hide();
+ *    $('.foldable_toggle').each(function() {
+ *        $(this).append('<span class="toggle">&nbsp;</span>');
+ *        $(this).wrapInner('<a href="#"></a>');
+ *    });
+ *    $('.foldable_toggle a').click(function() {
+ *        $(this).parent().next('.foldable').slideToggle('slow');
+ *        $(this).toggleClass('unfolded');
+ *        return false;
+ *    });
+ */
     /////////////////////
     // LAYOUT
     $("nav#east-pane").tabs();
@@ -288,6 +303,13 @@ $(document).ready(function() {
         }           
     });
     // $("nav#south-pane").tabs();
+    //
+    
+    $("a[title='add']:first").click(function() {
+        var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
+        $('article').append(elt);
+        elt.trigger('refresh').trigger('edit');
+    });
 
 });
 })(jQuery);
