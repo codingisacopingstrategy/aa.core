@@ -292,14 +292,9 @@ def page_detail(request, slug):
         return redirect(url)
 
     context['page'] = page
-    md = get_markdown()
-    rev = request.REQUEST.get('rev', 'HEAD')
-    rendered = md.convert(page.read(rev=rev))
-    t = Template("{% load filters aatags %}" + rendered)
     c = RequestContext(request)
-    if 'css' in md.Meta:
-        context['extra_css'] = md.Meta['css']
-    context['content'] = mark_safe(t.render(c))
+#    if 'css' in md.Meta:
+#        context['extra_css'] = md.Meta['css']
 
     return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
 
