@@ -212,3 +212,43 @@ class SparqlQuery (object):
         
         return ret
 
+def load_links (model, context, uri=None, literal=None):
+    """
+    load all the relationship of a uri via the rdf model using SPARQL.
+    """
+    links_in = []
+    links_out = []
+    node_stats = []
+    as_rel = None
+
+    if literal:
+        s = '"{0}"'.format(literal)
+    else:
+        s = "<{0}>".format(uri)
+
+    q = "SELECT DISTINCT ?relation ?object WHERE {{ {0} ?relation ?object . }} ORDER BY ?relation".format(s)
+    for b in query(q, model):
+        if b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/title":
+            context['title'] = b['object'].literal_value.get("string")
+        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/description":
+            context['description'] = b['object'].literal_value.get("string")
+        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://xmlns.com/foaf/0.1/thumbnail":
+            context['thumbnail'] = str(b['object'].uri)
+        elif b['object'].is_resource():
+            links_out.append(b)
+        else:
+            node_stats.append(b)
+
+    q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation {0} . }} ORDER BY ?relation".format(s)
+    for b in query(q, model):
+        links_in.append(b)
+
+    if not literal:
+        q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject {0} ?object . }} ORDER BY ?subject".format(s)
+        as_rel = [x for x in query(q, model)]
+    else:
+        as_rel = ()
+
+    return node_stats, links_out, links_in, as_rel
+
+

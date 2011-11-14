@@ -40,26 +40,35 @@ from forms import PageEditForm
 
 
 #### RDFSource
-def rdf_source (request, id):
+def rdf_delegate(request, id):
+    """
+    RDF Delegate view
+    """
     context = {}
     source = get_object_or_404(RDFSource, pk=id)
     context['source'] = source
-    # context['namespaces'] = Namespace.objects.all()
     return render_to_response("aacore/rdf_source.html", context, context_instance=RequestContext(request))
 
 def colors_css (request):
+    """
+    Generates a stylesheet with the namespace colors
+    """
     context = {}
     context['namespaces'] = Namespace.objects.all()
     return render_to_response("aacore/colors.css", context, context_instance=RequestContext(request), mimetype="text/css")
 
 def resources (request):
+    """
+    Temporary view to dump a list of all the resources and links to browser view.
+    """
     context = {}
     context['resources'] = Resource.objects.all()
     return render_to_response("aacore/resources.html", context, context_instance = RequestContext(request))
 
 def get_embeds (uri, model, request):
-    """ Example get_embeds for basic HTML(5) types """
+    """ UNSTABLE: Example get_embeds for basic HTML(5) types """
 
+    # Is this suitable for a audio/video tag?
     q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
 PREFIX aa:<http://activearchives.org/terms/>
 PREFIX http:<http://www.w3.org/Protocols/rfc2616/>
@@ -82,6 +91,7 @@ WHERE {{
 
     ret = []
 
+    # TODO: move to templates
     if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
         ret.append('<img src="{0}" />'.format(uri))
     elif b.get('ctype') in ("video/ogg", "video/webm") or (b.get('videocodec') in ("theora", "vp8")):
@@ -91,12 +101,11 @@ WHERE {{
 
     return ret
 
-def embed_js (request):
-    context = {}
-    context['embed_url'] = full_site_url(reverse("aa-embed"))
-    return render_to_response("aacore/embed.js", context, context_instance = RequestContext(request), mimetype="application/javascript")
-
 def embed (request):
+    """
+    Receives a request with parameters URL and filter.
+    Returns a JSON containing content of the embed.
+    """
     url = request.REQUEST.get("url")
     # ALLOW (authorized users) to trigger a resource to be added...
     model = get_rdf_model()
@@ -138,6 +147,7 @@ def embed (request):
     content = ret.format({'url': url, 'browseurl': browseurl, 'embed': rendered})
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
+
 def browse (request):
     """ Main "browser" view """
 
@@ -151,50 +161,34 @@ def browse (request):
 
     submit = request.REQUEST.get("_submit", "")
 
-    if submit == "direct":
-        return HttpResponseRedirect(uri)
-    elif submit == "remove":
-        return HttpResponse('not implemented')
-    elif submit == "reload":
+    if submit == "reload":
         add_resource(uri, model, request, reload=True)
-#    elif submit == "sniff":
-#        add_resource(uri, model, request)
     else:
         # force every (http) resource to be added
         if uri.startswith("http"):
             # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
             add_resource(uri, model, request)
 
+    # RDF distinguishes URI and literals...
     literal = None
     if not uri.startswith("http:"):
         literal = uri
 
     context = {}
-    context['embeds'] = [] # get_embeds(uri, model, request)
     context['namespaces'] = Namespace.objects.all()
-
     context['uri'] = uri
     context['literal'] = literal
 
     if literal:
-        node_stats, links_out, links_in, as_rel = load_links(model, context, literal=uri)
+        node_stats, links_out, links_in, as_rel = rdfutils.load_links(model, context, literal=uri)
     else:
-        node_stats, links_out, links_in, as_rel = load_links(model, context, uri=uri)
+        node_stats, links_out, links_in, as_rel = rdfutils.load_links(model, context, uri=uri)
 
     context['node_stats'] = node_stats
     context['links_out'] = links_out
     context['links_in'] = links_in
     context['links_as_rel'] = as_rel
 
-    # literals (by rel, by context)
-    # links in/out (left/right) (by rel, by context)
-
-    ###
-    # is this resource starred by the current user
-    if request.user:
-        pass
-
-    ###
     if not literal:
         try:
             resource = Resource.objects.get(url=uri)
@@ -203,44 +197,6 @@ def browse (request):
             pass
 
     return render_to_response("aacore/browse.html", context, context_instance = RequestContext(request))
-
-def load_links (model, context, uri=None, literal=None):
-    """ load all the relationship of a uri via the rdf model """
-    links_in = []
-    links_out = []
-    node_stats = []
-    as_rel = None
-
-    if literal:
-        s = '"{0}"'.format(literal)
-    else:
-        s = "<{0}>".format(uri)
-
-    q = "SELECT DISTINCT ?relation ?object WHERE {{ {0} ?relation ?object . }} ORDER BY ?relation".format(s)
-    for b in rdfutils.query(q, model):
-        if b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/title":
-            context['title'] = b['object'].literal_value.get("string")
-        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/description":
-            context['description'] = b['object'].literal_value.get("string")
-        elif b['relation'].is_resource() and str(b['relation'].uri) == "http://xmlns.com/foaf/0.1/thumbnail":
-            context['thumbnail'] = str(b['object'].uri)
-        elif b['object'].is_resource():
-            links_out.append(b)
-        else:
-            node_stats.append(b)
-
-    q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation {0} . }} ORDER BY ?relation".format(s)
-    for b in rdfutils.query(q, model):
-        links_in.append(b)
-
-    if not literal:
-        q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject {0} ?object . }} ORDER BY ?subject".format(s)
-        as_rel = [x for x in rdfutils.query(q, model)]
-    else:
-        as_rel = ()
-
-    return node_stats, links_out, links_in, as_rel
-
 
 ####################################
 ### Resource Main Sniff Page (http)
@@ -288,6 +244,8 @@ def page_detail(request, slug):
 
     context['page'] = page
     c = RequestContext(request)
+
+    # TODO: Markdown extension for stylesheet embed
 #    if 'css' in md.Meta:
 #        context['extra_css'] = md.Meta['css']
 
@@ -362,7 +320,10 @@ def page_edit(request, slug):
 
             if page:
                 if section:  # section edit
-                    page.content = sectionalize_replace(page.content, section, content)
+                    if section == -1:
+                        page.content = page.content.rstrip() + "\n\n" + content
+                    else:
+                        page.content = sectionalize_replace(page.content, section, content)
                     page.commit(message=message, author=author, is_minor=is_minor)
                 else:
                     if content == "delete":
@@ -454,58 +415,15 @@ def sandbox(request):
 
     if text:
         # This is a trick to use of django filter in the pages
-        t = Template("{% load aatags %}\n" + text)
+        t = Template("{% load aacoretags %}\n" + text)
         c = Context({})
         context['result'] = t.render(c)
 
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
 
-############################################################
-
-def getLinks (rdfmodel, url, norels=None):
-    """ formerly getTag """
-    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
-SELECT DISTINCT ?rel ?doc ?title ?author ?date
-WHERE {
-?doc dc:title ?title .
-?doc ?rel <%s> .
-OPTIONAL { ?doc dc:creator ?author }
-OPTIONAL { ?doc dc:date ?date }
-}
-ORDER BY ?rel ?title""".strip() % url
-    return rdfutils.query(q, rdfmodel)
-
-def getLinksFaceted (rdfmodel, url):
-    q = """
-PREFIX dc:<http://purl.org/dc/elements/1.1/>
-PREFIX sarma:<http://sarma.be/terms/>
-
-SELECT ?doc ?rel ?tag
-WHERE {
-  ?doc ?rel ?tag .
-  ?doc ?tagrel <%s> .
-}
-ORDER BY ?doc ?rel
-""".strip() % url
-    # groupby(res, "doc", "rel")
-    links = rdfutils.query(q, rdfmodel)
-    curdoc = None
-    doc = None
-    docs = []
-    for rec in links:
-        if curdoc != rec['doc']:
-            curdoc = rec['doc']
-            doc = {'doc': rdfnode(rec['doc']), 'tagsbyrel' : {}}
-            docs.append(doc)
-        rel = rdfnode(rec['rel'])
-        if not rel in doc['tagsbyrel']:
-            doc['tagsbyrel'][rel] = []
-        doc['tagsbyrel'][rel].append(rdfnode(rec['tag']))
-    return docs
-
 
 ############################################################
-# Embed
+# UNSTABLE
 ############################################################
 
 # map filter args to template context...
@@ -538,6 +456,7 @@ def thumbnail_filter (fargs, res, cur, rdfmodel=None):
             os.system(cmd)
         return '<img src="{}" />'.format(path_to_url(tpath))
 
+
 import urlparse, html5lib, urllib2, lxml.cssselect
 
 def xpath_filter (fargs, url, cur, rdfmodel=None):
@@ -568,238 +487,3 @@ def get_filter_by_name (n):
         return xpath_filter
     elif n == "embed":
         return embed_filter
-
-def embed_jsonp_js (request):
-    context = {}
-    context['embed_url'] = full_site_url(reverse("aa-embed-jsonp"))
-    return render_to_response("aacore/embed_jsonp.js", context, context_instance = RequestContext(request), mimetype="application/javascript")
-
-# embed could always return a dictionary with content + an eventual polling url
-# or test returned content that itself triggers polling (better?)
-
-def embed_jsonp (request):
-    url = request.REQUEST.get("url")
-    # ALLOW (authorized users) to trigger a resource to be added...
-    rdfmodel = get_rdf_model()
-    try:
-        res = Resource.objects.get(url=url)
-    except Resource.DoesNotExist:
-        add_resource(url, rdfmodel=rdfmodel)
-        res = get_object_or_404(Resource, url=url)
-
-    filterstr = request.REQUEST.get("filter", "embed").strip()
-    filters = [x.strip() for x in filterstr.split("|")]
-    rendered = ""
-    for fcall in filters:
-        if ":" in fcall:
-            (fname, fargs) = fcall.split(":", 1) 
-        else:
-            fname = fcall.strip()
-            fargs = ""
-        f = get_filter_by_name(fname)
-        if f:
-            rendered = f(fargs, res, rendered, rdfmodel=rdfmodel)
-
-    callback = request.REQUEST.get("callback", "callback")
-    response = callback + "(" + json.dumps(rendered) + ");"
-
-    return HttpResponse(response, mimetype="application/javascript")
-
-############################################################
-# BROWSE
-############################################################
-
-#def resource (request, id=None, url=None):
-#    if id:
-#        resource = get_object_or_404(Resource, pk=id)
-#    else:
-#        try:    
-#            resource = Resource.objects.get(url=url)
-#        except Resource.DoesNotExist:
-#            return HttpResponseRedirect(reverse("aa-404", (), url=url))
-
-#    context = {}
-#    context['resource'] = resource
-#    context['collections'] = resource.collections.exclude(star=True)
-
-#    # check if resource is starred by this user
-#    try:
-#        collection = Collection.objects.get(star=True, owner=request.user)
-#        try:
-#            citem = collection.items.get(asset=asset)
-#            context['star'] = True
-#        except CollectionItem.DoesNotExist:
-#            pass
-#    except Collection.DoesNotExist:
-#        pass
-
-#    ### LOAD ALL METADATA
-#    model = get_rdf_model()
-#    uri = resource.url
-#    context['namespaces'] = Namespace.objects.all()
-#    context['uri'] = uri
-#    q = "SELECT DISTINCT ?relation ?object WHERE { <%s> ?relation ?object . } ORDER BY ?relation" % uri
-#    context['results_as_subject'] = rdfutils.query(q, model)
-#    q = "SELECT DISTINCT ?subject ?object WHERE { ?subject <%s> ?object . } ORDER BY ?subject" % uri
-#    context['results_as_relation'] = rdfutils.query(q, model)
-#    q = "SELECT DISTINCT ?subject ?relation WHERE { ?subject ?relation <%s> . } ORDER BY ?relation" % uri
-#    context['results_as_object'] = rdfutils.query(q, model)
-
-
-#    return render_to_response("aacore/browse_resource.html", context, context_instance = RequestContext(request))
-
-@login_required
-def resource_meta (request, id):
-    context = {}
-    context['resource'] = get_object_or_404(Resource, pk=id)
-    return render_to_response("resource_meta.html", context, context_instance = RequestContext(request))
-
-@login_required
-def resource_export (request, id):
-    context = {}
-    context['resource'] = get_object_or_404(Resource, pk=id)
-    return render_to_response("resource_export.html", context, context_instance = RequestContext(request))
-
-@login_required
-def resource_star (request, id):
-    context = {}
-    resource = get_object_or_404(Resource, pk=id)
-    context['resource'] = resource
-    if request.method == "POST":
-        if request.POST.get("star") == "true":
-            # Add this resource to this users starred resources
-            (collection, created) = Collection.objects.get_or_create(star=True, owner=request.user)
-            try:
-                citem = collection.items.get(resource=resource)
-            except CollectionItem.DoesNotExist:
-                citem = CollectionItem(collection=collection, resource=resource, author=request.user)
-                citem.save()
-                return HttpResponse(json.dumps({'star': True}));
-        else:
-            # Remove this resource from users starred resources
-            try:
-                collection = Collection.objects.get(star=True, owner=request.user)
-                item = collection.items.get(resource=resource)
-                item.delete()
-            except Collection.DoesNotExist:
-                pass
-            except CollectionItem.DoesNotExist:
-                pass
-
-            return HttpResponse(json.dumps({'star': False}));
-
-from django import forms
-class AddToCollectionForm (forms.Form):
-    name = forms.CharField(max_length=255, required=True, label="Name of collection")
-
-def resource_addtocollection (request, id):
-    resource = get_object_or_404(Resource, pk=id)
-    context = {}
-    context['resource'] = resource
-    context['form'] = AddToCollectionForm()
-    collections = Collection.objects.filter(owner=request.user).exclude(star=True).order_by("name")
-    
-    if request.method == "POST":
-        form = AddToCollectionForm(request.POST)
-        if form.is_valid():
-            cname = form.cleaned_data.get('name').strip()
-            if cname:
-                (collection, created) = Collection.objects.get_or_create(owner=request.user, name=cname)
-                (citem, created) = CollectionItem.objects.get_or_create(collection=collection, asset=asset)
-                next = reverse('asset', args=[asset.id])
-                return HttpResponseRedirect(next)
-    else:
-        form = AddToCollectionForm()
-
-    context['form'] = form        
-    context['collections'] = collections
-    return render_to_response("resource_addtocollection.html", context, context_instance = RequestContext(request))
-
-@login_required
-def starred (request):
-    context={}
-    context['star'] = True
-    try:
-        c = Collection.objects.get(owner=request.user, star=True)
-        context['collection'] = c
-        context['items'] = c.items.all()
-    except Collection.DoesNotExist:
-        pass
-    return render_to_response("star.html", context, context_instance = RequestContext(request))
-
-@login_required
-def collections (request):
-    context={}
-    context['collections'] = Collection.objects.filter(owner=request.user).exclude(star=True)
-    context['allcollections'] = Collection.objects.exclude(owner=request.user).exclude(star=True)
-    return render_to_response("collections.html", context, context_instance = RequestContext(request))
-
-@login_required
-def collection (request, id):
-    context={}
-    c = get_object_or_404(Collection, pk=id)
-    context['collection'] = c
-    context['items'] = c.items.all()
-    return render_to_response("collection.html", context, context_instance = RequestContext(request))
-
-@login_required
-def collection_order (request, id):
-    context={}
-    c = get_object_or_404(Collection, pk=id)
-    if request.method == "POST":
-        ordered_ids = request.POST.getlist("citem[]")
-        for x, citem_id in enumerate(ordered_ids):
-            citem = CollectionItem.objects.get(pk=citem_id)
-            if citem.collection == c:
-                citem.order = x
-                citem.save()
-        return HttpResponse(json.dumps({'result': True}));
-    return HttpResponseNotAllowed(['POST'])
-
-@login_required
-def collection_delete (request, id):
-    context={}
-    c = get_object_or_404(Collection, pk=id)
-    context['collection'] = c
-    if request.method == "POST":
-        if request.POST.get("_submit", "").lower() == "cancel":
-            return HttpResponseRedirect(reverse('collection', args=[c.id]))
-        c.delete()
-        return HttpResponseRedirect(reverse('collections'))
-    return render_to_response("collection_delete.html", context, context_instance = RequestContext(request))
-
-@login_required
-def tags (request):
-    context={}
-    context['tags'] = Tag.objects.all()
-    return render_to_response("tags.html", context, context_instance = RequestContext(request))
-
-@login_required
-def tag (request, id):
-    context={}
-    tag = get_object_or_404(Tag, pk=id)
-    context['tag'] = tag
-    context['resources'] = tag.assets.all()
-    return render_to_response("tag.html", context, context_instance = RequestContext(request))
-
-@login_required
-def users (request):
-    context={}
-    context['users'] = User.objects.filter(is_active=True)
-    return render_to_response("users.html", context, context_instance = RequestContext(request))
-
-@login_required
-def user (request, id):
-    context={}
-    u = get_object_or_404(User, pk=id)
-    context['user'] = u
-    context['assets'] = [] # u.assets.all()
-    context['collections'] = u.collections.exclude(favorites=True)
-    return render_to_response("user.html", context, context_instance = RequestContext(request))
-
-@login_required
-def search (request, id):
-    context={}
-    return render_to_response("search.html", context, context_instance = RequestContext(request))
-
-

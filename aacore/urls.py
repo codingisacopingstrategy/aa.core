@@ -4,9 +4,12 @@ from django.views.generic.simple import direct_to_template
 
 
 urlpatterns = patterns('aacore.views',
-    ### RESOURCE ###
-    url(r'^resource/(?P<id>\d+)/$', 'resource_sniff', {}, 'aa-resource-sniff'),
-    url(r'^rdfsource/(?P<id>\d+)/$', 'rdf_source', {}, name='aa-rdf-source'),
+    ### BROWSER
+    url(r'^browse/$', 'browse', {}, name='aa-browse'),
+    url(r'^colors.css$', 'colors_css', {}, name='aa-colors-css'),
+    url(r'^resources/$', 'resources', {}, name='aa-resources'),
+    url(r'^resources/(?P<id>\d+)/$', 'resource_sniff', {}, 'aa-resource-sniff'),
+    url(r'^rdfdelegate/(?P<id>\d+)/$', 'rdf_delegate', {}, name='aa-rdf-source'),
 
     ### WIKI
     url(r'^$', redirect_to, {'url': '/pages/Index/'}),
@@ -16,15 +19,7 @@ urlpatterns = patterns('aacore.views',
     url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),
 
     ### EMBED
-    url(r'^embed.js$', 'embed_js', {}, name='aa-embed-js'),
     url(r'^embed/$', 'embed', {}, name='aa-embed'),
-    url(r'^embed_jsonp.js$', 'embed_jsonp_js', {}, name='aa-embed-jsonp-js'),
-    url(r'^embed_jsonp/$', 'embed_jsonp', {}, name='aa-embed-jsonp'),
-
-    ### BROWSER
-    url(r'^browse/$', 'browse', {}, name='aa-browse'),
-    url(r'^resources/$', 'resources', {}, name='aa-resources'),
-    url(r'^colors.css$', 'colors_css', {}, name='aa-colors-css'),
 
     ### SANDBOX
     url(r'^sandbox/$', 'sandbox', {}, name='aa-sandbox'),
