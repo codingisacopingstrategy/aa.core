@@ -7,10 +7,12 @@ import RDF
 
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.conf import settings as projectsettings
 
 from settings import RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS
 from rdfutils import get_model, rdf_parse_into_model, prep_uri
 import aacore.models
+
 
 #####################
 
@@ -37,14 +39,23 @@ def full_site_url(url):
     Return a FULL absolute URL for a given URL, join with Site.objects.get_current().domain
     Requires: That the Site is properly setup in the admin!
     """
-    return urlparse.urljoin("http://"+Site.objects.get_current().domain, url)
+    try:
+        base = projectsettings.SITE_URL
+    except AttributeError:
+        pass
+    base = base or "http://"+Site.objects.get_current().domain
+    return urlparse.urljoin(base, url)
 
 def relative_site_url(url):
     """
     Return a relative site URL, removing Site.objects.get_current().domain if present
     Requires: That the Site is properly setup in the admin!
     """
-    base = "http://"+Site.objects.get_current().domain
+    try:
+        base = projectsettings.SITE_URL
+    except AttributeError:
+        pass
+    base = base or "http://"+Site.objects.get_current().domain
     if url.startswith(base):
         url=url[len(base):]
     return url
