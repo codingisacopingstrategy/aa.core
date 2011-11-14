@@ -5,6 +5,7 @@ except ImportError: import json
 
 from django.db import models
 from flickr.apikey import apikey
+from aacore.models import reindex_request
 
 
 def api (**keys):
@@ -272,6 +273,8 @@ o	original image, either a jpg, gif or png, depending on source format"""
                 self.load_comments()
 
         self.save()
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
 
     def load_comments(self):
         comments = api(method='flickr.photos.comments.getList', photo_id=self.flickrid)

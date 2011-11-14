@@ -109,6 +109,6 @@ INSTALLED_APPS = (
 # AA
 ###################
 
-AA_INDEXED_MODELS = ("aacore.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
+AA_INDEXED_MODELS = ("aacore.models.Resource", "aacore.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
 SITE_URL = "http://localhost:8000"
 

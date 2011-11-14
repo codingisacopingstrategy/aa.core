@@ -1,5 +1,6 @@
 from django.db import models
 import utils
+from aacore.models import reindex_request
 
 
 class Media (models.Model):
@@ -101,4 +102,6 @@ class Media (models.Model):
         self.contact = meta.get("contact", "")
 
         self.save()
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
 

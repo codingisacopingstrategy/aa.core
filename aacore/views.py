@@ -155,8 +155,7 @@ def browse (request):
     uri = request.REQUEST.get("uri", "")
 
     # Avoids browsing an internal URL
-    this = "http://" + Site.objects.get_current().domain
-    if uri.startswith(this):
+    if utils.is_local_url(uri):
         return HttpResponseRedirect(uri)
 
     submit = request.REQUEST.get("_submit", "")

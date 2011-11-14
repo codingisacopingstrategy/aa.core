@@ -5,6 +5,7 @@ except ImportError: import json
 
 from django.db import models
 from settings import SYNC_REVIEWS
+from aacore.models import reindex_request
 
 
 urlpat = re.compile(r"^http://www.archive.org/details/(?P<id>[^/]+)/?", re.I)
@@ -268,6 +269,8 @@ class Asset (models.Model):
                     r.sync(rdata)
 
         self.save()
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
 
     def files_list (self):
         """ Generate the nested listing of files and their derivatives """

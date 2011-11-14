@@ -93,6 +93,8 @@ class Resource (models.Model):
         except urllib2.HTTPError, e:
             self.status = e.code
             self.save()
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
 
     def get_about_url(self):
         """ this gets used to do reverse lookup to resource """
@@ -324,10 +326,76 @@ class RDFDelegate (models.Model):
             return None, False
 
     def sync(self):
-        pass
-
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
+        
     def get_rdf_as_stream(self):
         uri = prep_uri(self.url)
         parser = RDF.Parser(self.format.encode("utf-8"))
         # stream = parser.parse_as_stream(uri, uri)
         return parser.parse_as_stream(uri)
+
+##############################################
+# SIGNALS
+##############################################
+#
+# (1) Creates the "reindex_request" signal to:
+#     Allow Delegates to request (re)indexing of their RDF,
+# (2) Watches delegates post_delete signal to:
+#     Clear RDF index related to Delegate instances when deleted
+#
+# NB: Delegates must themselves request reindexing by
+# sending the reindex_request signal, for example:
+#
+# from aacore.models import reindex_request
+# def some_method(self):
+#     ...
+#     reindex_request.send(sender=self.__class__, instance=self)
+
+import RDF
+from django.db.models.signals import post_save, post_delete, m2m_changed
+import utils
+import rdfutils
+import django.dispatch
+
+reindex_request = django.dispatch.Signal(providing_args=[])
+
+def indexing_reindex_item (item):
+    rdfmodel = utils.get_rdf_model()
+    full_url = utils.full_site_url(item.get_absolute_url())
+    if hasattr(item, 'get_rdf_as_stream'):
+        # in a way the URL here is the resource.url directly ?!
+        stream = item.get_rdf_as_stream()
+        context = RDF.Node(full_url)
+        rdfmodel.context_remove_statements(context=context)
+        rdfmodel.add_statements(stream, context=context)
+    else:
+#        # FOR DEBUGGING
+#        resp = utils.direct_get_response(item.get_absolute_url())
+#        page = resp.content
+#        rdfaparser = RDF.Parser("rdfa")
+#        furl = utils.full_site_url(item.get_absolute_url())
+#        s = rdfaparser.parse_string_as_stream(page, furl)
+#        print "RDFA:", (len(list(s))), "triples"
+
+        utils.parse_localurl_into_model(rdfmodel, full_url, format="rdfa", baseuri=full_url, context=full_url)
+    # rdfmodel.sync()
+
+def indexing_drop_item (item):
+    rdfmodel = utils.get_rdf_model()
+    full_url = utils.full_site_url(item.get_absolute_url())
+    rdfutils.rdf_context_remove_statements (rdfmodel, full_url)
+    # rdfmodel.sync()
+
+def indexing_post_delete(sender, instance, **kwargs):
+    indexing_drop_item(instance)
+
+def indexing_reindex(sender, instance, **kwargs):
+#    print "reindex_request", instance
+    indexing_reindex_item(instance)
+
+for model in utils.get_indexed_models():
+    reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
+    post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")
+
+
