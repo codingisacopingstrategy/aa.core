@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
 
+# TODO: Rename HttpUtils ?
+
 import re, urllib2, datetime, email.utils, urlparse, os
 
 from aacore.settings import USER_AGENT

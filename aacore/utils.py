@@ -27,6 +27,9 @@ def pagename_for_url(url):
 ######################
 
 def get_rdf_model ():
+    """
+    Opens the Active ARchives RDF Store.
+    """
     return get_model(RDF_STORAGE_NAME, RDF_STORAGE_DIR)
 
 def full_site_url(url):
@@ -110,6 +113,9 @@ def reindex (item, rdfmodel=None):
 # Main Resource View -- allow "preview" of non-added resources
 
 def add_resource (url, rdfmodel=None, request=None, reload=False):
+    """
+    This is what gets called when in the aa browser you type a URL.
+    """
     if rdfmodel == None:
         rdfmodel = get_rdf_model()
 

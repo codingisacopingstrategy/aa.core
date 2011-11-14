@@ -141,10 +141,11 @@ def embed (request):
 def browse (request):
     """ Main "browser" view """
 
-    model = get_rdf_model()
+    model = get_rdf_model()  # Open the RDF Store (the 4 redland databases)
     uri = request.REQUEST.get("uri", "")
 
-    this = "http://"+Site.objects.get_current().domain
+    # Avoids browsing an internal URL
+    this = "http://" + Site.objects.get_current().domain
     if uri.startswith(this):
         return HttpResponseRedirect(uri)
 

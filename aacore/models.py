@@ -25,64 +25,24 @@ from settings import GIT_DIR
 from diff_match_patch import diff_match_patch
 
 
-class License (models.Model):
-    name = models.CharField(max_length=255)
-    url = models.URLField(blank=True, verify_exists=False)
-    redirect = models.ForeignKey('self', null=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-class AAWait (Exception):
-    """
-    This exception is used when a resource is not yet available.  The URL is a
-    special "task-tracking" URL that can be used to poll until task is done.
-    (Returns a JSON object with a "done" boolean value.)
-    """
-    def __init__(self, url):
-        self.url = url
-
-
-class AANotAvailable (Exception):
-    pass
-
-
-RESOURCE_STATUS = (
-    ('active', 'active'),
-    ('default', 'default'),
-    ('inactive', 'inactive')
-)
-
-RESOURCE_TYPES = (
-    ('audio', 'audio'),
-    ('video', 'video (no audio)'),
-    ('audio/video', 'video'),
-    ('image', 'image'),
-    ('html', 'html'),
-    ('text', 'text'),
-    ('', '')
-)
-
-
 class Resource (models.Model):
     """
     Resource is the main class of AA.
     In a nutshell: a resource is an (augmented) URL.
+    Info is in the RDF Store, but is store in the db too for convenience.
     """
     url = models.URLField(verify_exists=False)
     _filter = models.CharField(max_length=1024, blank=True)
     primary = models.BooleanField(default=True)
     redirect = models.ForeignKey('self', null=True, blank=True)
 
+    # Misc cached information from the last connexion
+    # Allows conditional GET
     content_type = models.CharField(max_length=255, default="", blank=True)
     content_length = models.IntegerField(default=0)
     charset = models.CharField(max_length=64, default="", blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
     etag = models.CharField(max_length=255, default="", blank=True)
-
-    status = models.CharField(max_length=255, choices=RESOURCE_STATUS, default="default")
-    _type = models.CharField(max_length=255, choices=RESOURCE_TYPES, blank=True)
 
     def __unicode__(self):
         return self.url
@@ -93,6 +53,11 @@ class Resource (models.Model):
 
     @classmethod
     def get_or_create_from_url(cls, url, reload=False):
+        """ 
+        Retrieve the resource, or create it -- if possible (if matching)
+        Returns object, created
+        NB: Object may be None for non-matching URLs (in which case created will always be False)
+        """
         try:
             # SHOULD MAYBE CONVERT URL to id,
             # then search on flickrid NOT page_url
@@ -177,38 +142,6 @@ class ResourceDelegate (models.Model):
     delegate_type = models.ForeignKey(ContentType)
     delegate_id = models.PositiveIntegerField()
     delegate = generic.GenericForeignKey('delegate_type', 'delegate_id')
-
-
-class Collection (models.Model):
-    """
-    Collections are used by the gallery views to provide simple "star" and
-    other named collections/playlists of resources Collection membership
-    includes order, fragment, and text fields.
-    """
-    name = models.CharField(max_length=255)
-    star = models.BooleanField(default=False)
-    owner = models.ForeignKey(User, null=True, related_name="collections")
-    resources = models.ManyToManyField(Resource, through='CollectionItem', related_name="collections")
-    # items (provided by CollectionItem)
-
-    db_created = models.DateTimeField(auto_now_add=True)
-    db_lastmodified = models.DateTimeField(auto_now=True)
-
-
-class CollectionItem(models.Model):
-    collection = models.ForeignKey(Collection, related_name="items")
-    resource = models.ForeignKey(Resource, related_name="collectionitems")
-    author = models.ForeignKey(User, null=True)
-    order = models.IntegerField(null=True, blank=True, default=1e10)
-    fragment = models.CharField(max_length=255, blank=True)
-    text = models.TextField()
-
-    db_created = models.DateTimeField(auto_now_add=True)
-    db_lastmodified = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ("order", "db_created")
-
 
 
 class Page(models.Model):
@@ -334,19 +267,12 @@ class Page(models.Model):
 
 
 class Namespace (models.Model):
+    """
+    Defines RDF namespaces and assigns colors. 
+    """
     name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
     color = models.CharField(max_length=255, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-class Language (models.Model):
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ("name",)
 
     def __unicode__(self):
         return self.name
@@ -358,46 +284,16 @@ SORTKEY_CHOICES = (
 )
 
 
-class Relationship (models.Model):
-    url = models.CharField(max_length=255)
-    name = models.CharField(max_length=255, blank=True)
-    reverse_name = models.CharField(max_length=255, blank=True)
-    name_plural = models.CharField(max_length=255, blank=True)
-    facet = models.BooleanField(default=False)
-    order = models.IntegerField(default=100)
-
-    sort_key = models.CharField(max_length=255, default="default", choices=SORTKEY_CHOICES)
-    autotag = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ("order", "name")
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('core.views.rel', [self.id])
-
-    def parse_value(self, val):
-        """ take a URL value and return an N3 representation ? """
-        return ""
-
-    def compact_url(self):
-        for ns in Namespace.objects.all():
-            if self.url.startswith(ns.url):
-                return ns.name + ":" + self.url[len(ns.url):]
-        return self.url
-
-
 RDF_SOURCE_FORMATS = (
     ("rdfxml", "RDF/XML"),
     ("rdfa", "RDFA"),
 )
 
 
-class RDFSource (models.Model):
+class RDFDelegate (models.Model):
     """
-    An RDF Source represents a URL that itself directly contains RDF-encoded
-    data (such as an RDF/XML file, or an HTML file with RDFA embedded within
-    it)
+    AA Delegate for a URL that itself directly contains RDF-encoded data (such
+    as an RDF/XML file, or an HTML file with RDFA embedded within it).
     """
 
     url = models.URLField(verify_exists=False)
@@ -435,17 +331,3 @@ class RDFSource (models.Model):
         parser = RDF.Parser(self.format.encode("utf-8"))
         # stream = parser.parse_as_stream(uri, uri)
         return parser.parse_as_stream(uri)
-
-
-class Command(models.Model):
-    """
-    Commands represent a queue for batch actions to be preformed asynchronously
-    ref: (optional) code to coordinate commands (ie possible prevent duplicate
-    commands)
-    """
-    ref = models.CharField(max_length=255)
-    text = models.TextField()
-    creator = models.ForeignKey(User)
-    started = models.DateTimeField(null=True, blank=True)
-    completed = models.DateTimeField(null=True, blank=True)
-    results = models.TextField()

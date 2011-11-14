@@ -7,11 +7,6 @@ from models import *
 admin.site.register(ResourceDelegate)
 
 
-class LicenseAdmin(admin.ModelAdmin):
-    list_display = ("name", "url")
-admin.site.register(License, LicenseAdmin)
-
-
 class ResourceDelegateInline(admin.TabularInline):
     model = ResourceDelegate
     extra = 0
@@ -32,20 +27,12 @@ class NamespaceAdmin(admin.ModelAdmin):
 admin.site.register(Namespace, NamespaceAdmin)
 
 
-class RelationshipAdmin(admin.ModelAdmin):
-    ordering = ("order", "name")
-    list_display = ("order", "facet", "autotag", "name", "name_plural", "sort_key", "url")
-    list_display_links = ("url", )
-    list_editable = ("order", "facet", "autotag", "name", "name_plural", "sort_key")
-admin.site.register(Relationship, RelationshipAdmin)
-
-
 class PageAdmin(admin.ModelAdmin):
     list_display = ("name", "content", )
     search_fields = ("name", "content")
 admin.site.register(Page, PageAdmin)
 
 
-class RDFSourceAdmin(admin.ModelAdmin):
+class RDFDelegateAdmin(admin.ModelAdmin):
     list_display = ("url", "format")
-admin.site.register(RDFSource, RDFSourceAdmin)
+admin.site.register(RDFDelegate, RDFDelegateAdmin)
