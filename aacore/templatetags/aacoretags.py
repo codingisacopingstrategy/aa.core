@@ -3,6 +3,7 @@ import urlparse, xml.sax.saxutils, urllib, os.path
 
 from django.template.defaultfilters import stringfilter
 from django import template
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
@@ -82,70 +83,6 @@ def embed (value, arg):
 embed.is_safe = True
 
 
-#@register.filter
-#def crop(uri, size='200w'):
-    #""" Takes an image ressource uri as input value and a size as argument
-    #returns the url of the new image
-    #usage:
-        #{{ http://mysite.org/myimage.png | crop }}
-    #"""
-    #SCALE_WIDTH = 'w'
-    #SCALE_HEIGHT = 'h'
-    #SCALE_BOTH = 'both'
-
-    #def scale(max_x, pair):
-        #x, y = pair
-        #new_y = (float(max_x) / x) * y
-        #return (int(max_x), int(new_y))
-
-    ## defining the size
-    #if (size.lower().endswith('h')):
-        #mode = 'h'
-        #size = size[:-1]
-        #height = int(size.strip())
-        #width = ""
-    #elif (size.lower().endswith('w')):
-        #mode = 'w'
-        #size = size[:-1]
-        #width = int(size.strip())
-        #height = ""
-    #else:
-        #mode = 'both'
-        #size = size.split("x")
-        #width = int(size[0].strip())
-        #height = int(size[1].strip())
-        
-    ## defining the filename and the miniature filename
-    #filehead, filetail = os.path.split(file.path)
-    #basename, format = os.path.splitext(filetail)
-    #miniature = basename + '_thumb_' + str(width) + str(height) + format
-    #filename = file.path
-    #miniature_filename = os.path.join(filehead, miniature)
-    #filehead, filetail = os.path.split(file.url)
-    #miniature_url = filehead + '/' + miniature
-
-    #if os.path.exists(miniature_filename) and os.path.getmtime(filename)>os.path.getmtime(miniature_filename):
-        #os.unlink(miniature_filename)
-
-    ## if the image wasn't already resized, resize it
-    #if not os.path.exists(miniature_filename):
-        
-        ## See http://redskiesatnight.com/2005/04/06/sharpening-using-image-magick/
-        ## for unsharpening values
-        #if mode == SCALE_HEIGHT:
-            #cmd = 'convert %s -resize x%d -unsharp 0.5x0.5+0.75+0.05     %s' % (filename, height, miniature_filename)
-        #elif mode == SCALE_WIDTH:
-            #cmd = 'convert %s -resize %d -unsharp 0.5x0.5+0.75+0.05 %s' % (filename, width, miniature_filename)
-        #elif mode == SCALE_BOTH:
-            #cmd = 'convert %s -resize %dx%d -unsharp 0.5x0.5+0.75+0.05 %s' % (filename, width, height, miniature_filename)
-        #else:
-            #raise Exception("Thumbnail size must be in ##w, ##h, or ##x## format.")
-        
-        #os.system(cmd)   
-
-    #return miniature_url
-
-
 @register.filter
 @stringfilter
 def zoom (value):
@@ -154,7 +91,6 @@ def zoom (value):
     usage:
         {{ "http://upload.wikimedia.org/wikipedia/commons/c/cd/Tympanum_central_mosaic_santa_Maria_del_Fiore_Florence.jpg"|zoom }}
     """
-    from django.template.loader import render_to_string
     rendered = render_to_string('aacore/partials/zoom.html', { 'value': value })
     return rendered
     

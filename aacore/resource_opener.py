@@ -20,6 +20,8 @@
 #
 #
 
+# TODO: Rename HttpUtils ?
+
 import re, urllib2, datetime, email.utils, urlparse, os
 
 from aacore.settings import USER_AGENT

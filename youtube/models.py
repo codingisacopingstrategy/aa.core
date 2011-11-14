@@ -220,7 +220,10 @@ class Video (models.Model):
         
         # url = entry.find(".//atom:id", namespaces=NS).text
         # self.youtubeid = scalar(entry.xpath(".//yt:videoid/text()", namespaces=NS))
-        self.published = scalar(entry.xpath(".//atom:published/text()", namespaces=NS), type=dateutil.parser.parse)
+        try:
+            self.published = scalar(entry.xpath(".//atom:published/text()", namespaces=NS), type=dateutil.parser.parse)
+        except TypeError:
+            pass
         self.title = scalar(entry.xpath(".//atom:title/text()", namespaces=NS), default="")
         self.duration = scalar(entry.xpath(".//yt:duration/@seconds", namespaces=NS), type=int)
         self.category = scalar(entry.xpath(".//media:category/@label", namespaces=NS), default="")

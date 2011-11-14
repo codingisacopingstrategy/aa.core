@@ -1,15 +1,15 @@
 <!DOCTYPE HTML>
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-    {% for ns in namespaces%}xmlns:{{ns.name}}="{{ns.url}}" {%endfor %}
+    {% for ns in namespaces %}xmlns:{{ ns.name }}="{{ ns.url }}" {% endfor %}
     version="HTML+RDFa 1.1">
 <head>
-<title>{% block title %}active archives{%endblock%}</title>
-<script src="{{STATIC_URL}}lib/jquery/jquery.js" type="text/javascript" language="javascript" charset="utf-8"></script>
-<script src="{{STATIC_URL}}lib/jquery/jquery-ui.js" type="text/javascript" language="javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="{{STATIC_URL}}lib/jquery/jquery-ui.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-<script src="{{STATIC_URL}}jquery.djangocsrf.js" type="text/javascript" language="javascript" charset="utf-8"></script>
-{%block stylesheet%}<link rel="stylesheet" href="{{STATIC_URL}}styles.css" type="text/css" charset="utf-8" />{%endblock%}
+<title>{% block title %}active archives{% endblock %}</title>
+<script src="{{ STATIC_URL }}lib/jquery/jquery.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<script src="{{ STATIC_URL }}jquery.djangocsrf.js" type="text/javascript" language="javascript" charset="utf-8"></script>
+{% block stylesheet %}<link rel="stylesheet" href="{{ STATIC_URL }}styles.css" type="text/css" charset="utf-8" />{% endblock %}
 {%block head %}{% endblock %}
 </head>
 <body>
@@ -17,4 +17,5 @@
 {% endblock %}
 </body>
 </html>
+
 

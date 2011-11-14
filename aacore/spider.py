@@ -2,7 +2,11 @@
 docstring :)
 """
 
-import urllib2, urlparse, lxml, lxml.cssselect, html5lib
+import urllib2
+import urlparse
+import lxml
+import lxml.cssselect
+import html5lib
 
 from settings import USER_AGENT
 

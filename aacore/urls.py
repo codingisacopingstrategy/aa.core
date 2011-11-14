@@ -36,5 +36,3 @@ urlpatterns = patterns('aacore.views',
     url(r'^mini/r/(?P<id>\d+)/$', 'mini_res', {}, name='aa-mini-res'),
     url(r'^colors.css$', 'colors_css', {}, name='aa-colors-css'),
 )
-
-

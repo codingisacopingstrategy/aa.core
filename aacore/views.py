@@ -30,7 +30,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 
 from aacore.spider import spider
-from plugins import sniffer
+#from plugins import sniffer
 from models import *
 from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename, convert_line_endings, pagename_for_url, add_resource)
 from mdx import get_markdown
@@ -141,10 +141,11 @@ def embed (request):
 def browse (request):
     """ Main "browser" view """
 
-    model = get_rdf_model()
+    model = get_rdf_model()  # Open the RDF Store (the 4 redland databases)
     uri = request.REQUEST.get("uri", "")
 
-    this = "http://"+Site.objects.get_current().domain
+    # Avoids browsing an internal URL
+    this = "http://" + Site.objects.get_current().domain
     if uri.startswith(this):
         return HttpResponseRedirect(uri)
 
@@ -454,7 +455,7 @@ def sandbox(request):
 
     if text:
         # This is a trick to use of django filter in the pages
-        t = Template("{% load aatags %}{% load filters %}\n" + text)
+        t = Template("{% load aatags %}\n" + text)
         c = Context({})
         context['result'] = t.render(c)
 
@@ -826,7 +827,7 @@ from django.template.loader import render_to_string
 # USER_AGENT + MIME_TYPE
 
 def embed_filter (fargs, res, cur, rdfmodel=None):
-    contenttypes = res.getMetadata(rel="http://activearchives.org/terms/content_type")
+    contenttypes = res.get_metadata(rel="http://activearchives.org/terms/content_type")
     if "image/jpeg" in contenttypes:
         return render_to_string('aacore/embeds/image.html', { 'resource': res })
     return ""
@@ -841,7 +842,7 @@ def thumbnail_filter (fargs, res, cur, rdfmodel=None):
     m = sizepat.search(fargs)
     if m:
         width = m.groupdict()['width']
-        fpath = res.getLocalFile()
+        fpath = res.get_local_file()
         (dname, fname) = os.path.split(fpath)
         tpath = os.path.join(dname, "thumbnail_{}px.jpg".format(width))
         if not os.path.exists(tpath):

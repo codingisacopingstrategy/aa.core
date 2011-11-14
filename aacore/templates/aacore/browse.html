@@ -1,58 +1,62 @@
 {% extends "aacore/base.html" %}
+
 {% load aacoretags %}
+
 
 {% block title %}rdf: browse{% endblock %}
 
 {%block head %}
-<script type="text/javascript" language="javascript" charset="utf-8">
-    window.onload = function () { document.getElementById("uri").focus() }
+<script>
+window.onload = function () { 
+    document.getElementById("uri").focus();
+}
 </script>
-<link rel="stylesheet" href="{{STATIC_URL}}aacore/css/aa.styles.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-<link rel="stylesheet" href="{% url aa-colors-css %}" type="text/css" charset="utf-8" />
+<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" media="screen" />
+<link rel="stylesheet" href="{% url aa-colors-css %}" type="text/css" media="screen" />
 {% endblock %}
 
-{%block body %}
+
+{% block body %}
 <div id="minipage" class="browser">
 
 <div id="browser_top">
     <form method="get" action="">{% csrf_token %}
         <div>
-            <a href="{{uri}}" class="directlink">URL</a>
-            <input name="uri" id="uri" style="width: 70%;" value="{{uri}}" />
+            <a href="{{ uri }}" class="directlink">URL</a>
+            <input name="uri" id="uri" style="width: 70%;" value="{{ uri }}" />
             <input type="submit" name="_submit" value="ok" />
             {% if resource %}
             <input type="submit" name="_submit" value="reload" />
             {% endif %}
-            {%comment %}<input type="submit" name="_submit" value="direct" />{%endcomment%}
         </div>
     </form>
 </div>
 
 {% if embeds %}
 <div id="embeds" style="text-align: center">
-    {% for embed in embeds %}{{embed|safe}}{%endfor%}
+    {% for embed in embeds %}{{ embed|safe }}{% endfor %}
 </div>
-{%endif%}
+{% endif %}
 
 <div id="results">
 
 <!-- infobox representing the node, with all literal values (optionally grouped by context) -->
 
 <div class="data">
-{% if thumbnail %}<div class="thumbnail"><img src="{{thumbnail}}" /></div>{%endif%}
-{% if title %}<h2>{{title}}</h2>{%endif%}
-{% if description %}<p class="description">{{description|safe}}</p>{%endif%}
+{% if thumbnail %}<div class="thumbnail"><img src="{{ thumbnail }}" /></div>{% endif %}
+{% if title %}<h2>{{ title }}</h2>{% endif %}
+{% if description %}<p class="description">{{ description|safe }}</p>{% endif %}
 
 {% regroup node_stats by relation as grouped %}
 
     {% for relation in grouped %}
-    <div class="relbox {{relation.grouper|namespace_for_url}}" style="float: left; margin-right: 10px; margin-bottom: 10px; width: 280px">
+    <div class="relbox {{ relation.grouper|namespace_for_url }}" style="float: left; margin-right: 10px; margin-bottom: 10px; width: 280px">
         <div class="relbox_name">{{ relation.grouper|rdfrellink }}</div>
         <div class="relbox_values">
-            {% for item in relation.list %}<span class="relbox_value">{{ item.object|rdfbrowselink}}</span>{% if not forloop.last%} <span class="relbox_value_separator">&nbsp;</span>{%endif%}{%endfor%}
+            {% for item in relation.list %}<span class="relbox_value">{{ item.object|rdfbrowselink}}</span>{% if not forloop.last%} <span class="relbox_value_separator">&nbsp;</span>{% endif %}{% endfor %}
         </div>
     </div>
-    {%endfor%}
+    {% endfor %}
 
 </div><!-- data -->
 
@@ -65,26 +69,26 @@
 <!-- Links Out -->
 {% regroup links_out by relation as grouped %}
 {% for relation in grouped %}
-<div class="relbox {{ relation.grouper|namespace_for_url}}">
+<div class="relbox {{ relation.grouper|namespace_for_url }}">
     <div class="relbox_name">{{ relation.grouper|rdfrellink }}</div>
     <div class="relbox_values">
         {% for item in relation.list %}<div class="relbox_value"><a title="{{ item.object|rdfnode }}" href="{{ item.object|rdfnode|browseurl }}">{{ item.object|rdfnode }}</a></div>{%endfor%}
     </div>
 </div>
-{%endfor%}
+{% endfor %}
 
 </td>
 
 <td class="links_in">
 {% regroup links_in by relation as grouped %}
 {% for relation in grouped %}
-<div class="relbox {{ relation.grouper|namespace_for_url}}">
+<div class="relbox {{ relation.grouper|namespace_for_url }}">
     <div class="relbox_name">{{ relation.grouper|rdfrellink }}</div>
     <div class="relbox_values">
         {% for item in relation.list %}<div class="relbox_value"><a title="{{ item.suject|rdfnode }}" href="{{ item.subject|rdfnode|browseurl }}">{{ item.subject|rdfnode }}</a></div>{%endfor%}
     </div>
 </div>
-{%endfor%}
+{% endfor %}
 </td>
 
 </tr>
@@ -100,9 +104,9 @@
 {% regroup links_as_rel by subject as grouped %}
 {% for subject in grouped %}<tr>
     <td>{{ subject.grouper|rdfbrowselink }}</td>
-    <td><ul>{% for item in subject.list %}<li>{{ item.object|rdfbrowselink}}</li>{%endfor%}</ul></td>
+    <td><ul>{% for item in subject.list %}<li>{{ item.object|rdfbrowselink }}</li>{% endfor %}</ul></td>
 </tr>
-{%endfor%}
+{% endfor %}
 </table>
 {% endif %}
 
@@ -110,6 +114,6 @@
 </div>
 </div> <!-- minipage -->
 
-{%endblock %}
+{% endblock %}
 
 

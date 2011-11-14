@@ -181,8 +181,8 @@ section.section1 {
     left: 0;
     font-size: 13px;
     line-height: 18px;
-    /*overflow: auto;*/
-    overflow: hidden;
+    overflow: auto;
+    /*overflow: hidden;*/
 }
 section.section1 h2, p {
     margin-bottom: 18px;

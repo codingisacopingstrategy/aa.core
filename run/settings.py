@@ -109,6 +109,5 @@ INSTALLED_APPS = (
 # AA
 ###################
 
-# AA_INDEXED_MODELS = ("aacore.models.Relationship", "aacore.models.Page", "sarmadocs.models.Document")
-AA_INDEXED_MODELS = ("aacore.models.Relationship", "aacore.models.Page", "aacore.models.RDFSource", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
+AA_INDEXED_MODELS = ("aacore.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
 

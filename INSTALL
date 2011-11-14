@@ -45,5 +45,10 @@ Quick Installation
 3. Run the django webserver:
        python manage.py runserver
 
-4. Open a web browser and visit this URL:
-       <http://localhost:8000/>
+4. Configure the project domain name at:
+       <http://localhost:8000/admin/sites/site/1/>
+   Typically the value must be "localhost:8000" if you are running the project
+   on a local server.
+
+
+vim: ft=markdown:

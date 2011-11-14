@@ -1,9 +1,17 @@
 Management of:
+
 * Multiple files belonging to a single "item"
 * Inter-file relations such as derived from
 * File groupings such as a compilation of different resources.
 
-Guiding principle: Following the models suggested by Archive.org & Flickr (and in a way to be able to trivially incorporate these sources); but provided as a central implementation so that simpler models like ffmpeg which need not re-implement the same. Also, literally the archive provides a centralized notion of "resources" / assets with the various relations of source & collection.
+Guiding principle 
+=================
+
+Following the models suggested by Archive.org & Flickr (and in a way to be able
+to trivially incorporate these sources); but provided as a central
+implementation so that simpler models like ffmpeg which need not re-implement
+the same. Also, literally the archive provides a centralized notion of
+"resources" / assets with the various relations of source & collection.
 
 AHA moment: Looking at the meta & files feed from archive.org... Finally starting to get the subtleties of what something archive.org provides.
 
@@ -11,10 +19,6 @@ Though not implemented as a proper super class, an AAModel if it existed would l
 (Thus this is more a template/interface than a superclass)
 
 class AAModel (models.model):
-
-    @classmethod
-    def sniff(cls, url):
-        """Check the url, returns (Matches, Exists)"""
 
     @classmethod
     def get_or_create_from_url(cls, url, reload=False):
@@ -62,3 +66,5 @@ class AAModel (models.model):
         # ...
         self.save()
 
+
+vim: set ft=markdown:
