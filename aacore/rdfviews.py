@@ -38,7 +38,6 @@ urlpatterns = patterns('aacore.rdfviews',
     url(r'^dump/$', 'dump', {}, name='aa-rdf-dump'),
     url(r'^query/$', 'query', {}, name='aa-rdf-query'),
     url(r'^browse/$', 'browse', {}, name='aa-rdf-browse'),
-    url(r'^taxi/$', 'taxi', {}, name='aa-rdf-taxi'),
 )
 
 FORMAT_MIMETYPES = {
@@ -143,12 +142,4 @@ def browse (request):
     context['results_as_object'] = rdfutils.query(q, model)
 
     return render_to_response("rdfviews/browse.html", context, context_instance = RequestContext(request))
-
-def taxi (request):
-    model = get_rdf_model()
-    uri = request.REQUEST.get("uri", "")
-    context = {}
-    context['uri'] = uri
-    return render_to_response("rdfviews/taxi.html", context, context_instance = RequestContext(request))
-
 
