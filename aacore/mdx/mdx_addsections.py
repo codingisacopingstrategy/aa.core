@@ -72,14 +72,12 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
                 wrapper = etree.Element(tag)
                 if moveAttributes:
                     for key, value in child.attrib.items():
-                        print key
                         wrapper.set(key, value)
                         del child.attrib[key]
                 if typeof:
                     wrapper.set("typeof", typeof)
                 if tagclass:
                     classes = wrapper.get("class", "")
-                    print("the class " + classes)
                     if '%(LEVEL)d' in tagclass:
                         tagclass = tagclass % {'LEVEL': n}
                         wrapper.set("class", " ".join([tagclass, classes]))

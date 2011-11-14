@@ -1,6 +1,13 @@
+"""
+Implements active archives models
+"""
+
+
 import RDF
 import codecs
-import os, os.path, urllib2
+import os
+import os.path
+import urllib2
 from git import Repo, NoSuchPathError
 import cStringIO
 from ConfigParser import ConfigParser
@@ -9,7 +16,6 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 
 import utils
 from rdfutils import rdfnode, prep_uri
@@ -18,9 +24,6 @@ import resource_opener
 from settings import GIT_DIR
 from diff_match_patch import diff_match_patch
 
-############################
-# License
-############################
 
 class License (models.Model):
     name = models.CharField(max_length=255)
@@ -29,27 +32,6 @@ class License (models.Model):
 
     def __unicode__(self):
         return self.name
-
-
-############################
-# RESOURCE
-############################
-
-RESOURCE_TYPES = (
-    ('audio', 'audio'),
-    ('video', 'video (no audio)'),
-    ('audio/video', 'video'),
-    ('image', 'image'),
-    ('html', 'html'),
-    ('text', 'text'),
-    ('', '')
-)
-
-RESOURCE_STATUS = (
-    ('active', 'active'),
-    ('default', 'default'),
-    ('inactive', 'inactive')
-)
 
 
 class AAWait (Exception):
@@ -65,22 +47,25 @@ class AAWait (Exception):
 class AANotAvailable (Exception):
     pass
 
+
+RESOURCE_STATUS = (
+    ('active', 'active'),
+    ('default', 'default'),
+    ('inactive', 'inactive')
+)
+
+RESOURCE_TYPES = (
+    ('audio', 'audio'),
+    ('video', 'video (no audio)'),
+    ('audio/video', 'video'),
+    ('image', 'image'),
+    ('html', 'html'),
+    ('text', 'text'),
+    ('', '')
+)
+
+
 class Resource (models.Model):
-    @classmethod
-    def get_or_create_from_url(cls, url, reload=False):
-        try:
-            # SHOULD MAYBE CONVERT URL to id, then search on flickrid NOT page_url
-            ret = cls.objects.get(url=url)
-            if reload:
-                ret.sync()
-            return ret, False
-        except cls.DoesNotExist:
-            pass        
-
-        ret = Resource.objects.create(url=url)
-        ret.sync()
-        return ret, True
-
     """
     Resource is the main class of AA.
     In a nutshell: a resource is an (augmented) URL.
@@ -102,7 +87,27 @@ class Resource (models.Model):
     def __unicode__(self):
         return self.url
 
-    def load_data (self):
+    @models.permalink
+    def get_absolute_url(self):
+        return ('aa-resource-sniff', (str(self.id), ))
+
+    @classmethod
+    def get_or_create_from_url(cls, url, reload=False):
+        try:
+            # SHOULD MAYBE CONVERT URL to id,
+            # then search on flickrid NOT page_url
+            ret = cls.objects.get(url=url)
+            if reload:
+                ret.sync()
+            return ret, False
+        except cls.DoesNotExist:
+            pass
+
+        ret = Resource.objects.create(url=url)
+        ret.sync()
+        return ret, True
+
+    def load_data(self):
         r = resource_opener.ResourceOpener(url=self.url)
         r.get()
         return r
@@ -111,7 +116,7 @@ class Resource (models.Model):
         try:
             if data == None:
                 data = self.load_data()
-                data.file.close() # ? better to do this here ?
+                data.file.close()  # ? better to do this here ?
             # data is an instance of ResourceOpener
             self.content_type = data.content_type
             self.charset = data.charset
@@ -124,32 +129,28 @@ class Resource (models.Model):
             self.status = e.code
             self.save()
 
-    @models.permalink
-    def get_absolute_url(self):
-        return ('aa-resource-sniff', (str(self.id), ))
-
     def get_about_url(self):
         """ this gets used to do reverse lookup to resource """
         return self.url
 
-    def getLocalFile(self, forcereload=False):
+    def get_local_file(self, forcereload=False):
         """
         Returns: an absolute path to a local file (if available)
         Throws: AAWait when local file is not (yet) available
         """
-        localdir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
+        local_dir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
         try:
-            os.makedirs(localdir)
+            os.makedirs(local_dir)
         except OSError:
             pass
-        localpath = os.path.join(localdir, "original.data")
-        if forcereload or (not os.path.exists(localpath)):
-            outfile = open(localpath, "wb")
+        local_path = os.path.join(local_dir, "original.data")
+        if forcereload or (not os.path.exists(local_path)):
+            outfile = open(local_path, "wb")
             src = resource_opener.ResourceOpener(self.url)
             src.writeToFile(outfile)
-        return localpath
+        return local_path
 
-    def getMetadata(self, rel=None, rdfmodel=None):
+    def get_metadata(self, rel=None, rdfmodel=None):
         """
         Returns: a dictionary of key-value pairs (where keys are RDF style URLs)
         Throws: AAWait when not yet available.
@@ -165,9 +166,6 @@ class Resource (models.Model):
                 ret.append(rdfnode(row['obj']))
             return ret
 
-############################
-# ResourceDelegate
-############################
 
 class ResourceDelegate (models.Model):
     """
@@ -181,14 +179,11 @@ class ResourceDelegate (models.Model):
     delegate = generic.GenericForeignKey('delegate_type', 'delegate_id')
 
 
-############################
-# Collection
-############################
-
 class Collection (models.Model):
     """
-    Collections are used by the gallery views to provide simple "star" and other named collections/playlists of resources
-    Collection membership includes order, fragment, and text fields.
+    Collections are used by the gallery views to provide simple "star" and
+    other named collections/playlists of resources Collection membership
+    includes order, fragment, and text fields.
     """
     name = models.CharField(max_length=255)
     star = models.BooleanField(default=False)
@@ -196,28 +191,24 @@ class Collection (models.Model):
     resources = models.ManyToManyField(Resource, through='CollectionItem', related_name="collections")
     # items (provided by CollectionItem)
 
-    db_created = models.DateTimeField(auto_now_add = True)
-    db_lastmodified = models.DateTimeField(auto_now = True)
+    db_created = models.DateTimeField(auto_now_add=True)
+    db_lastmodified = models.DateTimeField(auto_now=True)
 
-class CollectionItem (models.Model):
-    class Meta:
-        ordering = ("order", "db_created")
 
-    collection = models.ForeignKey(Collection, related_name = "items")
-    resource = models.ForeignKey(Resource, related_name = "collectionitems")
+class CollectionItem(models.Model):
+    collection = models.ForeignKey(Collection, related_name="items")
+    resource = models.ForeignKey(Resource, related_name="collectionitems")
     author = models.ForeignKey(User, null=True)
     order = models.IntegerField(null=True, blank=True, default=1e10)
     fragment = models.CharField(max_length=255, blank=True)
     text = models.TextField()
 
-    db_created = models.DateTimeField(auto_now_add = True)
-    db_lastmodified = models.DateTimeField(auto_now = True)
+    db_created = models.DateTimeField(auto_now_add=True)
+    db_lastmodified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ("order", "db_created")
 
-
-############################
-# PAGE
-############################
 
 
 class Page(models.Model):
@@ -227,6 +218,25 @@ class Page(models.Model):
     """
     name = models.CharField(max_length=255)
     content = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    @models.permalink
+    def get_diff_url(self):
+        return ("aa-page-diff", (), {'slug': utils.wikify(self.name)})
+
+    @models.permalink
+    def get_history_url(self):
+        return ("aa-page-history", (), {'slug': utils.wikify(self.name)})
+
+    @models.permalink
+    def get_edit_url(self):
+        return ("aa-page-edit", (), {'slug': utils.wikify(self.name)})
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ("aa-page-detail", (), {'slug': utils.wikify(self.name)})
 
     @property
     def slug(self):
@@ -240,7 +250,7 @@ class Page(models.Model):
             repo = Repo(GIT_DIR)
         except NoSuchPathError:
             repo = Repo.init(GIT_DIR)
-        return repo 
+        return repo
 
     def iter_commits(self):
         repo = self.get_repository()
@@ -267,10 +277,10 @@ class Page(models.Model):
         repo.git.commit(message=message, author=author)
 
         # Add the commit metadata in a git note, formatted as
-        # a .ini config file 
+        # a .ini config file
         config = ConfigParser()
         config.add_section('metadata')
-        config.set('metadata','is_minor', is_minor)
+        config.set('metadata', 'is_minor', is_minor)
 
         output = cStringIO.StringIO()
         config.write(output)
@@ -323,70 +333,32 @@ class Page(models.Model):
         return diff_prettyXhtml(ui, diff)
 
 
-    @models.permalink
-    def get_diff_url(self):
-        return ("aa-page-diff", (), {'slug': wikify(self.name)})
-
-    @models.permalink
-    def get_history_url(self):
-        return ("aa-page-history", (), {'slug': utils.wikify(self.name)})
-
-    @models.permalink
-    def get_edit_url(self):
-        return ("aa-page-edit", (), {'slug': utils.wikify(self.name)})
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ("aa-page-detail", (), {'slug': utils.wikify(self.name)})
-
-    def __unicode__(self):
-        return self.name
-
-#from django.db.models.signals import post_save
-#from django.dispatch import receiver
-#from core.utils import get_rdf_model, reindex
-
-#@receiver(post_save, sender=Page)
-#def page_post_save(sender, instance, **kwargs):
-#    rdfmodel = get_rdf_model()
-#    reindex(instance, rdfmodel)
-
-
-######################################
-# NAMESPACE
-######################################
-
 class Namespace (models.Model):
     name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
     color = models.CharField(max_length=255, blank=True)
 
-    def __unicode__ (self):
+    def __unicode__(self):
         return self.name
 
-######################################
-# LANGUAGE
-######################################
 
 class Language (models.Model):
+    name = models.CharField(max_length=255)
+
     class Meta:
         ordering = ("name",)
-    name = models.CharField(max_length=255)
-    def __unicode__ (self):
+
+    def __unicode__(self):
         return self.name
 
-######################################
-# RELATIONSHIP
-######################################
 
-SORTKEYS = (
+SORTKEY_CHOICES = (
     ("default", "default"),
     ("lastword", "last word (name)")
 )
 
+
 class Relationship (models.Model):
-    class Meta:
-        ordering = ("order", "name")
     url = models.CharField(max_length=255)
     name = models.CharField(max_length=255, blank=True)
     reverse_name = models.CharField(max_length=255, blank=True)
@@ -394,38 +366,46 @@ class Relationship (models.Model):
     facet = models.BooleanField(default=False)
     order = models.IntegerField(default=100)
 
-    sort_key = models.CharField(max_length=255, default="default", choices=SORTKEYS)
+    sort_key = models.CharField(max_length=255, default="default", choices=SORTKEY_CHOICES)
     autotag = models.BooleanField(default=False)
 
-    def parseValue (self, val):
-        """ take a URL value and return an N3 representation ? """
-        return ""
-
-    def compact_url (self):
-        for ns in Namespace.objects.all():
-            if self.url.startswith(ns.url):
-                return ns.name + ":" + self.url[len(ns.url):]
-        return self.url
+    class Meta:
+        ordering = ("order", "name")
 
     @models.permalink
     def get_absolute_url(self):
         return ('core.views.rel', [self.id])
 
+    def parse_value(self, val):
+        """ take a URL value and return an N3 representation ? """
+        return ""
 
-######################################
-# RDFSource
-######################################
+    def compact_url(self):
+        for ns in Namespace.objects.all():
+            if self.url.startswith(ns.url):
+                return ns.name + ":" + self.url[len(ns.url):]
+        return self.url
+
 
 RDF_SOURCE_FORMATS = (
     ("rdfxml", "RDF/XML"),
     ("rdfa", "RDFA"),
 )
 
+
 class RDFSource (models.Model):
     """
-    An RDF Source represents a URL that itself directly contains RDF-encoded data 
-    (such as an RDF/XML file, or an HTML file with RDFA embedded within it)
+    An RDF Source represents a URL that itself directly contains RDF-encoded
+    data (such as an RDF/XML file, or an HTML file with RDFA embedded within
+    it)
     """
+
+    url = models.URLField(verify_exists=False)
+    format = models.CharField(max_length=255, choices=RDF_SOURCE_FORMATS)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('aa-rdf-source', (str(self.id), ))
 
     @classmethod
     def get_or_create_from_url(cls, url, request=None, reload=False):
@@ -443,35 +423,25 @@ class RDFSource (models.Model):
                 if (r.content_type == "application/rdf+xml"):
                     ret = cls.objects.create(url=url, format="rdfxml")
                     return ret, True
-            except urllib2.HTTPError, e:
+            except urllib2.HTTPError:
                 pass
             return None, False
-
-    url = models.URLField(verify_exists=False)
-    format = models.CharField(max_length=255, choices=RDF_SOURCE_FORMATS)
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('aa-rdf-source', (str(self.id), ))
 
     def sync(self):
         pass
 
-    def get_rdf_as_stream (self):
+    def get_rdf_as_stream(self):
         uri = prep_uri(self.url)
-        parser=RDF.Parser(self.format.encode("utf-8"))
+        parser = RDF.Parser(self.format.encode("utf-8"))
         # stream = parser.parse_as_stream(uri, uri)
         return parser.parse_as_stream(uri)
 
 
-
-######################################
-# COMMAND
-######################################
-
-class Command (models.Model):   
-    """ Commands represent a queue for batch actions to be preformed asynchronously
-    ref: (optional) code to coordinate commands (ie possible prevent duplicate commands)
+class Command(models.Model):
+    """
+    Commands represent a queue for batch actions to be preformed asynchronously
+    ref: (optional) code to coordinate commands (ie possible prevent duplicate
+    commands)
     """
     ref = models.CharField(max_length=255)
     text = models.TextField()
@@ -479,4 +449,3 @@ class Command (models.Model):
     started = models.DateTimeField(null=True, blank=True)
     completed = models.DateTimeField(null=True, blank=True)
     results = models.TextField()
-
