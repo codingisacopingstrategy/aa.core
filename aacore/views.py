@@ -319,18 +319,21 @@ def page_edit(request, slug):
             author = "Anonymous <anonymous@%s>" % request.META['REMOTE_ADDR']
 
             if page:
+                old_content = page.content
                 if section:  # section edit
                     if section == -1:
                         page.content = page.content.rstrip() + "\n\n" + content
                     else:
                         page.content = sectionalize_replace(page.content, section, content)
-                    page.commit(message=message, author=author, is_minor=is_minor)
+                    if page.content != old_content:
+                        page.commit(message=message, author=author, is_minor=is_minor)
                 else:
                     if content == "delete":
                         page.delete()
                     else:
                         page.content = content
-                        page.commit(message=message, author=author, is_minor=is_minor)
+                        if page.content != old_content:
+                            page.commit(message=message, author=author, is_minor=is_minor)
             else:
                 if content == "delete":
                     pass
