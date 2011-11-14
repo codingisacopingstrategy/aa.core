@@ -5,10 +5,6 @@ from models import *
 from django.contrib.contenttypes import generic
 
 
-class LicenseAdmin(admin.ModelAdmin):
-    list_display = ("name", "url")
-admin.site.register(License, LicenseAdmin)
-
 class ResourceDelegateInline(admin.TabularInline):
     model = ResourceDelegate
     extra = 0

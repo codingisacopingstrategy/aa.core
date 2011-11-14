@@ -1,3 +1,6 @@
+# HTTP utilities
+# (conditional get, dealing with parsing http headers)
+#
 # This file is part of Active Archives.
 # Copyright 2006-2010 the Active Archives contributors (see AUTHORS)
 #
@@ -14,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
+#
+#
 
 import re, urllib2, datetime, email.utils, urlparse, os
 

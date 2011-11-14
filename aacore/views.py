@@ -204,6 +204,7 @@ def browse (request):
     return render_to_response("aacore/browse.html", context, context_instance = RequestContext(request))
 
 def load_links (model, context, uri=None, literal=None):
+    """ load all the relationship of a uri via the rdf model """
     links_in = []
     links_out = []
     node_stats = []
@@ -239,12 +240,6 @@ def load_links (model, context, uri=None, literal=None):
 
     return node_stats, links_out, links_in, as_rel
 
-def mini (request):
-    pass
-
-def mini_res (request, id):
-    res = get_object_or_404(Resource, pk=id)
-    load_resource_links(res, model)
 
 ####################################
 ### Resource Main Sniff Page (http)

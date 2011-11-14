@@ -18,52 +18,11 @@ import resource_opener
 from settings import GIT_DIR
 from diff_match_patch import diff_match_patch
 
-############################
-# License
-############################
-
-class License (models.Model):
-    name = models.CharField(max_length=255)
-    url = models.URLField(blank=True, verify_exists=False)
-    redirect = models.ForeignKey('self', null=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
 
 ############################
 # RESOURCE
 ############################
 
-RESOURCE_TYPES = (
-    ('audio', 'audio'),
-    ('video', 'video (no audio)'),
-    ('audio/video', 'video'),
-    ('image', 'image'),
-    ('html', 'html'),
-    ('text', 'text'),
-    ('', '')
-)
-
-RESOURCE_STATUS = (
-    ('active', 'active'),
-    ('default', 'default'),
-    ('inactive', 'inactive')
-)
-
-
-class AAWait (Exception):
-    """
-    This exception is used when a resource is not yet available.  The URL is a
-    special "task-tracking" URL that can be used to poll until task is done.
-    (Returns a JSON object with a "done" boolean value.)
-    """
-    def __init__(self, url):
-        self.url = url
-
-
-class AANotAvailable (Exception):
-    pass
 
 class Resource (models.Model):
     @classmethod
@@ -95,9 +54,6 @@ class Resource (models.Model):
     charset = models.CharField(max_length=64, default="", blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
     etag = models.CharField(max_length=255, default="", blank=True)
-
-    status = models.CharField(max_length=255, choices=RESOURCE_STATUS, default="default")
-    _type = models.CharField(max_length=255, choices=RESOURCE_TYPES, blank=True)
 
     def __unicode__(self):
         return self.url

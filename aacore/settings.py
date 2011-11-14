@@ -1,7 +1,6 @@
 from django.conf import settings
 import os.path
 
-
 EXIFTOOL = getattr(settings, 'AA_EXIFTOOL', 'exiftool')
 FFMPEG = getattr(settings, 'AA_FFMPEG', 'ffmpeg')
 IDENTIFY = getattr(settings, 'AA_IDENTIFY', 'identify')

@@ -3,6 +3,8 @@
 
 {% block body %}
 <div about="{{resource.url}}">
+    <h2>{{resource.url}}</h2>
+
     {% if original_url != url %}
     <div class="redirected">
         Redirected from <a href="{{original_url}}" property="aa:redirected_from">{{ original_url }}</a>
