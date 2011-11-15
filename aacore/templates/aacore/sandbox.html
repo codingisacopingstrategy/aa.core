@@ -1,25 +1,30 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
-          "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">			 
+ <!DOCTYPE HTML>
+
+{% load aacoretags %}
+
 <html>
 <head>
 <title>{% block title %}active archives{% endblock %}</title>
 <style type="text/css" media="screen">
 
+textarea {
+    width: 100%;
+    height: 300px;
+    display: block;
+}
+
 </style>
 </head>
+
 <body>
 <form method="post" action="">{% csrf_token %}
-<div>
-<textarea style="width: 100%; height: 80px; border: 1px solid black" name="text">{{text}}</textarea>
-</div>
-<div>
+<textarea name="content">{{ content }}</textarea>
 <input type="submit" />
-</div>
 </form>
 
-{% if result %}
+{% if content %}
 <div>
-{{ result|safe }}
+{{ content|aamarkdown|safe }}
 </div>
 {% endif %}
 

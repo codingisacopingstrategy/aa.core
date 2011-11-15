@@ -18,6 +18,14 @@ register = template.Library()
 
 @register.filter
 @stringfilter
+def escape_plain(value):
+    """
+    Escapes unicode sequences 
+    """
+    return value.encode('unicode-escape')
+
+@register.filter
+@stringfilter
 def aamarkdown (value):
     """ 
     markdown with aa extensions

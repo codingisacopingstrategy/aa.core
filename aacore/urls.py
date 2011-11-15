@@ -18,6 +18,9 @@ urlpatterns = patterns('aacore.views',
     url(r'^pages/(?P<slug>[^/]+)/edit/$', 'page_edit', {}, name='aa-page-edit'),
     url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),
 
+    ### Export
+    url(r'^pages/(?P<slug>[^/]+)/(?P<section>\d+)/$', 'annotation_export', {}, name='aa-annotation-export'),
+
     ### EMBED
     url(r'^embed/$', 'embed', {}, name='aa-embed'),
 

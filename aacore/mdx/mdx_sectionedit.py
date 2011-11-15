@@ -32,20 +32,16 @@ HASH_OR_TIMECODE_HEADER = r"""
 $
 """.strip()
 
-#def spliterator (pattern, text):
-#    """
-#    Utility function for splitting on a "header" patter
-#    yields (match, text), where text is that text between match and the next match
-#    """
-#    lastm = None
-#    cur = 0
-#    for m in pattern.finditer(text):
-#        if lastm:
-#            yield lastm, text[cur:m.start()]
-#        lastm = m
-#        cur = m.end()
-#    if lastm:
-#        yield m, text[cur:]
+TIMECODE_HEADER = r"""
+^
+  ( (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+  [ \t]* --> [ \t]*
+  (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+  (?P<other>.+)?
+  [ \t]*  
+  )
+$
+""".strip()
 
 def spliterator (pattern, text, returnLeading=False):
     """ yields: header (can be ''), body, start, end """

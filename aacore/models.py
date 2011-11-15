@@ -26,10 +26,13 @@ from diff_match_patch import diff_match_patch
 
 
 class Resource (models.Model):
-    """
-    Resource is the main class of AA.
-    In a nutshell: a resource is an (augmented) URL.
-    Info is in the RDF Store, but is store in the db too for convenience.
+    """ Represents an (augmented) URL.
+
+    Acts like a proxy to access to the associated RDF store but caches the
+    last information of an URL for convenience.
+    
+    This is the main class of Active Archives. 
+
     """
     url = models.URLField(verify_exists=False)
     _filter = models.CharField(max_length=1024, blank=True)
@@ -54,7 +57,7 @@ class Resource (models.Model):
     @classmethod
     def get_or_create_from_url(cls, url, reload=False):
         """ 
-        Retrieve the resource, or create it -- if possible (if matching)
+        Retrieves the resource, or creates it -- if possible (if matching)
         Returns object, created
         NB: Object may be None for non-matching URLs (in which case created will always be False)
         """
@@ -123,7 +126,11 @@ class Resource (models.Model):
         if rdfmodel == None:
             rdfmodel = get_rdf_model()
         if rel:
-            query = "SELECT DISTINCT ?obj WHERE {{ <{0}> <{1}> ?obj. }} ORDER BY ?rel ?obj".format(self.url, rel)
+            query = """SELECT DISTINCT ?obj 
+                    WHERE {{ <{0}> <{1}> ?obj. }} 
+                    ORDER BY ?rel ?obj
+                    """.format(self.url, rel)
+
             query = query.encode("utf-8")
             bindings = RDF.Query(query, query_language="sparql").execute(rdfmodel)
             ret = []
@@ -145,9 +152,11 @@ class ResourceDelegate (models.Model):
 
 
 class Page(models.Model):
-    """
-    This is the model class for Wiki pages.
-    It might move away from core in the future.
+    """ Represents a wiki page. 
+    
+    Acts like a proxy to access to the associated GIT repository but caches the
+    last revision of a page for convenience.
+    
     """
     name = models.CharField(max_length=255)
     content = models.TextField(blank=True)
@@ -284,7 +293,7 @@ SORTKEY_CHOICES = (
 )
 
 
-RDF_SOURCE_FORMATS = (
+RDF_SOURCE_FORMAT_CHOICES = (
     ("rdfxml", "RDF/XML"),
     ("rdfa", "RDFA"),
 )
@@ -297,7 +306,7 @@ class RDFDelegate (models.Model):
     """
 
     url = models.URLField(verify_exists=False)
-    format = models.CharField(max_length=255, choices=RDF_SOURCE_FORMATS)
+    format = models.CharField(max_length=255, choices=RDF_SOURCE_FORMAT_CHOICES)
 
     @models.permalink
     def get_absolute_url(self):

@@ -93,23 +93,14 @@ span#time {
     bottom: 1em;
     right: 1em;
     z-index: 2;
-    font-size: 13px;
-    /*letter-spacing: 1px;*/
-    font-family: "Liberation Mono";
 }
 
 div#controls {
-    font-family: "Liberation Mono";
     position: absolute;
     bottom: 1em;
     left: 1em;
     z-index: 999;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 13px;
 }
-div#controls span:hover {
-    text-decoration: underline;
 
 div#controls span#play,
 div#controls span#pause {

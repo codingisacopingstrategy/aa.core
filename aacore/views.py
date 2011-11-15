@@ -215,21 +215,55 @@ def resource_sniff (request, id):
 ############################################################
 # WIKI
 
+def annotation_export(request, slug, section, _format="audacity"):
+    context = {}
+    name = dewikify(slug)
+    page = Page.objects.get(name=name)
+
+    sections = sectionalize(page.content)
+    sectiondict = sections[int(section)]
+
+    sections = sectionalize(sectiondict['header'] + sectiondict['body'])
+    print sections
+
+    context['sections'] = sections
+
+    context['foo'] = []
+
+    import re
+    from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
+    pattern = re.compile(TIMECODE_HEADER, re.I | re.M | re.X)
+    for header, body, start, end in spliterator(pattern, sectiondict['header'] + sectiondict['body'], returnLeading=0):
+        p = r"((?P<hours>\d\d):)?(?P<minutes>\d\d):(?P<seconds>\d\d)(?P<milliseconds>[,.]\d{1,3})?"
+        bar = re.search(p, header)
+        hours = int(bar.groupdict()['hours'])
+        minutes = int(bar.groupdict()['minutes'])
+        seconds = int(bar.groupdict()['seconds'])
+        print(hours, minutes, seconds)
+        context['foo'].append({'start': start, 'end': end, 'body': body})
+        
+
+
+    c = RequestContext(request)
+    return render_to_response("aacore/annotation_export.audacity", context, context_instance=RequestContext(request), mimetype="text/plain;charset=utf-8")
+
 def page_detail(request, slug):
     """
-    Displays a wiki page :model:`aacore.Page`.
+    Displays a :model:`aacore.Page`.
 
     **Context**
 
     ``RequestContext``
         Request context
-
     ``page``
         An instance of :model:`aacore.Page`.
+    ``namespaces``
+        An list of all the instances of :model:`aacore.Namespace`.
 
     **Template:**
 
-    :template:`aacore/page.html`
+    :template:`aacore/page_detail.html`
+
     """
     context = {}
     context['namespaces'] = Namespace.objects.all()
@@ -249,18 +283,29 @@ def page_detail(request, slug):
 #    if 'css' in md.Meta:
 #        context['extra_css'] = md.Meta['css']
 
-    return render_to_response("aacore/page.html", context, context_instance=RequestContext(request))
+    return render_to_response("aacore/page_detail.html", context, context_instance=RequestContext(request))
 
 
 def page_edit(request, slug):
     """
-    Page edit
+    Displays the edit form for :model:`aacore.Page`
 
-    GET: Either the edit form, OR provides Markdown source via AJAX call
-    POST: Receives/commits edits on POST (either via form or AJAX)
+    **methods**
+    ``GET``
+        Either the edit form, OR provides Markdown source via AJAX call
+    ``POST``
+        Receives/commits edits on POST (either via form or AJAX)
 
-    template
-        :template:`aacore/edit.html`
+    **parameters**
+    ``section``
+        Optional. Limits the scope of edition to the given section.
+    ``is_ajax``
+        Optional. If present, the view returns the markdown source (GET) or the
+        computed markdown (POST).
+        
+
+    **template**
+        :template:`aacore/page_edit.html`
     """
     context = {}
     name = dewikify(slug)
@@ -294,7 +339,7 @@ def page_edit(request, slug):
             context['name'] = name  # So templates nows about what page we are editing
             context['form'] = PageEditForm(initial={"content": '# My first section'})
         
-        return render_to_response("aacore/edit.html", context, \
+        return render_to_response("aacore/page_edit.html", context, \
                 context_instance=RequestContext(request))
 
     elif request.method == "POST":
@@ -351,7 +396,7 @@ def page_edit(request, slug):
             context['page'] = page  # So templates nows about what page we are editing
             context['name'] = name  # So templates nows about what page we are editing
             context['form'] = form
-            return render_to_response("aacore/edit.html", context, \
+            return render_to_response("aacore/page_edit.html", context, \
                     context_instance=RequestContext(request))
 
         url = reverse('aa-page-detail', kwargs={'slug': slug})
@@ -359,7 +404,22 @@ def page_edit(request, slug):
 
 
 def page_history(request, slug): 
-    """ """ 
+    """
+    Displays the commit list of the Git repository associated to
+    :model:`aacore.Page`.
+
+    **Context**
+
+    ``RequestContext``
+        Request context
+    ``page``
+        An instance of :model:`aacore.Page`.
+
+    **Template:**
+
+    :template:`aacore/page_history.html`
+
+    """
     context = {} 
     name = dewikify(slug)
 
@@ -372,12 +432,28 @@ def page_history(request, slug):
 
     context['page'] = page
 
-    return render_to_response("aacore/history.html", context,
+    return render_to_response("aacore/page_history.html", context,
             context_instance=RequestContext(request))
 
 
 def page_diff(request, slug): 
-    """Shows a single wiki page."""
+    """
+    Displays a comparision of two revisions of a :model:`aacore.Page`.
+
+    **Context**
+
+    ``RequestContext``
+        Request context
+    ``page``
+        An instance of :model:`aacore.Page`.
+    ``content``
+        The diff rendered in HTML.
+
+    **Template:**
+
+    :template:`aacore/page_diff.html`
+
+    """
     # Does the repo exist?
     context = {} 
     name = dewikify(slug)
@@ -400,9 +476,8 @@ def page_diff(request, slug):
 
         context['content'] = page.diff(c1, c2)
 
-    return render_to_response("aacore/diff.html", context,
+    return render_to_response("aacore/page_diff.html", context,
             context_instance=RequestContext(request))
-
 
 
 def sandbox(request):
@@ -413,15 +488,7 @@ def sandbox(request):
     This view does not alter the database / create new resources (?)
     """
     context = {}
-    text = request.REQUEST.get("text", "")
-    context['text'] = text
-
-    if text:
-        # This is a trick to use of django filter in the pages
-        t = Template("{% load aacoretags %}\n" + text)
-        c = Context({})
-        context['result'] = t.render(c)
-
+    context['content'] = request.REQUEST.get("content", "")
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
 
 

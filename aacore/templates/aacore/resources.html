@@ -1,11 +1,12 @@
 {% extends "aacore/base.html" %}
+
+
 {% load aacoretags %}
 
 {% block body %}
 <ul>
 {% for resource in resources %}
-<li><a href="{{resource.url|browseurl}}">{{resource.url}}</a></li>
+    <li><a href="{{ resource.url|browseurl }}">{{ resource.url }}</a></li>
 {% endfor %}
 </ul>
-
-{%endblock %}
+{% endblock %}

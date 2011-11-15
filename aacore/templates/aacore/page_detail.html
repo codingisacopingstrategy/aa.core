@@ -1,5 +1,7 @@
 {% extends "aacore/base_wiki.html" %}
+
 {% load aacoretags %}
+
 {% block extrahead %}
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
@@ -21,7 +23,6 @@
 {% endblock %}
 
 {% block body %}
-
 <nav id="toolbar">
     <ul>
         {% if page %}
