@@ -13,7 +13,7 @@ RDF_STORAGE_NAME = getattr(settings, 'AA_RDF_STORAGE_NAME', "aa")
 RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
 
 # List of models that are indexed by the RDF Store
-INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Page",))
+INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Resource", "aacore.models.Page",))
 
 import os
 CACHE_DIR = os.path.join(settings.MEDIA_ROOT, "cache")

@@ -32,7 +32,8 @@ def get_rdf_model ():
     """
     Opens the Active ARchives RDF Store.
     """
-    return get_model(RDF_STORAGE_NAME, RDF_STORAGE_DIR)
+    rdfmodel = get_model(RDF_STORAGE_NAME, RDF_STORAGE_DIR)
+    return rdfmodel
 
 def full_site_url(url):
     """
@@ -45,6 +46,17 @@ def full_site_url(url):
         pass
     base = base or "http://"+Site.objects.get_current().domain
     return urlparse.urljoin(base, url)
+
+def is_local_url(url):
+    """
+    Returns True if url.startswith SITE_URL (or Site.domain)
+    """
+    try:
+        base = projectsettings.SITE_URL
+    except AttributeError:
+        pass
+    base = base or "http://"+Site.objects.get_current().domain
+    return url.startswith(base)
 
 def relative_site_url(url):
     """
@@ -123,6 +135,8 @@ def reindex (item, rdfmodel=None):
 # "Sniff" / "Add"
 # Main Resource View -- allow "preview" of non-added resources
 
+import aacore.models
+
 def add_resource (url, rdfmodel=None, request=None, reload=False):
     """
     This is what gets called when in the aa browser you type a URL.
@@ -136,32 +150,36 @@ def add_resource (url, rdfmodel=None, request=None, reload=False):
 
     (r, created) = aacore.models.Resource.get_or_create_from_url(url, reload=reload)
     if created or reload:
-        sniff_url = full_site_url(r.get_absolute_url())
-        parse_localurl_into_model(rdfmodel, sniff_url, format="rdfa", baseuri=sniff_url, context=sniff_url, request=request)
+#        sniff_url = full_site_url(r.get_absolute_url())
+#        parse_localurl_into_model(rdfmodel, sniff_url, format="rdfa", baseuri=sniff_url, context=sniff_url, request=request)
+
         # relink delegates
         r.delegates.all().delete()
         for model in get_indexed_models():
+            if model == aacore.models.Resource:
+                continue
             try:
                 delegate, created = model.get_or_create_from_url(url, reload=reload)
                 # are they already linked?
                 if delegate:
-                    print "\tlinking to", delegate
+#                    print "\tlinking to", delegate
                     rd = aacore.models.ResourceDelegate(resource=r, delegate=delegate)
                     rd.save()
-                    # ideally the delegate would be auto-magically indexed
-                    delegate_url = full_site_url(delegate.get_absolute_url())
-
-                    if hasattr(delegate, 'get_rdf_as_stream'):
-                        stream = delegate.get_rdf_as_stream()
-                        context = RDF.Node(delegate_url)
-                        rdfmodel.context_remove_statements(context=context)
-                        rdfmodel.add_statements(stream, context=context)
-                    else:
-                        delegate_url = full_site_url(delegate.get_absolute_url())
-                        parse_localurl_into_model(rdfmodel, delegate_url, format="rdfa", baseuri=delegate_url, context=delegate_url, request=request)
+#                    delegate_url = full_site_url(delegate.get_absolute_url())
+#                    if hasattr(delegate, 'get_rdf_as_stream'):
+#                        stream = delegate.get_rdf_as_stream()
+#                        context = RDF.Node(delegate_url)
+#                        rdfmodel.context_remove_statements(context=context)
+#                        rdfmodel.add_statements(stream, context=context)
+#                    else:
+#                        parse_localurl_into_model(rdfmodel, delegate_url, format="rdfa", baseuri=delegate_url, context=delegate_url, request=request)
             except AttributeError:
                 # print "attribute error in", model, "skipping."
                 pass
+        # Force Reindex of resource (to get delegate/sniffer links)        
+        ## r.sync()
+        aacore.models.reindex_request.send(sender=r.__class__, instance=r)
+
 
 def get_indexed_models():
     modelnames = INDEXED_MODELS
@@ -191,6 +209,9 @@ def direct_get_response (url, request=None):
     # de-absolutize the URL
     if request == None:
         request = HttpRequest()
+        request.REQUEST = {}
+        request.POST = {}
+        request.GET = {}
 
     rurl = relative_site_url(url)
     func, args, kwargs = resolve(rurl)
@@ -223,7 +244,7 @@ def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=No
 
     stream = parser.parse_string_as_stream(content, baseuri)
     model.context_remove_statements(context=context)
-    print model.add_statements(stream, context=context)
+    model.add_statements(stream, context=context)
 
 #if __name__ == '__main__':
 #    import doctest

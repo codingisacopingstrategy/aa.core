@@ -131,9 +131,8 @@ def rdf_parse_into_model (model, uri, format=None, baseuri=None, context=None):
     model.add_statements(stream, context=context)
     # model.sync() # better not to do this
 
-def rdf_context_remove_statements (context):
+def rdf_context_remove_statements (model, context):
     """ Remove all statements related to context in the default store """
-    model = get_model()
     context = RDF.Node(prep_uri(context))
     model.context_remove_statements(context=context)
 

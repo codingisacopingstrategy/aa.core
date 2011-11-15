@@ -2,7 +2,7 @@ from django.db import models
 import re, dateutil.parser
 import urllib, urllib2
 import lxml.etree
-
+from aacore.models import reindex_request
 
 NS = {
     'atom': 'http://www.w3.org/2005/Atom',
@@ -197,6 +197,8 @@ class Video (models.Model):
         feed = api(url="http://gdata.youtube.com/feeds/api/videos/" + self.youtubeid)
         entry = feed.xpath("//atom:entry", namespaces=NS)[0]
         self.syncEntry(entry)
+        # request reindex (via signal)
+        reindex_request.send(sender=self.__class__, instance=self)
 
     @property
     def thumbnail_url (self):
