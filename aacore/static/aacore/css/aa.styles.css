@@ -70,8 +70,10 @@
 
 body {
     font-family: "LiberationSans", serif;
-    font-weight: normal;
-    font-style: normal;
+    /*font-weight: normal;*/
+    /*font-style: normal;*/
+    letter-spacing: 0.5px;
+    font-size: smaller;
 }
 
 em {
@@ -84,10 +86,31 @@ strong {
 nav#toolbar {
     text-align: right;
     position: relative;
-    z-index: 999;
+    z-index: 1003;
 }   
+nav#toolbar:hover a:hover {
+    background-color: yellow;
+    color: black;
+}
+nav#toolbar:hover a {
+    position:relative;
+}
 nav#toolbar a {
-    background-color: white;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: center;
+    background-color: lightgray;
+    color: white;
+    font-weight: bold;
+    width: 18px;
+    margin-right: 2px;
+    height: 18px;
+    display: block;
+    float: left;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    position: fixed;
+    border: 1px solid lightgray;
 }
 nav {
     /*text-align: right;*/
@@ -107,11 +130,6 @@ nav#toolbar ul li:before {
 }   
 nav#toolbar ul li:first-child:before {
     content: "";
-}   
-nav#toolbar ul li a {
-    font-size: 22px;
-    border-bottom: 0px;
-
 }   
 
 article {
@@ -161,19 +179,19 @@ nav#east-pane {
     z-index: 9999;
 }
 section {
-    border-top: 1px dotted black;
-    border-bottom: 1px dotted black;
+    border-top: 1px dotted lightgray;
+    /*border-bottom: 1px dotted lightgray;*/
     background-color: white;
     z-index: 2;
 }
 section + section {
-    border-top: 0px dotted black;
+    /*border-top: 0px dotted black;*/
 }
 section.section1:hover {
     z-index: 1002;
 }
 section.section1 {
-    border: 1px solid black;
+    border: 1px solid lightgrey;
     position: absolute !important;
     width: 300px;
     height: 400px;
@@ -181,8 +199,12 @@ section.section1 {
     left: 0;
     font-size: 13px;
     line-height: 18px;
+    overflow: hidden;
+    padding-bottom: 22px;
+}
+
+div.wrapper {
     overflow: auto;
-    /*overflow: hidden;*/
 }
 section.section1 h2, p {
     margin-bottom: 18px;
@@ -200,19 +222,19 @@ section textarea {
 /*}*/
 
 section.section1 > div.wrapper:hover {
-    overflow-x: scroll;
+    /*overflow-x: scroll;*/
 }
 section.section1 > div.wrapper {
-    overflow-x: scroll;
+    overflow-x: hidden;
     /*width: 100%;*/
     height: 100%;
-    box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    -ms-box-sizing: content-box;
-    -webkit-box-sizing: content-box;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 section.section1 > div.wrapper {
-    padding: 10px;
+    padding: 5px;
 }
 /*section.section1 div.wrapper > div.wrapper {*/
     /*padding: 0px;*/
@@ -249,7 +271,7 @@ div.wrapper:hover {
 }
 h1 { 
     text-decoration: underline;
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
 }
 h2 {
     text-transform: uppercase;
@@ -313,6 +335,12 @@ nav#west-pane pre code {
 .active {
     background: yellow;
 }
+span[property="aa:start"],
+span[property="aa:end"] {
+    color: lightgray;
+    font-weight: normal;
+    font-size: smaller;
+}
 span[property="aa:start"]:hover,
 span[property="aa:end"]:hover {
     cursor: pointer;
@@ -321,6 +349,8 @@ span[property="aa:end"]:hover {
     cursor: move;
 }
 
+video,
+audio,
 img {
     max-width: 100%;
 }
@@ -340,10 +370,27 @@ div.iviewer img {
 section.section1 h1 {
     text-decoration: none;
     margin: 0;
-    height: 20px;
-    background: black;
-    color: white;
-    font-size: 15px;
+    background-color: white;
+    /*background-image: url("/static/aacore/css/bg.png");*/
+    font-weight: bold;
+    /*font-size: 1.5em;*/
+    white-space: nowrap;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    width:100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+
+    display:block;
+    padding: 5px;
+    cursor: move;
+    /*color: white;*/
+}
+
+section.section1 h1:hover {
+    background-color: #FAFAFA;
 }
 
 section.section1 h1.drophover {
@@ -351,13 +398,16 @@ section.section1 h1.drophover {
 }
 
 /* section_edit_link */
+section:hover .section_edit_link {
+    display:inline;
+}
 .section_edit_link {
-    font-size: 10px;
+    /*font-size: 10px;*/
     cursor: pointer;
     color: gray;
     display: block;
     float: right;
-    padding-right: 3px;
+    display: none;
 }
 .section_edit_link:hover {
     color: blue;
@@ -430,18 +480,29 @@ a.directlink {
 
 /*section.section1 h1 { display: none; }*/
 
-.collapsed {
+section.section1.collapsed {
     height: auto!important;
+    padding-bottom: 0;
+    border: 1px dotted lightgray;
+    z-index: 1 !important;
 }
-.collapsed > div.wrapper {
+section.section1.collapsed .section_edit_link {
+    display: none;
+}
+section.section1.collapsed h1 {
+    color: lightgray;
+}
+section.section1.collapsed > div.wrapper {
     display:none;
 }
 form#edit-all textarea {
-    width: 700px;
+    width: 100%;
+    max-width: 700px;
     height: 450px;
 }
 form#edit-all input[type=text] {
-    width: 620px;
+    width: 100%;
+    max-width: 620px;
 }
 
 dl#commits > dt {

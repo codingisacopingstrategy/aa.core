@@ -1,15 +1,15 @@
-function post_styles (elt) {
+function post_styles (elt, attr) {
     /*
      * Updates and posts the annotation style
      */
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-    var STYLE_ATTR_RE = /{@style=.*?}/; 
+    var STYLE_ATTR_RE = new RegExp('{@' + attr + '=.*?}'); 
     var start;
     var end;
     var content = "";
 
-    var style = "{@style=" + $.trim($(elt).attr('style')) + "}";
+    var style = "{@" + attr + "=" + $.trim($(elt).attr(attr)) + "}";
 
     var section = $(elt).attr("data-section");
     $.get("edit/", {
@@ -82,9 +82,9 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        stop: function () { post_styles(this) }
+        stop: function () { post_styles(this, 'style') }
     }).resizable({
-        stop: function () { post_styles(this) }
+        stop: function () { post_styles(this, 'style') }
     });
 
     // RENUMBER ALL SECTIONS
@@ -97,12 +97,30 @@ $(document).bind("refresh", function (evt) {
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     ffind('section', context).each(function () {
         // console.log("adding edit link");
-        var editlink = $("<span>edit</span>").addClass("section_edit_link").click(function () {
-            $(this).closest("section").trigger("edit");
-        }).appendTo($(":header:first", this));
-    });
 
+        $("<span>✎</span>").addClass("section_edit_link").click(function () {
+            $(this).closest("section").trigger("edit");
+        }).prependTo($(":header:first", this));
+        
+        $(this).children("h1").bind('dblclick', function(e) {
+            $(this).closest("section").trigger("collapse");
+        });
+        var nonhead = $(this).children(":not(:header)");
+        var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
+        $(this).append(wrapped);
+    })
+
+    //$(this).find(':header:first').position({
+          //my: "top left",
+          //at: "top left",
+          //of: 'section.section1:first',
+    //});
     // IN-PLACE EDITING
+    ffind('section', context).bind("collapse", function (evt) {
+        $(this).toggleClass('collapsed');
+        post_styles(this, 'class');
+    })
+
     ffind('section', context).bind("edit", function (evt) {
 
         function edit (data) {
@@ -187,8 +205,8 @@ $(document).ready(function() {
     /////////////////////
     // Once-only page inits
 
-    // $("section.section1 > div.wrapper").autoscrollable();
-    $("section.section1").autoscrollable();
+    $("section.section1 > div.wrapper").autoscrollable();
+    //$("section.section1").autoscrollable();
 
     /////////////////////////
     // SHORTCUTS
@@ -246,12 +264,12 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    post_styles($(target));
+                    post_styles($(target), 'style');
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            post_styles(target);
+            post_styles(target, 'style');
         },
     });
 /*
@@ -293,13 +311,13 @@ $(document).ready(function() {
         east: {
             size: 360,
             fxSpeed: "slow",
-            initClosed: false
+            initClosed: true,
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
             size: 200,
-            initClosed: true
+            initClosed: true,
         }           
     });
     // $("nav#south-pane").tabs();
