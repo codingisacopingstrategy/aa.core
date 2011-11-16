@@ -359,10 +359,12 @@ $(document).ready(function() {
     });
 
     $("a[title='commit']:first").click(function() {
-        var message = "[LAYOUT] " + window.prompt("Summary", "A nice configuration");
-        $.get("flag/", {
-            message: message,
-        });
+        var message = window.prompt("Summary", "A nice configuration");
+        if (message) {
+            $.get("flag/", {
+                message: "[LAYOUT] " + message,
+            });
+        };
     });
 
 });
