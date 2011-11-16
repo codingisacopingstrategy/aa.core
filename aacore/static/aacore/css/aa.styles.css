@@ -84,8 +84,10 @@ strong {
 }
 
 nav#toolbar {
-    text-align: right;
-    position: relative;
+    position: fixed;
+    width: 100%;
+    top: 5px;
+    left: 5px;
     z-index: 1003;
 }   
 nav#toolbar:hover a:hover {
@@ -188,7 +190,7 @@ section + section {
     /*border-top: 0px dotted black;*/
 }
 section.section1:hover {
-    z-index: 1002;
+    z-index: 9999;
 }
 section.section1 {
     border: 1px solid lightgrey;
@@ -450,8 +452,11 @@ div.aa_embed .links a {
     border-bottom: none;
 }
 div.aa_embed .links a:hover {
-    background: black;
-    color: white;
+background: black;
+color: white;
+}
+div.aa_embed audio {
+    min-height: 60px;
 }
 /* draggable reference to a URL */
 a.directlink {
@@ -535,9 +540,8 @@ del {
     text-decoration: line-through;
     color: red;
 }
-add {
-    background-color: green;
-    color: white;
+ins {
+    color: green;
 }
 /*span.equal {*/
     /*background-color: yellow;*/
