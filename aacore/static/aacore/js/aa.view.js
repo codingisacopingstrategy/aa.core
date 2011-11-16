@@ -4,13 +4,19 @@ function post_styles (elt, attr) {
      */
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-    //var STYLE_ATTR_RE = new RegExp('{@' + attr + '=.*?}'); 
     var STYLE_ATTR_RE = /{:[^}]*}/;
     var start;
     var end;
     var content = "";
 
-    var $elt = $(elt);
+    var clone = $(elt).clone();
+    clone.removeClass('section1 ui-draggable ui-resizable ui-draggable-dragging editing');
+    clone.css({
+        'display': '',
+        'position': '',
+    });
+
+    var $elt = clone;
     var about = $.trim($elt.attr('about'));
     var id = $.trim($elt.attr('id'));
     var style = $.trim($elt.attr('style'));
@@ -123,7 +129,10 @@ $(document).bind("refresh", function (evt) {
         }).prependTo($(":header:first", this));
         
         $(this).children("h1").bind('dblclick', function(e) {
-            $(this).closest("section").trigger("collapse");
+            var section = $(this).closest("section");
+            if (!section.hasClass('editing')) {
+                section.trigger("collapse");
+            };
         });
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
@@ -347,6 +356,13 @@ $(document).ready(function() {
         var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
         $('article').append(elt);
         elt.trigger('refresh').trigger('edit');
+    });
+
+    $("a[title='commit']:first").click(function() {
+        var message = "[LAYOUT] " + window.prompt("Summary", "A nice configuration");
+        $.get("flag/", {
+            message: message,
+        });
     });
 
 });

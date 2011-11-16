@@ -94,6 +94,9 @@ nav#toolbar:hover a:hover {
     background-color: yellow;
     color: black;
 }
+nav#toolbar:hover a[title="menu"] {
+    display: none;
+}
 nav#toolbar:hover a {
     position:relative;
 }
