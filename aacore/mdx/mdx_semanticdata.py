@@ -38,7 +38,7 @@ pattern = r"""
 """.strip()
 
 def make_elt (rel, target, label):
-    elt = markdown.etree.Element('span')
+    elt = markdown.util.etree.Element('span')
     elt.set('content', target)
     elt.text = label or target
     if rel:

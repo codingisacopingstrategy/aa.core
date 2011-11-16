@@ -4,12 +4,32 @@ function post_styles (elt, attr) {
      */
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-    var STYLE_ATTR_RE = new RegExp('{@' + attr + '=.*?}'); 
+    //var STYLE_ATTR_RE = new RegExp('{@' + attr + '=.*?}'); 
+    var STYLE_ATTR_RE = /{:[^}]*}/;
     var start;
     var end;
     var content = "";
 
-    var style = "{@" + attr + "=" + $.trim($(elt).attr(attr)) + "}";
+    var $elt = $(elt);
+    var about = $.trim($elt.attr('about'));
+    var id = $.trim($elt.attr('id'));
+    var style = $.trim($elt.attr('style'));
+    var class_ = $.trim($elt.attr('class'));
+
+    var width = $elt.css('width');
+    var height = $elt.css('height');
+    var left = $elt.css('left');
+    var top = $elt.css('top');
+
+    var attr_list = "{: ";
+    if (about) attr_list += "about='" + about + "' ";
+    if (style) attr_list += "style='" + style + "' ";
+    if (class_) attr_list += "class='" + class_ + "' ";
+    attr_list += "}" ;
+
+
+    //var style = " {: " + attr + "='" + $.trim($(elt).attr(attr)) + "' }";
+    var style = attr_list;
 
     var section = $(elt).attr("data-section");
     $.get("edit/", {

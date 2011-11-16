@@ -4,7 +4,7 @@
 '''
 
 import markdown, re
-from markdown import etree
+from markdown.util import etree
 
 
 def add_sectionstoolbar (tree, tag, tagclass, typeof, moveAttributes=True):

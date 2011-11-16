@@ -269,6 +269,13 @@ div.wrapper {
 div.wrapper:hover {
     /*background-color: yellow;*/
 }
+
+section.section1[about] h1:before,
+section.section2[about] h2:before {
+    content: "@ ";
+    float: left;
+}
+
 h1 { 
     text-decoration: underline;
     /*text-transform: uppercase;*/
@@ -428,6 +435,7 @@ div.aa_embed {
 }
 div.aa_embed .links {
     position: absolute;
+    z-index: 1004;
     left: 5px;
     top: 5px;
     display: none;

@@ -53,7 +53,7 @@ Produces confusing results (the ## gets placed inside the ###)
 
 '''
 import markdown, re
-from markdown import etree
+from markdown.util import etree
 
 
 def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):

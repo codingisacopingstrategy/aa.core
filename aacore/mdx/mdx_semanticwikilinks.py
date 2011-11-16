@@ -19,7 +19,7 @@ Basic usage:
 Define a custom URL builder:
 
     >>> def make_rdfa(rel, target, label, default_link_rel=None):
-    ...     elt = markdown.etree.Element("span")
+    ...     elt = markdown.util.etree.Element("span")
     ...     elt.set("property", rel)
     ...     elt.set("value", target)
     ...     elt.text = label or target
@@ -70,7 +70,7 @@ wikilink_pattern = r"""
 """
 
 def make_link (rel, target, label, default_link_rel=None):
-    a = markdown.etree.Element('a')
+    a = markdown.util.etree.Element('a')
     a.set('href', target)
     a.text = label or target
     if rel:

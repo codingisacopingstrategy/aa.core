@@ -24,7 +24,7 @@ def make_link(rel, target, label, default_link_rel=None):
     Custom implementation of the SemanticWikilinks make_link function.
     Returns ElementTree Element. 
     """
-    a = markdown.etree.Element('a')
+    a = markdown.util.etree.Element('a')
     parts = urlparse.urlparse(target)
     if parts.scheme:
         href = target
