@@ -10,6 +10,9 @@ USER_AGENT = getattr(settings, 'AA_USER_AGENT', "Mozilla/5.0 (X11; U; Linux i686
 
 DEFAULT_REL_NAMESPACE = getattr(settings, 'AA_DEFAULT_REL_NAMESPACE', "aa")
 RDF_STORAGE_NAME = getattr(settings, 'AA_RDF_STORAGE_NAME', "aa")
+
+# FIXME: Change this setting to an absolute path as it throws a redland error
+# on production
 RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
 
 # List of models that are indexed by the RDF Store
