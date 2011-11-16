@@ -75,7 +75,7 @@ function resetTimelines() {
             show: function (elt) {
                 $(elt).addClass("active")
                     .closest('section.section1')
-//                        .find('div.wrapper:first')
+                       .find('div.wrapper:first')
                             .autoscrollable("scrollto", elt);
             },
             hide: function (elt) {
