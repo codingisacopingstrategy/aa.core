@@ -108,6 +108,7 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
+        delay: 500,
         stop: function () { post_styles(this, 'style') }
     }).resizable({
         stop: function () { post_styles(this, 'style') }
