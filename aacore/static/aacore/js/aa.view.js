@@ -220,6 +220,25 @@ $(document).bind("refresh", function (evt) {
             player.play();
         }
     });
+
+
+
+    $("span.swatch", context).each(function () {
+        $(this).draggable({helper: function () {
+            return $(this).clone().appendTo("body");
+        }});
+    });
+    ffind("section", context).droppable({
+        accept: ".swatch",
+        hoverClass: "drophover",
+        drop: function (evt, ui) {
+            var key = $(ui.helper).attr("data-style-key");
+            var value = $(ui.helper).attr("data-style-value");
+            var s1 = $(this).closest(".section1");
+            s1.css(key, value);
+            post_styles(s1, 'style');
+        }
+    });
     
 
 });

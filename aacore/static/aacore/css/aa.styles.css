@@ -186,7 +186,6 @@ nav#east-pane {
 section {
     border-top: 1px dotted lightgray;
     /*border-bottom: 1px dotted lightgray;*/
-    background-color: white;
     z-index: 2;
 }
 section + section {
@@ -196,6 +195,7 @@ section.section1:hover {
     z-index: 9999;
 }
 section.section1 {
+    background-color: white;
     border: 1px solid lightgrey;
     position: absolute !important;
     width: 300px;
@@ -382,10 +382,7 @@ div.iviewer img {
 section.section1 h1 {
     text-decoration: none;
     margin: 0;
-    background-color: white;
-    /*background-image: url("/static/aacore/css/bg.png");*/
     font-weight: bold;
-    /*font-size: 1.5em;*/
     white-space: nowrap;
     text-overflow:ellipsis;
     overflow:hidden;
@@ -394,11 +391,9 @@ section.section1 h1 {
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-
     display:block;
     padding: 5px;
     cursor: move;
-    /*color: white;*/
 }
 
 section.section1 h1:hover {
@@ -550,3 +545,5 @@ ins {
     /*background-color: yellow;*/
 /*}*/
 
+span.swatch { display: block; float: left; margin-right: 3px; margin-bottom: 3px; border: 1px solid lightgray; padding: 2px; background-color: white; cursor: move;}
+span.swatch.ui-draggable { z-index: 999999; }
