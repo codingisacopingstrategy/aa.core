@@ -285,6 +285,19 @@ def page_detail(request, slug):
     return render_to_response("aacore/page_detail.html", context, context_instance=RequestContext(request))
 
 
+def page_flag(request, slug):
+    """
+    Flags the last commit the edit of a :model:`aacore.Page` as a major one
+
+    Returns "OK"
+    """
+    name = dewikify(slug)
+    page = Page.objects.get(name=name)
+    message = request.REQUEST.get('message', None)
+    page.commit(amend=True, message=message)
+    return HttpResponse("Seems like it worked!")
+
+
 def page_edit(request, slug):
     """
     Displays the edit form for :model:`aacore.Page`

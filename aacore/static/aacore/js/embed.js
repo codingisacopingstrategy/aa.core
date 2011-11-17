@@ -70,6 +70,7 @@ $(document).bind("refresh", function (evt) {
             var href = $(ui.helper).attr("href");
             var s1 = $(this).closest(".section1");
             s1.attr("about", href);
+            post_styles(s1, 'style');
             // console.log("href", href, this);
             // post_styles(s1);
             // TODO:

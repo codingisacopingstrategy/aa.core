@@ -1,15 +1,41 @@
-function post_styles (elt) {
+function post_styles (elt, attr) {
     /*
      * Updates and posts the annotation style
      */
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-    var STYLE_ATTR_RE = /{@style=.*?}/; 
+    var STYLE_ATTR_RE = /{:[^}]*}/;
     var start;
     var end;
     var content = "";
 
-    var style = "{@style=" + $.trim($(elt).attr('style')) + "}";
+    var clone = $(elt).clone();
+    clone.removeClass('section1 ui-draggable ui-resizable ui-draggable-dragging editing');
+    clone.css({
+        'display': '',
+        'position': '',
+    });
+
+    var $elt = clone;
+    var about = $.trim($elt.attr('about'));
+    var id = $.trim($elt.attr('id'));
+    var style = $.trim($elt.attr('style'));
+    var class_ = $.trim($elt.attr('class'));
+
+    var width = $elt.css('width');
+    var height = $elt.css('height');
+    var left = $elt.css('left');
+    var top = $elt.css('top');
+
+    var attr_list = "{: ";
+    if (about) attr_list += "about='" + about + "' ";
+    if (style) attr_list += "style='" + style + "' ";
+    if (class_) attr_list += "class='" + class_ + "' ";
+    attr_list += "}" ;
+
+
+    //var style = " {: " + attr + "='" + $.trim($(elt).attr(attr)) + "' }";
+    var style = attr_list;
 
     var section = $(elt).attr("data-section");
     $.get("edit/", {
@@ -49,7 +75,7 @@ function resetTimelines() {
             show: function (elt) {
                 $(elt).addClass("active")
                     .closest('section.section1')
-//                        .find('div.wrapper:first')
+                       .find('div.wrapper:first')
                             .autoscrollable("scrollto", elt);
             },
             hide: function (elt) {
@@ -82,9 +108,9 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        stop: function () { post_styles(this) }
+        stop: function () { post_styles(this, 'style') }
     }).resizable({
-        stop: function () { post_styles(this) }
+        stop: function () { post_styles(this, 'style') }
     });
 
     // RENUMBER ALL SECTIONS
@@ -97,12 +123,33 @@ $(document).bind("refresh", function (evt) {
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     ffind('section', context).each(function () {
         // console.log("adding edit link");
-        var editlink = $("<span>edit</span>").addClass("section_edit_link").click(function () {
-            $(this).closest("section").trigger("edit");
-        }).appendTo($(":header:first", this));
-    });
 
+        $("<span>✎</span>").addClass("section_edit_link").click(function () {
+            $(this).closest("section").trigger("edit");
+        }).prependTo($(":header:first", this));
+        
+        $(this).children("h1").bind('dblclick', function(e) {
+            var section = $(this).closest("section");
+            if (!section.hasClass('editing')) {
+                section.trigger("collapse");
+            };
+        });
+        var nonhead = $(this).children(":not(:header)");
+        var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
+        $(this).append(wrapped);
+    })
+
+    //$(this).find(':header:first').position({
+          //my: "top left",
+          //at: "top left",
+          //of: 'section.section1:first',
+    //});
     // IN-PLACE EDITING
+    ffind('section', context).bind("collapse", function (evt) {
+        $(this).toggleClass('collapsed');
+        post_styles(this, 'class');
+    })
+
     ffind('section', context).bind("edit", function (evt) {
 
         function edit (data) {
@@ -173,6 +220,25 @@ $(document).bind("refresh", function (evt) {
             player.play();
         }
     });
+
+
+
+    $("span.swatch", context).each(function () {
+        $(this).draggable({helper: function () {
+            return $(this).clone().appendTo("body");
+        }});
+    });
+    ffind("section", context).droppable({
+        accept: ".swatch",
+        hoverClass: "drophover",
+        drop: function (evt, ui) {
+            var key = $(ui.helper).attr("data-style-key");
+            var value = $(ui.helper).attr("data-style-value");
+            var s1 = $(this).closest(".section1");
+            s1.css(key, value);
+            post_styles(s1, 'style');
+        }
+    });
     
 
 });
@@ -187,8 +253,8 @@ $(document).ready(function() {
     /////////////////////
     // Once-only page inits
 
-    // $("section.section1 > div.wrapper").autoscrollable();
-    $("section.section1").autoscrollable();
+    $("section.section1 > div.wrapper").autoscrollable();
+    //$("section.section1").autoscrollable();
 
     /////////////////////////
     // SHORTCUTS
@@ -246,12 +312,12 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    post_styles($(target));
+                    post_styles($(target), 'style');
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            post_styles(target);
+            post_styles(target, 'style');
         },
     });
 /*
@@ -293,13 +359,13 @@ $(document).ready(function() {
         east: {
             size: 360,
             fxSpeed: "slow",
-            initClosed: false
+            initClosed: true,
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
             size: 200,
-            initClosed: true
+            initClosed: true,
         }           
     });
     // $("nav#south-pane").tabs();
@@ -309,6 +375,15 @@ $(document).ready(function() {
         var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
         $('article').append(elt);
         elt.trigger('refresh').trigger('edit');
+    });
+
+    $("a[title='commit']:first").click(function() {
+        var message = window.prompt("Summary", "A nice configuration");
+        if (message) {
+            $.get("flag/", {
+                message: "[LAYOUT] " + message,
+            });
+        };
     });
 
 });

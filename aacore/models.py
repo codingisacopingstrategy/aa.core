@@ -200,7 +200,7 @@ class Page(models.Model):
         repo = self.get_repository()
         return repo.iter_commits(paths=self.slug)
 
-    def commit(self, message="No message", author="Anonymous <anonymous@127.0.0.1>", is_minor=False):
+    def commit(self, amend=False, message="No message", author="Anonymous <anonymous@127.0.0.1>", is_minor=False):
         """
         Commits page content and saves it it in the database.
         """
@@ -218,7 +218,7 @@ class Page(models.Model):
 
         # Adds the newly creates files and commits
         repo.index.add([self.slug,])
-        repo.git.commit(message=message, author=author)
+        repo.git.commit(amend=amend, message=message, author=author)
 
         # Add the commit metadata in a git note, formatted as
         # a .ini config file

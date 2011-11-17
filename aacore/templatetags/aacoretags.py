@@ -1,5 +1,7 @@
 import html5lib, urllib2, lxml
 import urlparse, xml.sax.saxutils, urllib, os.path
+import time
+from datetime import datetime
 
 from django.template.defaultfilters import stringfilter
 from django import template
@@ -15,6 +17,10 @@ from aacore.models import *
 
 
 register = template.Library()
+
+@register.filter
+def epock2datetime(value):
+    return datetime.datetime(*time.gmtime(value)[:6])
 
 @register.filter
 @stringfilter

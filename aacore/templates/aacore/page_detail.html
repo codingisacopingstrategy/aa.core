@@ -29,7 +29,9 @@
         <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
         <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
         <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
-        <li><a title="add" href="#">add</a></li>
+        <li><a title="add" href="#">+</a></li>
+        <li><a title="commit" href="#">★</a></li>
+        <li><a title="menu" href="#">⚙</a></li>
         {% endif %}
     </ul>
 </nav>
@@ -42,14 +44,55 @@
 {% block postbody %}
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>
-        <li><a title="Layers" href="#tabs-2">⪗</a></li>
+        <li><a title="Layers" href="#tabs-2">&#8738;</a></li>
         <li><a title="Help" href="#tabs-1">?</a></li>
+        <li><a title="Styles" href="#tabs-3">?</a></li>
     </ul>
     <div id="tabs-2">
     </div>
     <div id="tabs-1">
         {% include "aacore/partials/timecode_help.html" %}
         {% include "aacore/partials/markdown_help.html" %}
+    </div>
+    <div id="tabs-3">
+        <h2>color</h2>
+        <span class="swatch" data-style-key="color" data-style-value="">reset</span>
+        <span class="swatch" data-style-key="color" data-style-value="red" style="color: red;">red</span>
+        <span class="swatch" data-style-key="color" data-style-value="blue" style="color: blue;">blue</span>
+        <span class="swatch" data-style-key="color" data-style-value="blue" style="color: blue;">blue</span>
+
+        <!--<span class="swatch">-->
+            <!--color-->
+        <!--<select>-->
+          <!--<option label="test" value="1">Afrique</option>-->
+          <!--<option label="test" value="2">Amérique</option>-->
+          <!--<option label="test" value="3">Asie</option>-->
+        <!--</select>-->
+    <!--</span>-->
+
+        <br style="clear: both" />
+        <br style="clear: both" />
+
+        <h2>background-color</h2>
+        <span class="swatch" data-style-key="background-color" data-style-value="">reset</span>
+        <span class="swatch" data-style-key="background-color" data-style-value="yellow" style="background-color: yellow">yellow</span>
+
+        <br style="clear: both" />
+        <br style="clear: both" />
+
+        <h2>width</h2>
+        <span class="swatch" data-style-key="width" data-style-value="">reset</span>
+        <span class="swatch" data-style-key="width" data-style-value="auto">auto</span>
+        <span class="swatch" data-style-key="width" data-style-value="200px">200px</span>
+        <span class="swatch" data-style-key="width" data-style-value="300px">300px</span>
+        <span class="swatch" data-style-key="width" data-style-value="400px">400px</span>
+
+        <br style="clear: both" />
+        <br style="clear: both" />
+
+        <h2>height</h2>
+        <span class="swatch" data-style-key="height" data-style-value="">reset</span>
+        <span class="swatch" data-style-key="height" data-style-value="auto">auto</span>
     </div>
 </nav>
 <nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> 

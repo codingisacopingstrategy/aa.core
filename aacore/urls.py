@@ -17,6 +17,8 @@ urlpatterns = patterns('aacore.views',
     url(r'^pages/(?P<slug>[^/]+)/$', 'page_detail', {}, name='aa-page-detail'),
     url(r'^pages/(?P<slug>[^/]+)/edit/$', 'page_edit', {}, name='aa-page-edit'),
     url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),
+    url(r'^pages/(?P<slug>[-\w]+)/diff/$', 'page_diff', {}, name='aa-page-diff'),
+    url(r'^pages/(?P<slug>[-\w]+)/flag/$', 'page_flag', {}, name='aa-page-flag'),
 
     ### Export
     url(r'^pages/(?P<slug>[^/]+)/(?P<section>\d+)/$', 'annotation_export', {}, name='aa-annotation-export'),
