@@ -7,7 +7,9 @@
 
 Timeline organizes (HTML) elements by time.
 Elements are attached to a timeline with a start time and (optionally) an end time.
-A Timeline has a notion of a currentTime, and manages hiding / showing (via a callback) elements accordingly. Timelines follow the element's "timeupdate" events. A Timeline may also be passive and require an external element to "drive" it via calls to setCurrentTime.
+A Timeline has a notion of a currentTime, and manages hiding / showing (via a callback) elements accordingly.
+Timelines follow the element's "timeupdate" events.
+A Timeline may also be passive and require an external element to "drive" it via calls to setCurrentTime.
 
 */
 
@@ -336,6 +338,15 @@ var aTimeline = function (options) {
         }
         if (clearFlag) { toHide = {}; }
 
+        /* setCurrentTime */
+        // console.log("setCurrentTime", settings);
+        if (settings.setCurrentTime) {
+            for (tid in activeItems) {
+                var elt = activeItems[tid];
+                settings.setCurrentTime(elt.elt, time-elt.start); 
+            }
+        }
+
         return;
     }
 
@@ -392,7 +403,9 @@ var aTimeline = function (options) {
 // based on http://docs.jquery.com/Plugins/Authoring
 
 var settings = {
-    currentTime: function (elt) { return elt.currentTime; }
+    currentTime: function (elt) { return elt.currentTime; },
+    start : function (elt) { return $(elt).attr("data-start"); },
+    end : function (elt) { return $(elt).attr("data-end"); }
 }
 
 var methods = {
@@ -410,9 +423,9 @@ var methods = {
                 $(this).data('timeline', data);
             }
             // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
-            data.timeline = aTimeline({ show: opts.show, hide: opts.hide})
+            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime})
             $this.bind("timeupdate", function (evt) {
-                console.log("timeupdate", evt.target, evt.target.currentTime);
+                // console.log("timeupdate", evt.target, evt.target.currentTime);
                 // allow a wrapped getCurrentTime for the element (via playable?)
                 data.timeline.setCurrentTime(opts.currentTime(elt));
             });
@@ -431,7 +444,14 @@ var methods = {
         })
 
     },
-    setCurrentTime: function (t) {
+    currentTime: function (t) {
+        var data = this.data('timeline');
+        if (t === undefined) {
+            return data.timeline.getCurrentTime();
+        } else {
+            data.timeline.setCurrentTime(t);
+            return this;
+        }
     },
     add : function( selector, options ) {
         var data = this.data('timeline');
