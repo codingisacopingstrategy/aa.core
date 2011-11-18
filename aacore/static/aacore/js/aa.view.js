@@ -246,21 +246,24 @@ $(document).bind("refresh", function (evt) {
 
     $("span.swatch", context).each(function () {
         $(this).draggable({helper: function () {
-            return $(this).clone().appendTo("body");
+            var $this = $(this);
+            var $clone = $(this).clone();
+            $clone.find('select:first').val($this.find('select:first').val());
+            return $clone.appendTo("body");
         }});
     });
     ffind("section", context).droppable({
         accept: ".swatch",
         hoverClass: "drophover",
         drop: function (evt, ui) {
-            var key = $(ui.helper).attr("data-style-key");
-            var value = $(ui.helper).attr("data-style-value");
+            var $select = $(ui.helper).find('select');
+            var key = $select.attr("name");
+            var value = $select.find('option:selected').val();
             var s1 = $(this).closest(".section1");
             s1.css(key, value);
             post_styles(s1, 'style');
         }
     });
-    
 
 });
 
