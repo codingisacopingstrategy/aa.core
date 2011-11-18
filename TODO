@@ -1,38 +1,33 @@
-- Create new page: default content that give clues
-- First page directly created?
-- Give a location to the first annotation
-- more meaningful default text for new pages
-- add annotation button: predefined location + meaningful text too.
-- menu overlaps the top of the page
-
-- button to remove the about attribute
-
-- Update the documentation to use [[ links ]] rather than default markdown links.
-- Update the doc for link boxes
-
+# High priority
 - Apply the styles to sub elements too.
-- draggable help
-
-- rework on the manual
-- Metadata in the sidebar
-
 - BUG: negative positions
+- rework the menu
+    - remove unnecessary menu buttons
+    - link to the home page
+- rework on the manual
+    - Update the documentation to use [[ links ]] rather than default markdown links.
+- Create new page: default content that give clues
+    - First page directly created?
+    - Give a location to the first annotation
+    - more meaningful default text for new pages
+    - add annotation button: predefined location + meaningful text too.
+- add more available styles
+- shift to enable the grid snapping
+- Improve history 
+    - Be able to revert a page
+- rev doesn't work
 
-- max-width for content in the background
-- remove unnecessary menu buttons
 
-- draggable boxes not always on top
 
+## Low priority
+- menu overlaps the top of the page
 - javascript scrollbars (less ugly)
+- draggable help
 - extra menu to show/hide annotation by criterias
-
-- Bring wifi router 
-
-## 
+- Metadata in the sidebar
 - User accounts
 - edit locks?
 - Audacity
-
-## Medium priority
-- Be able to revert a page
-- Improve history 
+- button to remove the about attribute
+- "attach" boxes
+    - with data-anchor, data-position (north, south, east, west etc.)
