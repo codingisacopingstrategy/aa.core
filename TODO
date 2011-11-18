@@ -1,5 +1,3 @@
-- beamer from constant?
-
 - Create new page: default content that give clues
 - First page directly created?
 - Give a location to the first annotation
@@ -7,7 +5,6 @@
 - add annotation button: predefined location + meaningful text too.
 - menu overlaps the top of the page
 
-- highlight related material on rollover (via about attribute)
 - button to remove the about attribute
 
 - Update the documentation to use [[ links ]] rather than default markdown links.
@@ -25,26 +22,17 @@
 - remove unnecessary menu buttons
 
 - draggable boxes not always on top
-- dragging delay is slightly too long 
 
 - javascript scrollbars (less ugly)
 - extra menu to show/hide annotation by criterias
 
 - Bring wifi router 
-- save button on the menu bar
-
-
-
-
-{: about='http://...' style='color: red;' }
-{@about=http://...}{
-
 
 ## 
 - User accounts
+- edit locks?
 - Audacity
 
 ## Medium priority
 - Be able to revert a page
 - Improve history 
-

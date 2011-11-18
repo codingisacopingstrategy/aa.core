@@ -12,7 +12,7 @@ function post_styles (elt, attr) {
     var clone = $(elt).clone();
     clone.removeClass('section1 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
     clone.css({
-        'display': '',
+        'display': $(elt).is(":visible") ? "" : "none",  // we only want to know if it is hidden or not
         'position': '',
     });
 
@@ -22,19 +22,12 @@ function post_styles (elt, attr) {
     var style = $.trim($elt.attr('style'));
     var class_ = $.trim($elt.attr('class'));
 
-    var width = $elt.css('width');
-    var height = $elt.css('height');
-    var left = $elt.css('left');
-    var top = $elt.css('top');
-
     var attr_list = "{: ";
     if (about) attr_list += "about='" + about + "' ";
     if (style) attr_list += "style='" + style + "' ";
     if (class_) attr_list += "class='" + class_ + "' ";
     attr_list += "}" ;
 
-
-    //var style = " {: " + attr + "='" + $.trim($(elt).attr(attr)) + "' }";
     var style = attr_list;
 
     var section = $(elt).attr("data-section");
