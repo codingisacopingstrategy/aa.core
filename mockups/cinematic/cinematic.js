@@ -190,7 +190,7 @@ $(document).ready(function() {
         $('#time').text($.timecode_fromsecs($(this).voidplayer('currentTime')) + " / " + $.timecode_fromsecs($(this).voidplayer('duration')));
     }).bind('seeking', function(e) { 
         // console.log('seeking');
-        $('audio').get(0).currentTime = $(this).voidplayer('currentTime') - $('audio').attr('data-start');
+        $('audio').get(0).currentTime = $(this).voidplayer('currentTime') - $.timecode_tosecs_attr($('audio').attr('data-start'));
     }).bind('ended', function(e) { 
         // console.log('ended');
     });

@@ -13,6 +13,7 @@
 </nav>
 
 {% if page %}
+<div id="page-edit">
 <h1>Editing {{ page.name }}</h1>
 {% else %}
 <h1>Creating {{ name }}</h1>
@@ -22,4 +23,5 @@
     {{ form.as_p }}
     <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>
 </form>
+</div>
 {% endblock %}
