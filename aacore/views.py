@@ -349,7 +349,7 @@ def page_edit(request, slug):
                 context['form'] = PageEditForm(initial={"content": context['content']})
         else:
             context['name'] = name  # So templates nows about what page we are editing
-            context['form'] = PageEditForm(initial={"content": '# My first section'})
+            context['form'] = PageEditForm(initial={"content": '# First section {: style="top: 30px; left: 30px;" }'})
         
         return render_to_response("aacore/page_edit.html", context, \
                 context_instance=RequestContext(request))

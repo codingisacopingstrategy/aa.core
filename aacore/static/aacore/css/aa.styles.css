@@ -73,7 +73,8 @@ body {
     /*font-weight: normal;*/
     /*font-style: normal;*/
     letter-spacing: 0.5px;
-    font-size: smaller;
+    font-size: 13px;
+    line-height: 18px;
 }
 
 em {
@@ -81,6 +82,23 @@ em {
 }
 strong {
     font-weight: bold;
+}
+
+.highlight {
+    /*border: 1px solid red !important;*/
+    background-color: yellow;
+}
+section.highlight {
+    border: 1px solid yellow !important;
+    z-index: 9999!important;
+}
+
+section.not-concerned {
+    /*zoom: 1;*/
+    /*filter: alpha(opacity=25);*/
+    /*opacity: 0.25;*/
+    visibility: hidden;
+    z-index: 1!important;
 }
 
 nav#toolbar {
@@ -139,6 +157,9 @@ nav#toolbar ul li:first-child:before {
 
 article {
     background-color: white;
+    max-width: 100%;
+    width: 40em;
+    margin-top: 2em;
 }
 a {
     color: Blue;
@@ -167,10 +188,12 @@ section.section1 > nav {
 .important {
     color: red;
 }
-pre {
-    white-space: pre-line;
+code {
     font-family: LatinModernMono, mono;
     font-style: italic;
+}
+pre {
+    white-space: pre-line;
 }
 form.source {
     display: none;
@@ -202,10 +225,8 @@ section.section1 {
     height: 400px;
     top: 0;
     left: 0;
-    font-size: 13px;
-    line-height: 18px;
     overflow: hidden;
-    padding-bottom: 22px;
+    padding-bottom: 28px;
 }
 
 div.wrapper {
@@ -275,18 +296,27 @@ div.wrapper:hover {
     /*background-color: yellow;*/
 }
 
-section.section1[about] h1:before,
-section.section2[about] h2:before {
-    content: "@ ";
+section.section1 span.about {
     float: left;
+    display: none;
 }
+section.section1[about] span.about {
+    display: block;
+}
+
+/*section.section1[about] h1:before,*/
+/*section.section2[about] h2:before {*/
+    /*content: "@ ";*/
+    /*float: left;*/
+/*}*/
 
 h1 { 
     text-decoration: underline;
-    /*text-transform: uppercase;*/
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 h2 {
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     font-weight: bold;
     margin-bottom: 18px;
 }
@@ -406,27 +436,49 @@ section.section1 h1.drophover {
 
 /* section_edit_link */
 section:hover .section_edit_link {
-    display:inline;
+    display: block;
 }
-.section_edit_link {
+.section_edit_link,
+.section_save_link,
+.section_cancel_link {
     /*font-size: 10px;*/
     cursor: pointer;
     color: gray;
-    display: block;
     float: right;
     display: none;
 }
-.section_edit_link:hover {
+.section_edit_link:hover,
+.section_save_link:hover,
+.section_cancel_link:hover {
     color: blue;
 }
+
+section.editing .section_edit_link {
+    display: none;
+}
+section.editing .section_save_link,
+section.editing .section_cancel_link {
+    display: block;
+}
 /* section_edit: hide contents while editing */
-section.editing * { display: none; }
+section.editing div.wrapper { display: none; }
 section.editing div.section_edit { display: inline; }
 section.editing div.section_edit * { display: inline; }
 /* section_edit textarea */
 section.editing div.section_edit textarea {
-    border: 1px solid black;
+    border: 0px none transparent;
+    border-color: Transparent; 
+    overflow: auto;
     width: 100%;
+    outline:0px none transparent;
+box-sizing: border-box;
+-webkit-box-sizing:border-box;
+-moz-box-sizing: border-box;
+-ms-box-sizing: border-box;
+font-size: smaller;
+resize: none;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
 }
 
 /* Embed */
@@ -546,4 +598,22 @@ ins {
 /*}*/
 
 span.swatch { display: block; float: left; margin-right: 3px; margin-bottom: 3px; border: 1px solid lightgray; padding: 2px; background-color: white; cursor: move;}
-span.swatch.ui-draggable { z-index: 999999; }
+span.swatch.ui-draggable-dragging { z-index: 999999; }
+
+ol li {
+     list-style: decimal inside
+}
+ul li {
+     list-style: square inside
+}
+
+li ol,
+li ul {
+    margin-left: 1em;
+}
+
+section.section2 + section.section2 {
+    margin-top: 18px;
+
+}
+
