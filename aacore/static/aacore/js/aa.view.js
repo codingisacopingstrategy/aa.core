@@ -381,12 +381,14 @@ $(document).ready(function() {
             size: 360,
             fxSpeed: "slow",
             initClosed: true,
+            enableCursorHotkey: false
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
             size: 200,
             initClosed: true,
+            enableCursorHotkey: false
         }           
     });
     // $("nav#south-pane").tabs();
