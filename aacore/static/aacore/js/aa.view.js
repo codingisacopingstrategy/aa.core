@@ -10,7 +10,7 @@ function post_styles (elt, attr) {
     var content = "";
 
     var clone = $(elt).clone();
-    clone.removeClass('section1 ui-draggable ui-resizable ui-draggable-dragging editing');
+    clone.removeClass('section1 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
     clone.css({
         'display': '',
         'position': '',
@@ -102,13 +102,13 @@ function ffind (selector, context) {
 // then on any <section> or other dynamically loaded/created element to "activate" it
 //
 $(document).bind("refresh", function (evt) {
-    // console.log("refreshing", evt.target);
+    //console.log("refreshing", evt.target);
     var context = evt.target;
 
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        delay: 500,
+        delay: 100,  // avoids unintentional dragging when (un)collpasing
         stop: function () { post_styles(this, 'style') }
     }).resizable({
         stop: function () { post_styles(this, 'style') }
@@ -129,11 +129,29 @@ $(document).bind("refresh", function (evt) {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
         
+        var about = $(this).closest("section.section1").attr('about');
+        $("<span>@</span>").addClass("about").hover(function () {
+            $('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
+        }, function() {
+            $('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
+        }).prependTo($("h1:first", this));
+        
         $(this).children("h1").bind('dblclick', function(e) {
             var section = $(this).closest("section");
             if (!section.hasClass('editing')) {
                 section.trigger("collapse");
             };
+        //}).hover(function(e) {
+            //var about = $(this).closest("section").attr('about');
+            //$('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
+            ////$('section.section1[about!="' + about + '"]:not(:has(audio[src!="' + about + '"]))').addClass('not-concerned');
+            ////$('section.section1[about!="' + about + '"]').addClass('not-concerned');
+            ////$('[src="' + about + '"]').addClass('highlight').closest('section.section1').removeClass('not-concerned');
+        //}, function(e) { 
+            //var about = $(this).closest("section").attr('about');
+            //$('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
+            ////$('[src="' + about + '"]').removeClass('highlight');
+            ////$('section.section1[about!="' + about + '"]').removeClass('not-concerned');
         });
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
@@ -155,12 +173,12 @@ $(document).bind("refresh", function (evt) {
 
         function edit (data) {
             var position = $(that).css("position");
-            var section_height = Math.min($(window).height() - 20, $(that).height());
-            var use_height = (position == "absolute") ? (section_height - 36) : section_height;
+            var section_height = Math.min($(window).height() - 28, $(that).height());
+            var use_height = (position == "absolute") ? section_height : section_height;
             var f = $("<div></div>").addClass("section_edit").appendTo(that);
             var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
             $(that).addClass("editing");
-            $("<button>save</button>").click(function () {
+            var ok = $("<span>✔</span>").addClass("section_save_link").click(function () {
                 // console.log("commencing section edit save...");
                 $.ajax("edit/", {
                     type: 'post',
@@ -176,17 +194,21 @@ $(document).bind("refresh", function (evt) {
                         new_content.trigger("refresh");
                     }
                 });
-            }).appendTo(f);
-            $("<button>cancel</button>").click(function () {
+            }).appendTo($(that).find(':header:first'));
+            $("<span>✘</span>").addClass("section_cancel_link").click(function () {
                 // console.log("cancelling section edit save...");
                 if (new_section) {
                     // removes the annotation
                     $(that).remove(); 
+                    $(this).remove(); 
+                    ok.remove(); 
                 } else {
                     f.remove();
+                    $(this).remove(); 
+                    ok.remove(); 
                     $(that).removeClass("editing");
                 }
-            }).appendTo(f);
+            }).appendTo($(that).find(':header:first'));
         }
 
         evt.stopPropagation();
@@ -221,8 +243,6 @@ $(document).bind("refresh", function (evt) {
             player.play();
         }
     });
-
-
 
     $("span.swatch", context).each(function () {
         $(this).draggable({helper: function () {
