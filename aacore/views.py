@@ -371,6 +371,7 @@ def page_edit(request, slug):
             # Retrieves and cleans the form values
             content = form.cleaned_data["content"]
             content = convert_line_endings(content, 0)  # Normalizes EOL
+            content = content.strip() + "\n\n" # Normalize whitespace around the markdown
             message = form.cleaned_data["message"] or "<no messages>"
             is_minor = form.cleaned_data["is_minor"]
             author = "Anonymous <anonymous@%s>" % request.META['REMOTE_ADDR']
