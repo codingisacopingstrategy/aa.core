@@ -215,7 +215,7 @@ section + section {
     /*border-top: 0px dotted black;*/
 }
 section.section1:hover {
-    z-index: 9999;
+    z-index: 9999!important;
 }
 section.section1 {
     background-color: white;
