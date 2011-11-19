@@ -1,5 +1,5 @@
 # High priority
-- Apply the styles to sub elements too.
+* Apply the styles to sub elements too.
 - BUG: negative positions
 - rework the menu
     - remove unnecessary menu buttons
@@ -13,9 +13,9 @@
     - add annotation button: predefined location + meaningful text too.
 - add more available styles
 - shift to enable the grid snapping
-- Improve history 
-    - Be able to revert a page
-- rev doesn't work
+* Improve history 
+    * Be able to revert a page
+* rev doesn't work
 
 
 
