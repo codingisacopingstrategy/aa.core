@@ -3,14 +3,14 @@ function post_styles (elt, attr) {
      * Updates and posts the annotation style
      */
     // RegExp
-    var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
+    var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
     var STYLE_ATTR_RE = /{:[^}]*}/;
     var start;
     var end;
     var content = "";
 
     var clone = $(elt).clone();
-    clone.removeClass('section1 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
+    clone.removeClass('section1 section2 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
     clone.css({
         'display': $(elt).is(":visible") ? "" : "none",  // we only want to know if it is hidden or not
         'position': '',
@@ -245,7 +245,19 @@ $(document).bind("refresh", function (evt) {
             return $clone.appendTo("body");
         }});
     });
-    ffind("section", context).droppable({
+    ffind("section.section2", context).droppable({
+        accept: ".swatch",
+        hoverClass: "drophover",
+        drop: function (evt, ui) {
+            var $select = $(ui.helper).find('select');
+            var key = $select.attr("name");
+            var value = $select.find('option:selected').val();
+            var s1 = $(this).closest(".section2");
+            s1.css(key, value);
+            post_styles(s1, 'style');
+        }
+    });
+    ffind("section.section1", context).droppable({
         accept: ".swatch",
         hoverClass: "drophover",
         drop: function (evt, ui) {
