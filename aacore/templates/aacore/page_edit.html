@@ -5,6 +5,7 @@
 <nav id="toolbar">
     <ul>
         {% if page %}
+        <li><a title="home" href="/pages/Index/">☗</a></li>
         <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
         <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
         <li><a title="menu" href="#">⚙</a></li>
