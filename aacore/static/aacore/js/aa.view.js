@@ -381,6 +381,8 @@ $(document).ready(function() {
  */
     /////////////////////
     // LAYOUT
+    // FIXME: is it really necessary to set enableCursorHotKey for each
+    // sidebar?
     $("nav#east-pane").tabs();
     $('body').layout({
         applyDefaultStyles: false,
@@ -389,12 +391,14 @@ $(document).ready(function() {
             size: 360,
             fxSpeed: "slow",
             initClosed: true,
+            enableCursorHotkey: false,
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
             size: 200,
             initClosed: true,
+            enableCursorHotkey: false,
         }           
     });
     // $("nav#south-pane").tabs();
