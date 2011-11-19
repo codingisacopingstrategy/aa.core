@@ -1,9 +1,5 @@
 # High priority
-* Apply the styles to sub elements too.
 - BUG: negative positions
-- rework the menu
-    - remove unnecessary menu buttons
-    - link to the home page
 - rework on the manual
     - Update the documentation to use [[ links ]] rather than default markdown links.
 - Create new page: default content that give clues
@@ -16,7 +12,6 @@
 * Improve history 
     * Be able to revert a page
 * rev doesn't work
-
 
 
 ## Low priority
