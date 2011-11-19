@@ -90,10 +90,8 @@ function ffind (selector, context) {
     return $(context).filter(selector).add(selector, context);
 }
 
-//
 // The refresh event gets fired on body initially
 // then on any <section> or other dynamically loaded/created element to "activate" it
-//
 $(document).bind("refresh", function (evt) {
     //console.log("refreshing", evt.target);
     var context = evt.target;
@@ -108,7 +106,6 @@ $(document).bind("refresh", function (evt) {
     });
 
     // RENUMBER ALL SECTIONS
-    // console.log("renumber sections");
     $("section:not([data-section='-1'])").each(function (i) {
         $(this).attr("data-section", (i+1));
     });
@@ -116,8 +113,6 @@ $(document).bind("refresh", function (evt) {
     // SECTION EDIT LINKS
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     ffind('section', context).each(function () {
-        // console.log("adding edit link");
-
         $("<span>✎</span>").addClass("section_edit_link").click(function () {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
@@ -134,28 +129,12 @@ $(document).bind("refresh", function (evt) {
             if (!section.hasClass('editing')) {
                 section.trigger("collapse");
             };
-        //}).hover(function(e) {
-            //var about = $(this).closest("section").attr('about');
-            //$('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
-            ////$('section.section1[about!="' + about + '"]:not(:has(audio[src!="' + about + '"]))').addClass('not-concerned');
-            ////$('section.section1[about!="' + about + '"]').addClass('not-concerned');
-            ////$('[src="' + about + '"]').addClass('highlight').closest('section.section1').removeClass('not-concerned');
-        //}, function(e) { 
-            //var about = $(this).closest("section").attr('about');
-            //$('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
-            ////$('[src="' + about + '"]').removeClass('highlight');
-            ////$('section.section1[about!="' + about + '"]').removeClass('not-concerned');
         });
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
         $(this).append(wrapped);
     })
 
-    //$(this).find(':header:first').position({
-          //my: "top left",
-          //at: "top left",
-          //of: 'section.section1:first',
-    //});
     // IN-PLACE EDITING
     ffind('section', context).bind("collapse", function (evt) {
         $(this).toggleClass('collapsed');
@@ -349,36 +328,7 @@ $(document).ready(function() {
             post_styles(target, 'style');
         },
     });
-/*
- *    /////////////////////
- *    // Animate scrolls
- *    $("a").click(function(event){
- *        //prevent the default action for the click event
- *        if ($(this).attr('href').match('^#')) {
- *            event.preventDefault();
- *            //get the full url - like mysitecom/index.htm#home
- *            var full_url = this.href;
- *
- *            //split the url by # and get the anchor target name - home in mysitecom/index.htm#home
- *            var parts = full_url.split("#");
- *            var target = $('#' + parts[1]);
- *            target.closest('section.section1')
- *                .find('div.wrapper:first')
- *                    .autoscrollable("scrollto", target);
- *        };
- *    });
- *    /////////////////////
- *    $('.foldable').hide();
- *    $('.foldable_toggle').each(function() {
- *        $(this).append('<span class="toggle">&nbsp;</span>');
- *        $(this).wrapInner('<a href="#"></a>');
- *    });
- *    $('.foldable_toggle a').click(function() {
- *        $(this).parent().next('.foldable').slideToggle('slow');
- *        $(this).toggleClass('unfolded');
- *        return false;
- *    });
- */
+
     /////////////////////
     // LAYOUT
     // FIXME: is it really necessary to set enableCursorHotKey for each
@@ -401,8 +351,6 @@ $(document).ready(function() {
             enableCursorHotkey: false,
         }           
     });
-    // $("nav#south-pane").tabs();
-    //
     
     $("a[title='add']:first").click(function() {
         var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
@@ -421,5 +369,3 @@ $(document).ready(function() {
 
 });
 })(jQuery);
-
-
