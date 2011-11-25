@@ -88,7 +88,7 @@ def get_markdown(default_link_rel = "aa:link"):
     This is a function to return a Active Archive markdown instance.
     Returns a Markdown instance.
     """
-    return markdown.Markdown(extensions=[
+    return markdown.Markdown(output_format="html5", extensions=[
             "extra",
             "meta",
             "toc",
@@ -108,7 +108,7 @@ def get_simple_markdown(default_link_rel = "aa:link"):
     This is a function to return a Active Archive markdown instance.
     Returns a Markdown instance.
     """
-    return markdown.Markdown(extensions=[
+    return markdown.Markdown(output_format="html5", extensions=[
             "extra",
             "meta",
             "toc",
