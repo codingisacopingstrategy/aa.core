@@ -40,6 +40,4 @@ configure serve to serve best html5 video/audio
 - manual sectioning "8<---"
 
 - Notion of focus for media, to know which one is being controlled
-- repolace "is_ajax" with `if request.header.get('X-Requested-With') == 'XMLHttpRequest'`
-
 - support for RSS embeding

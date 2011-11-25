@@ -311,10 +311,6 @@ def page_edit(request, slug):
     **parameters**
     ``section``
         Optional. Limits the scope of edition to the given section.
-    ``is_ajax``
-        Optional. If present, the view returns the markdown source (GET) or the
-        computed markdown (POST).
-        
 
     **template**
         :template:`aacore/page_edit.html`
@@ -323,7 +319,7 @@ def page_edit(request, slug):
     name = dewikify(slug)
 
     section = int(request.REQUEST.get('section', 0))
-    is_ajax = request.REQUEST.get('type') == 'ajax'
+    is_ajax = request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     try:
         page = Page.objects.get(name=name)

@@ -33,7 +33,6 @@ function post_styles (elt, attr) {
     var section = $(elt).attr("data-section");
     $.get("edit/", {
         section: section,
-        type: 'ajax', 
     }, function(data) {
         // Searches for Header
         var header_match = HASH_HEADER_RE.exec(data);
@@ -54,7 +53,6 @@ function post_styles (elt, attr) {
             $.post("edit/", {
                 content: content,
                 section: section,
-                type: 'ajax', 
             });
         }
     });
@@ -164,7 +162,6 @@ $(document).bind("refresh", function (evt) {
                     type: 'post',
                     data: {
                         section: $(that).attr("data-section"),
-                        type: 'ajax',
                         content: textarea.val()
                     },
                     success: function (data) {
@@ -201,7 +198,6 @@ $(document).bind("refresh", function (evt) {
             $.ajax("edit/", {
                 data: {
                     section: $(this).attr("data-section"),
-                    type: 'ajax'
                 },
                 success: edit,
             });
