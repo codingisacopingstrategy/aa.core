@@ -10,7 +10,7 @@ function post_styles (elt, attr) {
     var content = "";
 
     var clone = $(elt).clone();
-    clone.removeClass('section1 section2 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
+    clone.removeClass('section1 section2 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight drophover');
     clone.css({
         'display': $(elt).is(":visible") ? "" : "none",  // we only want to know if it is hidden or not
         'position': '',
@@ -99,10 +99,30 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        delay: 100,  // avoids unintentional dragging when (un)collpasing
-        stop: function () { post_styles(this, 'style') }
+        //delay: 100,  // avoids unintentional dragging when (un)collpasing
+        //cursorAt: { left: 0, top: 0, },
+        snap: ".grid",
+        snapTolerance: 5,
+        stop: function () { 
+            var position = $(this).position();
+            if (position.top < 0) {
+                $(this).css('top', '0px');
+            };
+            if (position.left < 0) {
+                $(this).css('left', '0px');
+            };
+            post_styles(this, 'style'); 
+        },
+        //drag: function (e) {
+            //if (e.ctrlKey == true) {
+                //$(this).draggable('option', 'grid', [20, 20]);
+            //} else {
+                //$(this).draggable('option', 'grid', false);
+            //}
+        //}
     }).resizable({
-        stop: function () { post_styles(this, 'style') }
+        stop: function () { post_styles(this, 'style') },
+        snap: ".grid",
     });
 
     // RENUMBER ALL SECTIONS
@@ -369,3 +389,38 @@ $(document).ready(function() {
 
 });
 })(jQuery);
+
+
+//$(document).ready(function() {
+//var gutter = 20;
+//var width = 200;
+//var height= 200;
+//var margin = 20;
+
+//console.log($(window).width());
+
+//$('<div></div>').addClass('foo grid').css({
+    //position: 'absolute',
+    //top: margin,
+    //left: margin,
+    //bottom: margin,
+    //right: margin,
+    ////backgroundColor: 'blue',
+//}).appendTo($('body'));
+
+
+//var max_column = Math.floor($('.foo').width() / (width + gutter));
+//var max_row = Math.floor($('.foo').height() / (height + gutter));
+//console.log(max_column);
+//for (var i = 0; i < (max_column * max_row); i++) {
+    //var column = $('<div></div>').addClass('column grid').css({
+        //width: width,
+        //float: 'left',
+        //marginRight: gutter,
+        //height: "100%",
+        //border: "1px dotted red",
+        //height: height,
+        //marginBottom: gutter,
+    //}).appendTo('.foo');
+//};
+//});
