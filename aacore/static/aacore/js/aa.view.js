@@ -1,34 +1,37 @@
-function post_styles (elt, attr) {
+function commit_attributes (elt) {
     /*
-     * Updates and posts the annotation style
+     * Updates and posts the annotation attributes
      */
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
-    var STYLE_ATTR_RE = /{:[^}]*}/;
-    var start;
-    var end;
-    var content = "";
+    var ATTR_RE = /{:[^}]*}/;
+    var NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
+            'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
+            'highlight', 'drophover'].join(' ');
 
-    var clone = $(elt).clone();
-    clone.removeClass('section1 section2 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight drophover');
-    clone.css({
-        'display': $(elt).is(":visible") ? "" : "none",  // we only want to know if it is hidden or not
-        'position': '',
-    });
+    // As we don't want all attributes/values to be persistent we need to
+    // perform some cleaning first. In order not to alter the original element
+    // we create a clone and perform the cleaning on it instead.
+    var $elt = $(elt).clone()
+        .removeClass(NON_PERSISTANT_CLASSES)
+        .css({
+            // we only want the record the visibility if the element is hidden...
+            'display': $(elt).is(":visible") ? "" : "none",
+            'position': '',
+        });
 
-    var $elt = clone;
+    // Removes extra whitespaces
     var about = $.trim($elt.attr('about'));
     var id = $.trim($elt.attr('id'));
     var style = $.trim($elt.attr('style'));
     var class_ = $.trim($elt.attr('class'));
 
-    var attr_list = "{: ";
-    if (about) attr_list += "about='" + about + "' ";
-    if (style) attr_list += "style='" + style + "' ";
-    if (class_) attr_list += "class='" + class_ + "' ";
-    attr_list += "}" ;
-
-    var style = attr_list;
+    // Constructs the markdown source
+    var attr_chunk = "{: ";
+    if (about) attr_chunk += "about='" + about + "' ";
+    if (style) attr_chunk += "style='" + style + "' ";
+    if (class_) attr_chunk += "class='" + class_ + "' ";
+    attr_chunk += "}" ;
 
     var section = $(elt).attr("data-section");
     $.get("edit/", {
@@ -37,21 +40,21 @@ function post_styles (elt, attr) {
         // Searches for Header
         var header_match = HASH_HEADER_RE.exec(data);
         if (header_match) {
+            var start, end;
             // Defines the substring to replace
-            var style_match = STYLE_ATTR_RE.exec(header_match[0]);
-            if (style_match) {
-                start = header_match.index + style_match.index;
-                end = start + style_match[0].length;
+            var attr_match = ATTR_RE.exec(header_match[0]);
+            if (attr_match) {
+                start = header_match.index + attr_match.index;
+                end = start + attr_match[0].length;
             } else {
                 start = header_match.slice(1,3).join('').length;
                 end = start;
             };
             var before = data.substring(0, start);
             var after = data.substring(end, data.length)
-            content = before + style + after;
             
             $.post("edit/", {
-                content: content,
+                content: before + attr_chunk + after,
                 section: section,
             });
         }
@@ -105,10 +108,10 @@ $(document).bind("refresh", function (evt) {
             if (position.left < 0) {
                 $(this).css('left', '0px');
             };
-            post_styles(this, 'style'); 
+            commit_attributes(this); 
         },
     }).resizable({
-        stop: function () { post_styles(this, 'style') },
+        stop: function () { commit_attributes(this) },
     });
 
     // RENUMBER ALL SECTIONS
@@ -144,7 +147,7 @@ $(document).bind("refresh", function (evt) {
     // IN-PLACE EDITING
     ffind('section', context).bind("collapse", function (evt) {
         $(this).toggleClass('collapsed');
-        post_styles(this, 'class');
+        commit_attributes(this);
     })
 
     ffind('section', context).bind("edit", function (evt) {
@@ -237,7 +240,7 @@ $(document).bind("refresh", function (evt) {
             var value = $select.find('option:selected').val();
             var s1 = $(this).closest(".section2");
             s1.css(key, value);
-            post_styles(s1, 'style');
+            commit_attributes(s1);
         }
     });
     ffind("section.section1", context).droppable({
@@ -249,7 +252,7 @@ $(document).bind("refresh", function (evt) {
             var value = $select.find('option:selected').val();
             var s1 = $(this).closest(".section1");
             s1.css(key, value);
-            post_styles(s1, 'style');
+            commit_attributes(s1);
         }
     });
 
@@ -324,12 +327,12 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    post_styles($(target), 'style');
+                    commit_attributes($(target));
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            post_styles(target, 'style');
+            commit_attributes(target);
         },
     });
 
