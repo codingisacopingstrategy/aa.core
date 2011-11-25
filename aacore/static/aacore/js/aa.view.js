@@ -99,10 +99,6 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        //delay: 100,  // avoids unintentional dragging when (un)collpasing
-        //cursorAt: { left: 0, top: 0, },
-        snap: ".grid",
-        snapTolerance: 5,
         stop: function () { 
             var position = $(this).position();
             if (position.top < 0) {
@@ -113,16 +109,8 @@ $(document).bind("refresh", function (evt) {
             };
             post_styles(this, 'style'); 
         },
-        //drag: function (e) {
-            //if (e.ctrlKey == true) {
-                //$(this).draggable('option', 'grid', [20, 20]);
-            //} else {
-                //$(this).draggable('option', 'grid', false);
-            //}
-        //}
     }).resizable({
         stop: function () { post_styles(this, 'style') },
-        snap: ".grid",
     });
 
     // RENUMBER ALL SECTIONS
@@ -389,38 +377,3 @@ $(document).ready(function() {
 
 });
 })(jQuery);
-
-
-//$(document).ready(function() {
-//var gutter = 20;
-//var width = 200;
-//var height= 200;
-//var margin = 20;
-
-//console.log($(window).width());
-
-//$('<div></div>').addClass('foo grid').css({
-    //position: 'absolute',
-    //top: margin,
-    //left: margin,
-    //bottom: margin,
-    //right: margin,
-    ////backgroundColor: 'blue',
-//}).appendTo($('body'));
-
-
-//var max_column = Math.floor($('.foo').width() / (width + gutter));
-//var max_row = Math.floor($('.foo').height() / (height + gutter));
-//console.log(max_column);
-//for (var i = 0; i < (max_column * max_row); i++) {
-    //var column = $('<div></div>').addClass('column grid').css({
-        //width: width,
-        //float: 'left',
-        //marginRight: gutter,
-        //height: "100%",
-        //border: "1px dotted red",
-        //height: height,
-        //marginBottom: gutter,
-    //}).appendTo('.foo');
-//};
-//});
