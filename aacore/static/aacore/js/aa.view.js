@@ -94,7 +94,6 @@ function ffind (selector, context) {
 // The refresh event gets fired on body initially
 // then on any <section> or other dynamically loaded/created element to "activate" it
 $(document).bind("refresh", function (evt) {
-    //console.log("refreshing", evt.target);
     var context = evt.target;
 
     // Draggable Sections
@@ -160,7 +159,6 @@ $(document).bind("refresh", function (evt) {
             var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
             $(that).addClass("editing");
             var ok = $("<span>✔</span>").addClass("section_save_link").click(function () {
-                // console.log("commencing section edit save...");
                 $.ajax("edit/", {
                     type: 'post',
                     data: {
@@ -168,15 +166,13 @@ $(document).bind("refresh", function (evt) {
                         content: textarea.val()
                     },
                     success: function (data) {
-                        // console.log("resetting contents of section to: ", data);
                         var new_content = $(data);
                         $(that).replaceWith(new_content);
                         new_content.trigger("refresh");
                     }
                 });
-            }).appendTo($(that).find(':header:first'));
+            }).prependTo($(that).find(':header:first'));
             $("<span>✘</span>").addClass("section_cancel_link").click(function () {
-                // console.log("cancelling section edit save...");
                 if (new_section) {
                     // removes the annotation
                     $(that).remove(); 
@@ -188,7 +184,7 @@ $(document).bind("refresh", function (evt) {
                     ok.remove(); 
                     $(that).removeClass("editing");
                 }
-            }).appendTo($(that).find(':header:first'));
+            }).prependTo($(that).find(':header:first'));
         }
 
         evt.stopPropagation();
