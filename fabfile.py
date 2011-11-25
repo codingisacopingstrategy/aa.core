@@ -2,18 +2,15 @@ import os.path
 from fabric.api import run, local, put, cd, sudo, env
 
 
-def set_env(hostname):
-    if hostname == 'sarma':
-        env.user = 'sarma'
-        env.path = '/home/sarma/www/fr.stdin.oralsite2/'
-    elif hostname == 'oscillator':
-        env.user = 'constant'
-        env.path = '/var/www/vhosts/aa.lgru.net/'
+def lgru():
+    env.hosts = ['constant@oscillator.worm.org:222']
+    env.path = '/var/www/vhosts/aa.lgru.net/'
 
+def sarma():
+    env.hosts = ['sarma@oralsite2.stdin.fr']
+    env.path = '/home/sarma/www/fr.stdin.oralsite2/'
 
 def deploy(treeish='HEAD'):
-    set_env(run('hostname'))
-
     # makes a tarball of the django project and transfers it
     local('git archive %s . | gzip > project.tar.gz' % treeish)
     put('project.tar.gz', env.path)
