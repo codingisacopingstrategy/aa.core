@@ -12,6 +12,7 @@
 * Improve history 
     * Be able to revert a page
 * rev doesn't work
+- layer palette doesn't refresh
 
 
 ## Low priority
@@ -26,3 +27,19 @@
 - button to remove the about attribute
 - "attach" boxes
     - with data-anchor, data-position (north, south, east, west etc.)
+
+html5 audio/video: preload="auto"?
+configure serve to serve best html5 video/audio
+
+- How can RDF be useful for collective commenting and annotating?
+- RSS feeds
+- rdf metadata to create relation between pages. EG. translation.
+- move page
+- How to preserve the title attribute with the new syntax ([[embed::ressource]])?
+- bug embed
+- manual sectioning "8<---"
+
+- Notion of focus for media, to know which one is being controlled
+- repolace "is_ajax" with `if request.header.get('X-Requested-With') == 'XMLHttpRequest'`
+
+- support for RSS embeding
