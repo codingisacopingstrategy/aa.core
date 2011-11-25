@@ -48,122 +48,124 @@
         <li><a title="Help" href="#tabs-1">?</a></li>
         <li><a title="Styles" href="#tabs-3">▦</a></li>
     </ul>
-    <div id="tabs-2">
-    </div>
-    <div id="tabs-1">
-        {% include "aacore/partials/timecode_help.html" %}
-        {% include "aacore/partials/markdown_help.html" %}
-    </div>
-    <div id="tabs-3">
-        <span class="swatch">
-        <label for="font-size">font-size</label> 
-        <select name="font-size">
-          <option value="">reset</option>
-          <option value="xx-small">xx-small</option>
-          <option value="x-small">x-small</option>
-          <option value="small">small</option>
-          <option value="medium">medium</option>
-          <option value="large">large</option>
-          <option value="x-large">x-large</option>
-          <option value="xx-large">xx-large</option>
-          <option value="smaller">smaller</option>
-          <option value="larger">larger</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="font-style">font-style</label> 
-        <select name="font-style">
-          <option value="">reset</option>
-          <option value="normal">normal</option>
-          <option value="italic">italic</option>
-          <option value="oblique">oblique</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="font-weight">font-weight</label> 
-        <select name="font-weight">
-          <option value="">reset</option>
-          <option value="normal">normal</option>
-          <option value="bold">bold</option>
-          <option value="bolder">bolder</option>
-          <option value="lighter">lighter</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="font-family">font-family</label> 
-        <select name="font-family">
-          <option value="">reset</option>
-          <option value="LatinModernMono">Latin Modern Mono</option>
-          <option value="LiberationSans">Liberation Sans</option>
-          <option value="serif">serif</option>
-          <option value="sans">sans</option>
-          <option value="mono">mono</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="text-align">text-align</label> 
-        <select name="text-align">
-          <option value="">reset</option>
-          <option value="left">left</option>
-          <option value="center">center</option>
-          <option value="right">right</option>
-          <option value="justify">justify</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="color">color</label> 
-        <select name="color">
-          <option value="">reset</option>
-          <option value="yellow">yellow</option>
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="purple">purple</option>
-          <option value="pink">pink</option>
-          <option value="brown">brown</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="background-color">background-color</label> 
-        <select name="background-color">
-          <option value="">reset</option>
-          <option value="yellow">yellow</option>
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="purple">purple</option>
-          <option value="pink">pink</option>
-          <option value="brown">brown</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="width">width</label> 
-        <select name="width">
-          <option value="">reset</option>
-          <option value="auto">auto</option>
-          <option value="50%">50%</option>
-          <option value="200px">200px</option>
-          <option value="300px">300px</option>
-          <option value="400px">400px</option>
-          <option value="500px">500px</option>
-          <option value="600px">600px</option>
-          <option value="700px">700px</option>
-        </select>
-        </span>
-        <span class="swatch">
-        <label for="height">height</label> 
-        <select name="height">
-          <option value="">reset</option>
-          <option value="auto">auto</option>
-          <option value="50%">50%</option>
-          <option value="200px">200px</option>
-          <option value="300px">300px</option>
-          <option value="400px">400px</option>
-          <option value="500px">500px</option>
-          <option value="600px">600px</option>
-          <option value="700px">700px</option>
-        </select>
-        </span>
+    <div class="ui-layout-content">
+        <div id="tabs-2">
+        </div>
+        <div id="tabs-1">
+            {% include "aacore/partials/timecode_help.html" %}
+            {% include "aacore/partials/markdown_help.html" %}
+        </div>
+        <div id="tabs-3">
+            <span class="swatch">
+            <label for="font-size">font-size</label> 
+            <select name="font-size">
+              <option value="">reset</option>
+              <option value="xx-small">xx-small</option>
+              <option value="x-small">x-small</option>
+              <option value="small">small</option>
+              <option value="medium">medium</option>
+              <option value="large">large</option>
+              <option value="x-large">x-large</option>
+              <option value="xx-large">xx-large</option>
+              <option value="smaller">smaller</option>
+              <option value="larger">larger</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="font-style">font-style</label> 
+            <select name="font-style">
+              <option value="">reset</option>
+              <option value="normal">normal</option>
+              <option value="italic">italic</option>
+              <option value="oblique">oblique</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="font-weight">font-weight</label> 
+            <select name="font-weight">
+              <option value="">reset</option>
+              <option value="normal">normal</option>
+              <option value="bold">bold</option>
+              <option value="bolder">bolder</option>
+              <option value="lighter">lighter</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="font-family">font-family</label> 
+            <select name="font-family">
+              <option value="">reset</option>
+              <option value="LatinModernMono">Latin Modern Mono</option>
+              <option value="LiberationSans">Liberation Sans</option>
+              <option value="serif">serif</option>
+              <option value="sans">sans</option>
+              <option value="mono">mono</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="text-align">text-align</label> 
+            <select name="text-align">
+              <option value="">reset</option>
+              <option value="left">left</option>
+              <option value="center">center</option>
+              <option value="right">right</option>
+              <option value="justify">justify</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="color">color</label> 
+            <select name="color">
+              <option value="">reset</option>
+              <option value="yellow">yellow</option>
+              <option value="red">red</option>
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="brown">brown</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="background-color">background-color</label> 
+            <select name="background-color">
+              <option value="">reset</option>
+              <option value="yellow">yellow</option>
+              <option value="red">red</option>
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="brown">brown</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="width">width</label> 
+            <select name="width">
+              <option value="">reset</option>
+              <option value="auto">auto</option>
+              <option value="50%">50%</option>
+              <option value="200px">200px</option>
+              <option value="300px">300px</option>
+              <option value="400px">400px</option>
+              <option value="500px">500px</option>
+              <option value="600px">600px</option>
+              <option value="700px">700px</option>
+            </select>
+            </span>
+            <span class="swatch">
+            <label for="height">height</label> 
+            <select name="height">
+              <option value="">reset</option>
+              <option value="auto">auto</option>
+              <option value="50%">50%</option>
+              <option value="200px">200px</option>
+              <option value="300px">300px</option>
+              <option value="400px">400px</option>
+              <option value="500px">500px</option>
+              <option value="600px">600px</option>
+              <option value="700px">700px</option>
+            </select>
+            </span>
+        </div>
     </div>
 </nav>
 <nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> 
