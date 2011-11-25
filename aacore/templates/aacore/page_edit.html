@@ -20,9 +20,9 @@
 <h1>Creating {{ name }}</h1>
 {% endif %}
 <form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
-    {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
+    {% if section %}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
     {{ form.as_p }}
-    <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>
+    <p><input type="submit" value="✔ Save" />{% if page %}<input name="cancel" type="submit" value="✘ Cancel" />{% endif %}</p>
 </form>
 </div>
 {% endblock %}
