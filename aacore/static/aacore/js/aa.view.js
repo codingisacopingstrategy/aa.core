@@ -219,6 +219,7 @@ $(document).bind("refresh", function (evt) {
         }
     });
 
+    // Fixes the the clone select value being reset
     $("span.swatch", context).each(function () {
         $(this).draggable({helper: function () {
             var $this = $(this);
@@ -227,6 +228,7 @@ $(document).bind("refresh", function (evt) {
             return $clone.appendTo("body");
         }});
     });
+
     ffind("section.section1, section.section2", context).droppable({
         greedy: true,
         accept: ".swatch",
