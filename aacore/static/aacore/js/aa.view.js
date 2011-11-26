@@ -227,31 +227,19 @@ $(document).bind("refresh", function (evt) {
             return $clone.appendTo("body");
         }});
     });
-    ffind("section.section2", context).droppable({
+    ffind("section.section1, section.section2", context).droppable({
+        greedy: true,
         accept: ".swatch",
         hoverClass: "drophover",
         drop: function (evt, ui) {
             var $select = $(ui.helper).find('select');
             var key = $select.attr("name");
             var value = $select.find('option:selected').val();
-            var s1 = $(this).closest(".section2");
+            var s1 = $(this).closest(".section1, .section2");
             s1.css(key, value);
             commit_attributes(s1);
         }
     });
-    ffind("section.section1", context).droppable({
-        accept: ".swatch",
-        hoverClass: "drophover",
-        drop: function (evt, ui) {
-            var $select = $(ui.helper).find('select');
-            var key = $select.attr("name");
-            var value = $select.find('option:selected').val();
-            var s1 = $(this).closest(".section1");
-            s1.css(key, value);
-            commit_attributes(s1);
-        }
-    });
-
 });
 
 $(document).ready(function() {
