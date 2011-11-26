@@ -287,7 +287,14 @@ def page_detail(request, slug):
         url = reverse('aa-page-edit', kwargs={'slug': slug})
         return redirect(url)
 
+    revision = request.REQUEST.get('rev')
+    if revision:
+        content = page.read(revision)
+    else:
+        content = page.content
+
     context['page'] = page
+    context['content'] = content
     c = RequestContext(request)
 
     # TODO: Markdown extension for stylesheet embed
