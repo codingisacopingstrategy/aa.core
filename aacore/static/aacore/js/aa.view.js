@@ -127,7 +127,14 @@ $(document).bind("refresh", function (evt) {
             $('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
         }).prependTo($("h1:first", this));
         
-        $(this).children("h1").bind('dblclick', function(e) {
+        //$(this).children("h1").bind('dblclick', function(e) {
+            //var section = $(this).closest("section");
+            //if (!section.hasClass('editing')) {
+                //section.trigger("collapse");
+            //};
+        //});
+        $(this).find("h1, h2").bind('dblclick', function(e) {
+            e.stopImmediatePropagation();
             var section = $(this).closest("section");
             if (!section.hasClass('editing')) {
                 section.trigger("collapse");

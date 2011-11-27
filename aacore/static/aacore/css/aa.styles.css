@@ -544,19 +544,23 @@ a.directlink {
 
 /*section.section1 h1 { display: none; }*/
 
-section.section1.collapsed {
+section.section1.collapsed,
+section.section2.collapsed {
     height: auto!important;
     padding-bottom: 0;
     border: 1px dotted lightgray;
     z-index: 1 !important;
 }
-section.section1.collapsed .section_edit_link {
+section.section1.collapsed .section_edit_link,
+section.section2.collapsed .section_edit_link {
     display: none;
 }
-section.section1.collapsed h1 {
+section.section1.collapsed h1,
+section.section2.collapsed h2 {
     color: lightgray;
 }
-section.section1.collapsed > div.wrapper {
+section.section1.collapsed > div.wrapper,
+section.section2.collapsed > div.wrapper {
     display:none;
 }
 form#edit-all textarea {
