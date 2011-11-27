@@ -1,4 +1,5 @@
 function commit_attributes (elt) {
+    "use strict";
     /*
      * Updates and posts the annotation attributes
      */
@@ -22,7 +23,6 @@ function commit_attributes (elt) {
 
     // Removes extra whitespaces
     var about = $.trim($elt.attr('about'));
-    var id = $.trim($elt.attr('id'));
     var style = $.trim($elt.attr('style'));
     var class_ = $.trim($elt.attr('class'));
 
@@ -32,6 +32,8 @@ function commit_attributes (elt) {
     if (style) attr_chunk += "style='" + style + "' ";
     if (class_) attr_chunk += "class='" + class_ + "' ";
     attr_chunk += "}" ;
+    attr_chunk = (attr_chunk == "{: }") ? "" : attr_chunk;  // Removes empty attribute list junk
+
 
     var section = $(elt).attr("data-section");
     $.get("edit/", {
@@ -83,7 +85,6 @@ function resetTimelines() {
 
 (function($) {
 
-var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
 // The refresh event gets fired on body initially
@@ -252,7 +253,6 @@ $(document).ready(function() {
     // Once-only page inits
 
     $("section.section1 > div.wrapper").autoscrollable();
-    //$("section.section1").autoscrollable();
 
     /////////////////////////
     // SHORTCUTS
@@ -343,9 +343,14 @@ $(document).ready(function() {
     });
     
     $("a[title='add']:first").click(function() {
-        var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
-        $('article').append(elt);
-        elt.trigger('refresh').trigger('edit');
+        $('<section><h1>New section</h1></section>')
+            .addClass('section1')
+            .css('top', 30)
+            .css('left', 30)
+            .attr('data-section', '-1')
+            .prependTo('article')
+            .trigger('refresh')
+            .trigger('edit');
     });
 
     $("a[title='commit']:first").click(function() {

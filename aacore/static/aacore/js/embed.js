@@ -9,15 +9,11 @@ $(document).bind("refresh", function (evt) {
         var that = this;
         function poll () {
             $.ajax(embed_url, {
-                // type: 'GET',
-                // dataType: "jsonp",
                 data: {
                     url: $(that).attr("href"),
-                    // filter: $(that).attr("data-filter")
                     filter: $(that).text()
                 },
                 success: function (data) {
-                    // console.log("data", data, data.ok);
                     if (data.ok) {
                         var new_content = $(data.content);
                         $(that).replaceWith(new_content);
@@ -40,7 +36,6 @@ $(document).bind("refresh", function (evt) {
     // Embed Links show/hide on rollover 
     $(context).ffind("div.aa_embed").each(function () {
         $(this).mouseover(function () {
-            // console.log("mouseover", this);
             $(".links", this).show();
         }).mouseout(function () {
             $(".links", this).hide();
@@ -50,30 +45,24 @@ $(document).bind("refresh", function (evt) {
     // DIRECTLINKs
     // Make directlinks draggable
     $("a.directlink", context).each(function () {
-        // console.log("directlink", this);
-        $(this).draggable({helper: function () {
-            return $(this).clone().appendTo("body");
-        }});
+        $(this).draggable({
+            helper: function () {
+                return $(this).clone().appendTo("body");
+            }
+        });
     });
+
     // h1's are droppable to set about
     $(context).ffind(".section1").find("h1").droppable({
         accept: ".directlink",
         hoverClass: "drophover",
         drop: function (evt, ui) {
-            // console.log("drop", evt, ui);
             var href = $(ui.helper).attr("href");
             var s1 = $(this).closest(".section1");
             s1.attr("about", href);
-            post_styles(s1, 'style');
-            // console.log("href", href, this);
-            // post_styles(s1);
-            // TODO:
-           //  post_about(s1);
+            commit_attributes(s1);
             resetTimelines();
-            // s1.trigger("refresh");
         }
     });
-
 });
-
 })(jQuery);
