@@ -29,11 +29,6 @@ function resolveRelativeLink(base, link) {
     }
 }
 
-function ffind (selector, context, each) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
 $(document).bind("refresh", function (evt) {
     // console.log("refreshing browser links...");
     var context = evt.target;

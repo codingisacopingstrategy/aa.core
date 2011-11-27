@@ -1,17 +1,11 @@
 (function ($) {
 
-function ffind (selector, context, each) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
 var embed_url = $("link[rel='aa-embed']").attr("href");
 
 $(document).bind("refresh", function (evt) {
     // console.log("refreshing embeds...");
     var context = evt.target;
-    ffind("*[rel='aa:embed']", context).each(function () {
-        // $(this).html("foo");
+    $(context).ffind("*[rel='aa:embed']").each(function () {
         var that = this;
         function poll () {
             $.ajax(embed_url, {
@@ -44,7 +38,7 @@ $(document).bind("refresh", function (evt) {
     });
 
     // Embed Links show/hide on rollover 
-    ffind("div.aa_embed", context).each(function () {
+    $(context).ffind("div.aa_embed").each(function () {
         $(this).mouseover(function () {
             // console.log("mouseover", this);
             $(".links", this).show();
@@ -62,7 +56,7 @@ $(document).bind("refresh", function (evt) {
         }});
     });
     // h1's are droppable to set about
-    ffind(".section1", context).find("h1").droppable({
+    $(context).ffind(".section1").find("h1").droppable({
         accept: ".directlink",
         hoverClass: "drophover",
         drop: function (evt, ui) {

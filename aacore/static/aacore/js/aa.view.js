@@ -86,11 +86,6 @@ function resetTimelines() {
 var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
-function ffind (selector, context) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
 // The refresh event gets fired on body initially
 // then on any <section> or other dynamically loaded/created element to "activate" it
 $(document).bind("refresh", function (evt) {
@@ -120,7 +115,7 @@ $(document).bind("refresh", function (evt) {
 
     // SECTION EDIT LINKS
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
-    ffind('section', context).each(function () {
+    $(context).ffind('section').each(function () {
         $("<span>✎</span>").addClass("section_edit_link").click(function () {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
@@ -141,16 +136,11 @@ $(document).bind("refresh", function (evt) {
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
         $(this).append(wrapped);
-    })
-
-    // IN-PLACE EDITING
-    ffind('section', context).bind("collapse", function (evt) {
+    }).bind("collapse", function (evt) {
+        evt.stopPropagation();
         $(this).toggleClass('collapsed');
         commit_attributes(this);
-    })
-
-    ffind('section', context).bind("edit", function (evt) {
-
+    }).bind("edit", function (evt) {
         function edit (data) {
             var position = $(that).css("position");
             var section_height = Math.min($(window).height() - 28, $(that).height());
@@ -208,7 +198,7 @@ $(document).bind("refresh", function (evt) {
     resetTimelines();
 
     /// CLICKABLE TIMECODES
-    $('span[property="aa:start"],span[property="aa:end"]', context).bind("click", function () {
+    $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
         var t = $.timecode_tosecs_attr($(this).attr("content"));
         var about = $(this).parents('*[about]').attr('about');
         var player = $('[src="' + about + '"]')[0] 
@@ -220,7 +210,7 @@ $(document).bind("refresh", function (evt) {
     });
 
     // Fixes the the clone select value being reset
-    $("span.swatch", context).each(function () {
+    $(context).ffind("span.swatch").each(function () {
         $(this).draggable({helper: function () {
             var $this = $(this);
             var $clone = $(this).clone();
@@ -229,7 +219,7 @@ $(document).bind("refresh", function (evt) {
         }});
     });
 
-    ffind("section.section1, section.section2", context).droppable({
+    $(context).ffind("section.section1, section.section2").droppable({
         greedy: true,
         accept: ".swatch",
         hoverClass: "drophover",
