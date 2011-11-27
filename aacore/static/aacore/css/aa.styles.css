@@ -489,18 +489,22 @@ div.aa_embed {
 div.aa_embed .links {
     position: absolute;
     z-index: 1004;
-    left: 5px;
+    right: 5px;
     top: 5px;
     display: none;
 }
 div.aa_embed .links a {
     padding: 4px 8px;
-    background: gray;
+    background: rgba(0,0,0,0.5);
     color: white;
     margin-right: 5px;
     text-transform: uppercase;
     font-size:smaller;
+    letter-spacing: 1px;
+    font-weight: bold;
     border-bottom: none;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
 div.aa_embed .links a:hover {
 background: black;
@@ -517,7 +521,6 @@ a.directlink {
     background: black;
     color: white;
     text-transform: uppercase;
-    font-size:smaller;
     border-bottom: none;
     z-index: 100;
 }
