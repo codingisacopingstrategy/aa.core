@@ -48,5 +48,7 @@ configure serve to serve best html5 video/audio
 - URL and BROWSE buttons are too present.
 - "Browse" term leads to other expectations than getting metadata.
 - video leads text/text leads video
+- Still a problem with non consecutive header levels...
+- embed webpages = iframe?
 
 
