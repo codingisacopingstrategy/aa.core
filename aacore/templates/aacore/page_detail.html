@@ -5,6 +5,7 @@
 {% block extrahead %}
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
+<script src="{{ STATIC_URL }}lib/js-iso8601/iso8601.min.js"></script>   
 
 <script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
@@ -14,7 +15,6 @@
 
 <script src="{{ STATIC_URL }}aacore/js/aa.view.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
-
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
 
 {% for css in extra_css %}
@@ -34,6 +34,10 @@
         <li><a title="menu" href="#">⚙</a></li>
         {% endif %}
     </ul>
+</nav>
+
+<nav id="timeline">
+<div id="timelineslider"></div>
 </nav>
 
 <article>

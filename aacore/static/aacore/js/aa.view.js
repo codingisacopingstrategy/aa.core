@@ -38,6 +38,11 @@ function post_styles (elt, attr) {
     var style = attr_list;
 
     var section = $(elt).attr("data-section");
+    if (section == -1) {
+        // cancel anonymous section save -- BUG: duplicates sections by requesting section -1 (last)
+        return;
+    }
+
     $.get("edit/", {
         section: section,
         type: 'ajax', 
@@ -163,11 +168,15 @@ $(document).bind("refresh", function (evt) {
           //at: "top left",
           //of: 'section.section1:first',
     //});
-    // IN-PLACE EDITING
+
+    // Section Collapse
     ffind('section', context).bind("collapse", function (evt) {
         $(this).toggleClass('collapsed');
         post_styles(this, 'class');
     })
+
+    ////////////////////////////
+    // IN-PLACE EDITING
 
     ffind('section', context).bind("edit", function (evt) {
 
@@ -215,9 +224,11 @@ $(document).bind("refresh", function (evt) {
         var that = this;
         var new_section = false;
         if ($(this).attr('data-section') == "-1") {
+            // Directly enter edit mode
             new_section = true;
-            edit("# New section");
+            edit("# New");
         } else {
+            // Initiate the edit by GETting the markdown source
             $.ajax("edit/", {
                 data: {
                     section: $(this).attr("data-section"),
@@ -243,6 +254,9 @@ $(document).bind("refresh", function (evt) {
             player.play();
         }
     });
+
+    // SWATCHES
+    // MM: could THIS COULD MOVE TO ONCE-ONLY INIT (?)
 
     $("span.swatch", context).each(function () {
         $(this).draggable({helper: function () {
@@ -398,6 +412,7 @@ $(document).ready(function() {
         var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
         $('article').append(elt);
         elt.trigger('refresh').trigger('edit');
+        return false;
     });
 
     $("a[title='commit']:first").click(function() {
@@ -407,7 +422,21 @@ $(document).ready(function() {
                 message: "[LAYOUT] " + message,
             });
         };
+        return false;
     });
+
+    /////////////////////////////
+    // TIMELINE
+    $('#timelineslider').slider({
+        max: 3600,
+        start: function(e) {
+        },
+        slide: function(e) {
+        },
+        stop: function(e) {
+        },
+    });
+
 
 });
 })(jQuery);

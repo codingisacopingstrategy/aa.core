@@ -332,6 +332,7 @@ def page_edit(request, slug):
 
     # Gets the edit form
     if request.method == "GET":
+        # TODO: REJECT requests for section = -1 (this is the source of a section duplication bug)
         if page:
             # Gets the whole content or just a section
             if section:

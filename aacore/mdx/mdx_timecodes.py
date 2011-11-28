@@ -24,9 +24,9 @@ import markdown, re
 
 TIMECODE_RE = re.compile(
     r"""^
-    (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+    (?P<start> (?P<startdate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
     \s* --> \s*
-    (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+    (?P<end> (?P<enddate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
     \s*
     (?P<otherstuff>.*)
     $""",
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     doctest.testmod()
 
     text = """
-00:01:00 -->
+2011-11-28 00:01:00 -->
 00:02:00 --> 
 00:03:00 --> 00:04:00
 Hello
