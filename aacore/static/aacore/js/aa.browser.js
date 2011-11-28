@@ -29,11 +29,6 @@ function resolveRelativeLink(base, link) {
     }
 }
 
-function ffind (selector, context, each) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
 $(document).bind("refresh", function (evt) {
     // console.log("refreshing browser links...");
     var context = evt.target;
@@ -44,51 +39,52 @@ $(document).bind("refresh", function (evt) {
 });
 
 function loadbrowserpage (url, targetsel, expandWhenLoaded, success_callback) {
-    // console.log("loadminipage", url);
-    targetsel = targetsel || "#browser";
-    if (expandWhenLoaded === undefined) expandWhenLoaded = true;
-    loading = true;
-    $(targetsel).addClass('loading');
-    // var mitem = menuLinksByURL[url];
-    // $.log("setActive", mitem, url);
-    // setActiveMenuLink(mitem);
+    $("iframe#south-pane").attr('src', url);
+    $("body").layout().open("south");
+    //targetsel = targetsel || "#browser";
+    //if (expandWhenLoaded === undefined) expandWhenLoaded = true;
+    //loading = true;
+    //$(targetsel).addClass('loading');
+    //// var mitem = menuLinksByURL[url];
+    //// $.log("setActive", mitem, url);
+    //// setActiveMenuLink(mitem);
 
-    $(targetsel + " .minipage").load(url+" #minipage", function () {
-        loading = false;
-        $(targetsel).removeClass('loading');
-        window.setTimeout(function () { $(targetsel).scrollTop(0); }, 250);
+    //$(targetsel + " .minipage").load(url+" #minipage", function () {
+        //loading = false;
+        //$(targetsel).removeClass('loading');
+        //window.setTimeout(function () { $(targetsel).scrollTop(0); }, 250);
         
-        // load for any onload code
-        $(targetsel + " .minipage .minipage_onload").each(function () {
-            var text = $(this).text();
-            // console.log("minipage.onload", text);
-            eval(text);
-        });
+        //// load for any onload code
+        //$(targetsel + " .minipage .minipage_onload").each(function () {
+            //var text = $(this).text();
+            //// console.log("minipage.onload", text);
+            //eval(text);
+        //});
     
-        if (expandWhenLoaded) { $("body").layout().open("south");  }// expand(targetsel);
-        if (success_callback) { success_callback(); }
+        //if (expandWhenLoaded) { $("body").layout().open("south");  }// expand(targetsel);
+        //if (success_callback) { success_callback(); }
 
-        // retarget links
-        $(targetsel+" .minipage a").not("a.directlink").click(function () {
-            loadbrowserpage($(this).attr("href"));
-            return false;
-        });
+        //// retarget links
+        //$(targetsel+" .minipage a").not("a.directlink").click(function () {
+            //loadbrowserpage($(this).attr("href"));
+            //return false;
+        //});
 
-        // Fire a refresh at the browser content!
-        $(targetsel).trigger("refresh");
+        //// Fire a refresh at the browser content!
+        //$(targetsel).trigger("refresh");
 
-        // resolve (relative) links
-        /*
-        $(targetsel+" .minipage *[href]").each(function () {
-            $(this).attr("href", resolveRelativeLink(url, $(this).attr("href")));
-        });
-        $(targetsel+" .minipage *[src]").each(function () {
-            $(this).attr("src", resolveRelativeLink(url, $(this).attr("src")));
-        });
-        */
+        //// resolve (relative) links
+        //[>
+        //$(targetsel+" .minipage *[href]").each(function () {
+            //$(this).attr("href", resolveRelativeLink(url, $(this).attr("href")));
+        //});
+        //$(targetsel+" .minipage *[src]").each(function () {
+            //$(this).attr("src", resolveRelativeLink(url, $(this).attr("src")));
+        //});
+        //*/
 
 
-    });
+    //});
 }
 
 

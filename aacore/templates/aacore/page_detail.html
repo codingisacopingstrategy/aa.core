@@ -10,9 +10,10 @@
 <script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.aalayers.js"></script>   
-<script src="{{ STATIC_URL }}aacore/js/jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}aacore/js/jquery.ui.autoscrollable.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}aacore/js/jquery.timeline.js"></script>
+<script src="{{ STATIC_URL }}aacore/js/jquery.ui.autoscrollable.js"></script>
 
+<script src="{{ STATIC_URL }}aacore/js/jquery.ffind.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/aa.view.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
@@ -26,9 +27,9 @@
 <nav id="toolbar">
     <ul>
         {% if page %}
+        <li><a title="home" href="/pages/Index/">☗</a></li>
         <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
         <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
-        <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
         <li><a title="add" href="#">+</a></li>
         <li><a title="commit" href="#">★</a></li>
         <li><a title="menu" href="#">⚙</a></li>
@@ -41,7 +42,7 @@
 </nav>
 
 <article>
-    {{ page.content|aamarkdown|safe }}
+    {{ content|aamarkdown|safe }}
 </article>
 {% endblock %}
 
@@ -49,83 +50,25 @@
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>
         <li><a title="Layers" href="#tabs-2">&#8738;</a></li>
-        <li><a title="Help" href="#tabs-1">?</a></li>
         <li><a title="Styles" href="#tabs-3">▦</a></li>
+        <li><a title="Help" href="#tabs-1">?</a></li>
     </ul>
-    <div id="tabs-2">
-    </div>
-    <div id="tabs-1">
-        {% include "aacore/partials/timecode_help.html" %}
-        {% include "aacore/partials/markdown_help.html" %}
-    </div>
-    <div id="tabs-3">
-        <h2>font-size</h2>
-        <span class="swatch" data-style-key="font-size" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="font-size" data-style-value="smaller">smaller</span>
-        <span class="swatch" data-style-key="font-size" data-style-value="larger">larger</span>
-
-        <br style="clear: both" />
-        <br style="clear: both" />
-
-        <h2>text-align</h2>
-        <span class="swatch" data-style-key="text-align" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="text-align" data-style-value="left">left</span>
-        <span class="swatch" data-style-key="text-align" data-style-value="center">center</span>
-        <span class="swatch" data-style-key="text-align" data-style-value="right">right</span>
-        <span class="swatch" data-style-key="text-align" data-style-value="justify">justify</span>
-
-        <br style="clear: both" />
-        <br style="clear: both" />
-
-        <h2>color</h2>
-        <span class="swatch" data-style-key="color" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="color" data-style-value="red" style="color: red;">red</span>
-        <span class="swatch" data-style-key="color" data-style-value="blue" style="color: blue;">blue</span>
-        <span class="swatch" data-style-key="color" data-style-value="blue" style="color: blue;">blue</span>
-
-        <span class="swatch">
-        <label for="color">color</label> 
-        <select name="color">
-          <option value="">reset</option>
-          <option value="blue">blue</option>
-        </select>
-        </span>
-
-        <span class="swatch">
-        <label for="background-color">background-color</label> 
-        <select name="background-color">
-          <option value="">reset</option>
-          <option value="yellow">yellow</option>
-        </select>
-        </span>
-        <br style="clear: both" />
-        <br style="clear: both" />
-
-        <h2>background-color</h2>
-        <span class="swatch" data-style-key="background-color" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="background-color" data-style-value="yellow" style="background-color: yellow">yellow</span>
-
-        <br style="clear: both" />
-        <br style="clear: both" />
-
-        <h2>width</h2>
-        <span class="swatch" data-style-key="width" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="width" data-style-value="auto">auto</span>
-        <span class="swatch" data-style-key="width" data-style-value="200px">200px</span>
-        <span class="swatch" data-style-key="width" data-style-value="300px">300px</span>
-        <span class="swatch" data-style-key="width" data-style-value="400px">400px</span>
-
-        <br style="clear: both" />
-        <br style="clear: both" />
-
-        <h2>height</h2>
-        <span class="swatch" data-style-key="height" data-style-value="">reset</span>
-        <span class="swatch" data-style-key="height" data-style-value="auto">auto</span>
+    <div class="ui-layout-content">
+        <div id="tabs-2">
+        </div>
+        <div id="tabs-3">
+            {% include "aacore/partials/swatches.html" %}
+        </div>
+        <div id="tabs-1">
+            {% include "aacore/partials/timecode_help.html" %}
+            {% include "aacore/partials/markdown_help.html" %}
+        </div>
     </div>
 </nav>
-<nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> 
-<div id="browser">
-    <div class="minipage"></div>
-</div>
-</nav>
+<!--<nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> -->
+<!--<div id="browser">-->
+    <!--[><div class="minipage"></div><]-->
+    <!--<iframe class="minipage" src="/browse/"></iframe>-->
+<!--</div>-->
+<iframe id="south-pane" class="ui-layout-south"></iframe>
 {% endblock %}

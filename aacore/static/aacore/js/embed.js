@@ -1,29 +1,19 @@
 (function ($) {
 
-function ffind (selector, context, each) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
 var embed_url = $("link[rel='aa-embed']").attr("href");
 
 $(document).bind("refresh", function (evt) {
     // console.log("refreshing embeds...");
     var context = evt.target;
-    ffind("*[rel='aa:embed']", context).each(function () {
-        // $(this).html("foo");
+    $(context).ffind("*[rel='aa:embed']").each(function () {
         var that = this;
         function poll () {
             $.ajax(embed_url, {
-                // type: 'GET',
-                // dataType: "jsonp",
                 data: {
                     url: $(that).attr("href"),
-                    // filter: $(that).attr("data-filter")
                     filter: $(that).text()
                 },
                 success: function (data) {
-                    // console.log("data", data, data.ok);
                     if (data.ok) {
                         var new_content = $(data.content);
                         $(that).replaceWith(new_content);
@@ -44,9 +34,8 @@ $(document).bind("refresh", function (evt) {
     });
 
     // Embed Links show/hide on rollover 
-    ffind("div.aa_embed", context).each(function () {
+    $(context).ffind("div.aa_embed").each(function () {
         $(this).mouseover(function () {
-            // console.log("mouseover", this);
             $(".links", this).show();
         }).mouseout(function () {
             $(".links", this).hide();
@@ -56,30 +45,24 @@ $(document).bind("refresh", function (evt) {
     // DIRECTLINKs
     // Make directlinks draggable
     $("a.directlink", context).each(function () {
-        // console.log("directlink", this);
-        $(this).draggable({helper: function () {
-            return $(this).clone().appendTo("body");
-        }});
+        $(this).draggable({
+            helper: function () {
+                return $(this).clone().appendTo("body");
+            }
+        });
     });
+
     // h1's are droppable to set about
-    ffind(".section1", context).find("h1").droppable({
+    $(context).ffind(".section1").find("h1").droppable({
         accept: ".directlink",
         hoverClass: "drophover",
         drop: function (evt, ui) {
-            // console.log("drop", evt, ui);
             var href = $(ui.helper).attr("href");
             var s1 = $(this).closest(".section1");
             s1.attr("about", href);
-            post_styles(s1, 'style');
-            // console.log("href", href, this);
-            // post_styles(s1);
-            // TODO:
-           //  post_about(s1);
+            commit_attributes(s1);
             resetTimelines();
-            // s1.trigger("refresh");
         }
     });
-
 });
-
 })(jQuery);

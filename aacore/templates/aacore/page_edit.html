@@ -5,9 +5,10 @@
 <nav id="toolbar">
     <ul>
         {% if page %}
+        <li><a title="home" href="/pages/Index/">☗</a></li>
         <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
-        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
         <li><a title="view" href="{{ page.get_absolute_url }}">↬</a></li>
+        <li><a title="menu" href="#">⚙</a></li>
         {% endif %}
     </ul>
 </nav>
@@ -19,9 +20,9 @@
 <h1>Creating {{ name }}</h1>
 {% endif %}
 <form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
-    {% if section%}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
+    {% if section %}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
     {{ form.as_p }}
-    <p><input type="submit" value="Save" />{% if page %}<input name="cancel" type="submit" value="Cancel" />{% endif %}</p>
+    <p><input type="submit" value="✔ Save" />{% if page %}<input name="cancel" type="submit" value="✘ Cancel" />{% endif %}</p>
 </form>
 </div>
 {% endblock %}

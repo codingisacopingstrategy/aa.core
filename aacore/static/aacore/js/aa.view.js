@@ -1,41 +1,39 @@
-function post_styles (elt, attr) {
+function commit_attributes (elt) {
+    "use strict";
     /*
-     * Updates and posts the annotation style
+     * Updates and posts the annotation attributes
      */
     // RegExp
-    var HASH_HEADER_RE = /(^|\n)(#[^#].*?)#*(\n|$)/;
-    var STYLE_ATTR_RE = /{:[^}]*}/;
-    var start;
-    var end;
-    var content = "";
+    var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
+    var ATTR_RE = /{:[^}]*}/;
+    var NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
+            'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
+            'highlight', 'drophover'].join(' ');
 
-    var clone = $(elt).clone();
-    clone.removeClass('section1 ui-droppable ui-draggable ui-resizable ui-draggable-dragging editing highlight');
-    clone.css({
-        'display': '',
-        'position': '',
-    });
+    // As we don't want all attributes/values to be persistent we need to
+    // perform some cleaning first. In order not to alter the original element
+    // we create a clone and perform the cleaning on it instead.
+    var $elt = $(elt).clone()
+        .removeClass(NON_PERSISTANT_CLASSES)
+        .css({
+            // we only want the record the visibility if the element is hidden...
+            'display': $(elt).is(":visible") ? "" : "none",
+            'position': '',
+        });
 
-    var $elt = clone;
+    // Removes extra whitespaces
     var about = $.trim($elt.attr('about'));
-    var id = $.trim($elt.attr('id'));
     var style = $.trim($elt.attr('style'));
     var class_ = $.trim($elt.attr('class'));
 
-    var width = $elt.css('width');
-    var height = $elt.css('height');
-    var left = $elt.css('left');
-    var top = $elt.css('top');
+    // Constructs the markdown source
+    var attr_chunk = "{: ";
+    if (about) attr_chunk += "about='" + about + "' ";
+    if (style) attr_chunk += "style='" + style + "' ";
+    if (class_) attr_chunk += "class='" + class_ + "' ";
+    attr_chunk += "}" ;
+    attr_chunk = (attr_chunk == "{: }") ? "" : attr_chunk;  // Removes empty attribute list junk
 
-    var attr_list = "{: ";
-    if (about) attr_list += "about='" + about + "' ";
-    if (style) attr_list += "style='" + style + "' ";
-    if (class_) attr_list += "class='" + class_ + "' ";
-    attr_list += "}" ;
-
-
-    //var style = " {: " + attr + "='" + $.trim($(elt).attr(attr)) + "' }";
-    var style = attr_list;
 
     var section = $(elt).attr("data-section");
     if (section == -1) {
@@ -45,28 +43,26 @@ function post_styles (elt, attr) {
 
     $.get("edit/", {
         section: section,
-        type: 'ajax', 
     }, function(data) {
         // Searches for Header
         var header_match = HASH_HEADER_RE.exec(data);
         if (header_match) {
+            var start, end;
             // Defines the substring to replace
-            var style_match = STYLE_ATTR_RE.exec(header_match[0]);
-            if (style_match) {
-                start = header_match.index + style_match.index;
-                end = start + style_match[0].length;
+            var attr_match = ATTR_RE.exec(header_match[0]);
+            if (attr_match) {
+                start = header_match.index + attr_match.index;
+                end = start + attr_match[0].length;
             } else {
                 start = header_match.slice(1,3).join('').length;
                 end = start;
             };
             var before = data.substring(0, start);
             var after = data.substring(end, data.length)
-            content = before + style + after;
             
             $.post("edit/", {
-                content: content,
+                content: before + attr_chunk + after,
                 section: section,
-                type: 'ajax', 
             });
         }
     });
@@ -94,42 +90,38 @@ function resetTimelines() {
 
 (function($) {
 
-var TEXTAREA_MIN_PADDING_BOTTOM = 40;
 var currentTextArea = undefined; /* used for timecode pasting */
 
-function ffind (selector, context) {
-    // "filter find", like $.find but it also checks the context element itself
-    return $(context).filter(selector).add(selector, context);
-}
-
-//
 // The refresh event gets fired on body initially
 // then on any <section> or other dynamically loaded/created element to "activate" it
-//
 $(document).bind("refresh", function (evt) {
-    //console.log("refreshing", evt.target);
     var context = evt.target;
 
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        delay: 100,  // avoids unintentional dragging when (un)collpasing
-        stop: function () { post_styles(this, 'style') }
+        stop: function () { 
+            var position = $(this).position();
+            if (position.top < 0) {
+                $(this).css('top', '0px');
+            };
+            if (position.left < 0) {
+                $(this).css('left', '0px');
+            };
+            commit_attributes(this); 
+        },
     }).resizable({
-        stop: function () { post_styles(this, 'style') }
+        stop: function () { commit_attributes(this) },
     });
 
     // RENUMBER ALL SECTIONS
-    // console.log("renumber sections");
     $("section:not([data-section='-1'])").each(function (i) {
         $(this).attr("data-section", (i+1));
     });
 
     // SECTION EDIT LINKS
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
-    ffind('section', context).each(function () {
-        // console.log("adding edit link");
-
+    $(context).ffind('section').each(function () {
         $("<span>✎</span>").addClass("section_edit_link").click(function () {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
@@ -141,45 +133,27 @@ $(document).bind("refresh", function (evt) {
             $('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
         }).prependTo($("h1:first", this));
         
-        $(this).children("h1").bind('dblclick', function(e) {
+        //$(this).children("h1").bind('dblclick', function(e) {
+            //var section = $(this).closest("section");
+            //if (!section.hasClass('editing')) {
+                //section.trigger("collapse");
+            //};
+        //});
+        $(this).find("h1, h2").bind('dblclick', function(e) {
+            e.stopImmediatePropagation();
             var section = $(this).closest("section");
             if (!section.hasClass('editing')) {
                 section.trigger("collapse");
             };
-        //}).hover(function(e) {
-            //var about = $(this).closest("section").attr('about');
-            //$('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
-            ////$('section.section1[about!="' + about + '"]:not(:has(audio[src!="' + about + '"]))').addClass('not-concerned');
-            ////$('section.section1[about!="' + about + '"]').addClass('not-concerned');
-            ////$('[src="' + about + '"]').addClass('highlight').closest('section.section1').removeClass('not-concerned');
-        //}, function(e) { 
-            //var about = $(this).closest("section").attr('about');
-            //$('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
-            ////$('[src="' + about + '"]').removeClass('highlight');
-            ////$('section.section1[about!="' + about + '"]').removeClass('not-concerned');
         });
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
         $(this).append(wrapped);
-    })
-
-    //$(this).find(':header:first').position({
-          //my: "top left",
-          //at: "top left",
-          //of: 'section.section1:first',
-    //});
-
-    // Section Collapse
-    ffind('section', context).bind("collapse", function (evt) {
+    }).bind("collapse", function (evt) {
+        evt.stopPropagation();
         $(this).toggleClass('collapsed');
-        post_styles(this, 'class');
-    })
-
-    ////////////////////////////
-    // IN-PLACE EDITING
-
-    ffind('section', context).bind("edit", function (evt) {
-
+        commit_attributes(this);
+    }).bind("edit", function (evt) {
         function edit (data) {
             var position = $(that).css("position");
             var section_height = Math.min($(window).height() - 28, $(that).height());
@@ -188,24 +162,20 @@ $(document).bind("refresh", function (evt) {
             var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
             $(that).addClass("editing");
             var ok = $("<span>✔</span>").addClass("section_save_link").click(function () {
-                // console.log("commencing section edit save...");
                 $.ajax("edit/", {
                     type: 'post',
                     data: {
                         section: $(that).attr("data-section"),
-                        type: 'ajax',
                         content: textarea.val()
                     },
                     success: function (data) {
-                        // console.log("resetting contents of section to: ", data);
                         var new_content = $(data);
                         $(that).replaceWith(new_content);
                         new_content.trigger("refresh");
                     }
                 });
-            }).appendTo($(that).find(':header:first'));
+            }).prependTo($(that).find(':header:first'));
             $("<span>✘</span>").addClass("section_cancel_link").click(function () {
-                // console.log("cancelling section edit save...");
                 if (new_section) {
                     // removes the annotation
                     $(that).remove(); 
@@ -217,7 +187,7 @@ $(document).bind("refresh", function (evt) {
                     ok.remove(); 
                     $(that).removeClass("editing");
                 }
-            }).appendTo($(that).find(':header:first'));
+            }).prependTo($(that).find(':header:first'));
         }
 
         evt.stopPropagation();
@@ -232,7 +202,6 @@ $(document).bind("refresh", function (evt) {
             $.ajax("edit/", {
                 data: {
                     section: $(this).attr("data-section"),
-                    type: 'ajax'
                 },
                 success: edit,
             });
@@ -244,7 +213,7 @@ $(document).bind("refresh", function (evt) {
     resetTimelines();
 
     /// CLICKABLE TIMECODES
-    $('span[property="aa:start"],span[property="aa:end"]', context).bind("click", function () {
+    $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
         var t = $.timecode_tosecs_attr($(this).attr("content"));
         var about = $(this).parents('*[about]').attr('about');
         var player = $('[src="' + about + '"]')[0] 
@@ -255,27 +224,29 @@ $(document).bind("refresh", function (evt) {
         }
     });
 
-    // SWATCHES
-    // MM: could THIS COULD MOVE TO ONCE-ONLY INIT (?)
-
-    $("span.swatch", context).each(function () {
+    // Fixes the the clone select value being reset
+    $(context).ffind("span.swatch").each(function () {
         $(this).draggable({helper: function () {
-            return $(this).clone().appendTo("body");
+            var $this = $(this);
+            var $clone = $(this).clone();
+            $clone.find('select:first').val($this.find('select:first').val());
+            return $clone.appendTo("body");
         }});
     });
-    ffind("section", context).droppable({
+
+    $(context).ffind("section.section1, section.section2").droppable({
+        greedy: true,
         accept: ".swatch",
         hoverClass: "drophover",
         drop: function (evt, ui) {
-            var key = $(ui.helper).attr("data-style-key");
-            var value = $(ui.helper).attr("data-style-value");
-            var s1 = $(this).closest(".section1");
+            var $select = $(ui.helper).find('select');
+            var key = $select.attr("name");
+            var value = $select.find('option:selected').val();
+            var s1 = $(this).closest(".section1, .section2");
             s1.css(key, value);
-            post_styles(s1, 'style');
+            commit_attributes(s1);
         }
     });
-    
-
 });
 
 $(document).ready(function() {
@@ -289,7 +260,6 @@ $(document).ready(function() {
     // Once-only page inits
 
     $("section.section1 > div.wrapper").autoscrollable();
-    //$("section.section1").autoscrollable();
 
     /////////////////////////
     // SHORTCUTS
@@ -347,46 +317,19 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    post_styles($(target), 'style');
+                    commit_attributes($(target));
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            post_styles(target, 'style');
+            commit_attributes(target);
         },
     });
-/*
- *    /////////////////////
- *    // Animate scrolls
- *    $("a").click(function(event){
- *        //prevent the default action for the click event
- *        if ($(this).attr('href').match('^#')) {
- *            event.preventDefault();
- *            //get the full url - like mysitecom/index.htm#home
- *            var full_url = this.href;
- *
- *            //split the url by # and get the anchor target name - home in mysitecom/index.htm#home
- *            var parts = full_url.split("#");
- *            var target = $('#' + parts[1]);
- *            target.closest('section.section1')
- *                .find('div.wrapper:first')
- *                    .autoscrollable("scrollto", target);
- *        };
- *    });
- *    /////////////////////
- *    $('.foldable').hide();
- *    $('.foldable_toggle').each(function() {
- *        $(this).append('<span class="toggle">&nbsp;</span>');
- *        $(this).wrapInner('<a href="#"></a>');
- *    });
- *    $('.foldable_toggle a').click(function() {
- *        $(this).parent().next('.foldable').slideToggle('slow');
- *        $(this).toggleClass('unfolded');
- *        return false;
- *    });
- */
+
     /////////////////////
     // LAYOUT
+    // FIXME: is it really necessary to set enableCursorHotKey for each
+    // sidebar?
     $("nav#east-pane").tabs();
     $('body').layout({
         applyDefaultStyles: false,
@@ -395,24 +338,26 @@ $(document).ready(function() {
             size: 360,
             fxSpeed: "slow",
             initClosed: true,
-            enableCursorHotkey: false
+            enableCursorHotkey: false,
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
             size: 200,
             initClosed: true,
-            enableCursorHotkey: false
+            enableCursorHotkey: false,
         }           
     });
-    // $("nav#south-pane").tabs();
-    //
     
     $("a[title='add']:first").click(function() {
-        var elt = $('<section><h1>New</h1></section>').addClass('section1').attr('data-section', '-1');
-        $('article').append(elt);
-        elt.trigger('refresh').trigger('edit');
-        return false;
+        $('<section><h1>New section</h1></section>')
+            .addClass('section1')
+            .css('top', 30)
+            .css('left', 30)
+            .attr('data-section', '-1')
+            .prependTo('article')
+            .trigger('refresh')
+            .trigger('edit');
     });
 
     $("a[title='commit']:first").click(function() {
@@ -440,5 +385,3 @@ $(document).ready(function() {
 
 });
 })(jQuery);
-
-

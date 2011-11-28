@@ -19,6 +19,7 @@
 import RDF, urllib
 try: import simplejson as json
 except ImportError: import json
+import feedparser
 
 from django.shortcuts import (render_to_response, redirect, get_object_or_404)
 from django.http import (HttpResponse, HttpResponseRedirect)
@@ -98,6 +99,19 @@ WHERE {{
         ret.append('<video class="player" controls src="{0}" />'.format(uri))
     elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
         ret.append('<audio class="player" controls src="{0}" />'.format(uri))
+    elif b.get('ctype') in ("text/html"):
+        ret.append('<iframe src="{0}"></iframe>'.format(uri))
+    elif b.get('ctype') in ("application/rss+xml", "text/xml"):
+        feed = feedparser.parse(uri)
+        output = ""
+        for entry in feed['entries'][:4]:
+            output += '<div>'
+            output += '<h3><a href="%s">%s</a></h3>' % (entry.link.encode(feed.encoding), entry.title.encode(feed.encoding))
+            output += '<div>'
+            output += entry.summary.encode(feed.encoding)
+            output += '</div>'
+            output += '</div>'
+        ret.append(output)
 
     return ret
 
@@ -275,7 +289,14 @@ def page_detail(request, slug):
         url = reverse('aa-page-edit', kwargs={'slug': slug})
         return redirect(url)
 
+    revision = request.REQUEST.get('rev')
+    if revision:
+        content = page.read(revision)
+    else:
+        content = page.content
+
     context['page'] = page
+    context['content'] = content
     c = RequestContext(request)
 
     # TODO: Markdown extension for stylesheet embed
@@ -311,10 +332,6 @@ def page_edit(request, slug):
     **parameters**
     ``section``
         Optional. Limits the scope of edition to the given section.
-    ``is_ajax``
-        Optional. If present, the view returns the markdown source (GET) or the
-        computed markdown (POST).
-        
 
     **template**
         :template:`aacore/page_edit.html`
@@ -323,7 +340,7 @@ def page_edit(request, slug):
     name = dewikify(slug)
 
     section = int(request.REQUEST.get('section', 0))
-    is_ajax = request.REQUEST.get('type') == 'ajax'
+    is_ajax = request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     try:
         page = Page.objects.get(name=name)
