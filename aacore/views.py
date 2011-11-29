@@ -158,7 +158,7 @@ def embed (request):
     <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret.format({'url': url, 'browseurl': browseurl, 'embed': rendered})
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': rendered}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 
