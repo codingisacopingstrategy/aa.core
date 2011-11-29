@@ -123,7 +123,7 @@ def rdfbrowselink (node):
     """ filter by aa-resource """
     if node.is_resource():
         uri = str(node.uri)
-        return mark_safe('<a href="%s" title="%s">%s</a>' % (browseurl(uri), uri, compacturl(uri))
+        return mark_safe('<a href="%s" title="%s">%s</a>' % (browseurl(uri), uri, compacturl(uri)))
     elif node.is_literal():
         literal = node.literal_value.get("string")
 #        return literal
@@ -142,7 +142,7 @@ def rdfrellink (node):
     if node.is_resource():
         uri = str(node.uri)
         link = reverse('aa-browse') + "?" + urllib.urlencode({'uri': uri})
-        return mark_safe('<a href="%s" title="%s">%s</a>' % (link, uri, compacturl(uri))
+        return mark_safe('<a href="%s" title="%s">%s</a>' % (link, uri, compacturl(uri)))
     elif node.is_literal():
         literal = node.literal_value.get("string")
 #        return literal
