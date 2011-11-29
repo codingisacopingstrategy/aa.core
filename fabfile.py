@@ -43,4 +43,4 @@ def deploy(treeish='HEAD'):
     # fixes permission issues
     sudo('chown -R %s:www-data %s' % (env.user, env.path))
     sudo('chmod -R g+w %saa.core' % env.path)
-    sudo('apachectl graceful')
+    sudo('apache2ctl graceful')

@@ -221,11 +221,11 @@ def load_links (model, context, uri=None, literal=None):
     as_rel = None
 
     if literal:
-        s = '"{0}"'.format(literal)
+        s = '"%s"' % literal
     else:
-        s = "<{0}>".format(uri)
+        s = "<%s>" % uri
 
-    q = "SELECT DISTINCT ?relation ?object WHERE {{ {0} ?relation ?object . }} ORDER BY ?relation".format(s)
+    q = "SELECT DISTINCT ?relation ?object WHERE {{ %s ?relation ?object . }} ORDER BY ?relation" % s
     for b in query(q, model):
         if b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/title":
             context['title'] = b['object'].literal_value.get("string")
@@ -238,12 +238,12 @@ def load_links (model, context, uri=None, literal=None):
         else:
             node_stats.append(b)
 
-    q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation {0} . }} ORDER BY ?relation".format(s)
+    q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation %s . }} ORDER BY ?relation" % s
     for b in query(q, model):
         links_in.append(b)
 
     if not literal:
-        q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject {0} ?object . }} ORDER BY ?subject".format(s)
+        q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject %s ?object . }} ORDER BY ?subject" % s
         as_rel = [x for x in query(q, model)]
     else:
         as_rel = ()
