@@ -99,7 +99,7 @@ WHERE {{
         ret.append('<video class="player" controls src="{0}" />'.format(uri))
     elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
         ret.append('<audio class="player" controls src="{0}" />'.format(uri))
-    elif b.get('ctype') in ("text/html"):
+    elif b.get('ctype') in ("text/html", ):
         ret.append('<iframe src="{0}"></iframe>'.format(uri))
     elif b.get('ctype') in ("application/rss+xml", "text/xml"):
         feed = feedparser.parse(uri)

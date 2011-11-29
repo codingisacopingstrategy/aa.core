@@ -10,6 +10,10 @@ def sarma():
     env.hosts = ['sarma@oralsite2.stdin.fr']
     env.path = '/home/sarma/www/fr.stdin.oralsite2/'
 
+def aa():
+    env.hosts = ['activearchives@activearchives.org']
+    env.path = '/var/www/vhosts/activearchives.org/wsgi/vj13/'
+
 def deploy(treeish='HEAD'):
     # makes a tarball of the django project and transfers it
     local('git archive %s . | gzip > project.tar.gz' % treeish)

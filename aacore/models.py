@@ -222,13 +222,14 @@ class Page(models.Model):
 
         # Add the commit metadata in a git note, formatted as
         # a .ini config file
-        config = ConfigParser()
-        config.add_section('metadata')
-        config.set('metadata', 'is_minor', is_minor)
+    # THIS SEEMS TO CAUSE AN ERROR:  git: 'notes' is not a git-command. See 'git --help' in git 1.5.6.5 on debian at least
+#        config = ConfigParser()
+#        config.add_section('metadata')
+#        config.set('metadata', 'is_minor', is_minor)
 
-        output = cStringIO.StringIO()
-        config.write(output)
-        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
+#        output = cStringIO.StringIO()
+#        config.write(output)
+#        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
 
         self.save()
 

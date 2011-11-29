@@ -8,61 +8,167 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script src="jquery.voidplayer.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../aacore/static/aacore/js/jquery.timeline.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css">
-        #slider { margin: 10px; }
+    #slider { margin: 10px; }
+    #play { cursor: pointer; }
+    #pause { cursor: pointer; }
+
     </style>
     <script>
-        Math._round = Math.round;
-        Math.round = function(number, precision)
-        {
-            precision = Math.abs(parseInt(precision)) || 0;
-            var coefficient = Math.pow(10, precision);
-            return Math._round(number*coefficient)/coefficient;
+(function ($) {
+
+//
+// wrap body in a timeline to add the audio element at the given time
+// on show -- trigger play back of the audio, adding it to the "playstack"
+// "lock" the two elements together: use new style timeline to follow 
+// in the general case, both elements are timelines... how to negotiate control
+//
+// TO BEGIN: consider this specific case...
+
+var playstack = [];
+function ps_sync_on_timeupdate(elt) {
+    // sync two elements, giving preference to the latter element
+    if (elt === playstack_driver) {
+        var ct = $(elt).data("aaplayer").currentTime;
+        for (var i=0; i<playstack.length; i++) {
+            var oelt = playstack[i];
+            if (oelt !== elt) {
+                // how to generalize this code ?!
+                var oct = $(elt).data("data-start") + ct;
+                oelt.data("aaplayer").setCurrentTime(oct);
+            }
         }
-        $(document).ready(function() {
-            $("body").voidplayer({
-                duration: 30,
-                loop: true,
-            })
+    }
+}
+// at some point timeupdates are coming from both elements
+// MUST rely on a single source (latter for now)
 
-            $('#slider').slider({
-                max: $("body").voidplayer('duration'),
-                animate: true,
-                step: 0.1,
-                start: function(e) {
-                    $("body").voidplayer('pause');
-                },
-                slide: function(e) {
-                    $("body").voidplayer('currentTime', $(this).slider('value'));
-                },
-                stop: function(e) {
-                    console.log($(this).slider('value'));
-                    $("body").voidplayer('play');
-                },
-            });
-                
-            $("body").bind('play', function(e) { 
-                console.log('play');
-            }).bind('timeupdate', function(e) { 
-                console.log('timeupdate: ' + $(this).voidplayer('currentTime'));
-                $("#slider").slider('value', $(this).voidplayer('currentTime'));
-                $('#time').text(Math.round($(this).voidplayer('currentTime'), 2) + "/" + $(this).voidplayer('duration')) ;
-            }).bind('seeking', function(e) { 
-                console.log('seeking');
-                $('audio').get(0).currentTime = $(this).voidplayer('currentTime') - $('audio').attr('data-start');
-            }).bind('ended', function(e) { 
-                console.log('ended');
-            });
+Math._round = Math.round;
+Math.round = function(number, precision)
+{
+    precision = Math.abs(parseInt(precision)) || 0;
+    var coefficient = Math.pow(10, precision);
+    return Math._round(number*coefficient)/coefficient;
+}
 
-            $("#play").bind('click', function(e) {
-                $('body').voidplayer('play');
-                $('audio').get(0).play();
-            });
-            $("#pause").bind('click', function(e) {
-                $('body').voidplayer('pause');
-            });
-        });
-    </script>
+$(document).ready(function() {
+
+    $("body").voidplayer({
+        duration: 15,
+        loop: false,
+        autoplay: false
+    });
+
+    var sliderPaused = false, sliderDragging = false;
+    $('#slider').slider({
+        max: $("body").voidplayer('duration'),
+        animate: false,
+        step: 0.1,
+        start: function(e) {
+            sliderDragging = true;
+            sliderPaused = $("body").voidplayer("paused");
+            // console.log("paused", sliderPaused);
+            $("body").voidplayer('pause');
+        },
+        slide: function(e) {
+            // setCurrentTime of the current driver
+            // var sval = $(this).slider('value');
+            // console.log("slideTo", sval);
+            // $("body").voidplayer('currentTime', sval);
+            // $("body").timeline("currentTime", sval);
+        },
+        stop: function(e) {
+            // console.log($(this).slider('value'));
+            var sval = $(this).slider('value');
+            $("body").voidplayer('currentTime', sval);
+            sliderDragging = false;
+            if (!sliderPaused) {
+                $("body").voidplayer('play');
+            }
+        },
+    });
+        
+    $("body").bind('play', function(e) { 
+        console.log('body: play');
+    }).bind('timeupdate', function(e, controller) {
+        // console.log("void.timeupdate", e, controller);
+        var ct = $(this).voidplayer('currentTime');
+        if (!sliderDragging) { $("#slider").slider('value', ct); }
+        $('#time').text(Math.round(ct, 2) + "/" + $(this).voidplayer('duration')) ;
+    }).bind('seeking', function(e) { 
+        // console.log('seeking');
+        // $('audio').get(0).currentTime = $(this).voidplayer('currentTime') - $('audio').attr('data-start');
+    }).bind('ended', function(e) { 
+        console.log('body: ended');
+    });
+
+    $("audio").bind("play", function () {
+        // $("body").voidplayer("play");
+    }).bind("pause", function () {
+        // $("body").voidplayer("pause");
+    }).bind("timeupdate", function () {
+        // super important to prevent a ring
+        var visible = $(this).is(":visible");
+        // console.log("audio.timeupdate", visible);
+        if (!visible) { return; }
+
+        // DRIVE THE BODY PLAYER
+        var ct = this.currentTime;
+        var start = parseInt($(this).attr("data-start"));
+        var t = (start + ct);
+        // console.log("audio, drive body:", t);
+        $("body").voidplayer("currentTime", t, this);
+    });
+
+    $("#play").bind('click', function(e) {
+        $('body').voidplayer('play');
+        // $('audio').get(0).play();
+    });
+    $("#pause").bind('click', function(e) {
+        $('body').voidplayer('pause');
+    });
+
+    $("body").timeline({
+        currentTime: function (elt) {
+            return $(elt).voidplayer("currentTime");
+        },
+        setCurrentTime: function (elt, t, controller) {
+            //console.log("body.setTitleTime", elt, t, evt);
+            var audio = $("audio").get(0);
+            if (controller !== audio) {
+                console.log("audio.setCurrentTime", t);
+                audio.currentTime = t;
+            } else {
+                console.log("ignoring setCurrentTime");
+            }
+            // this also needs to pass through the playstack "filter"
+            // According to BODY, the elt (audio) should be at time t
+            // if element is driving - this is then likely the result of elements' own timeupdate...
+        },
+        show: function (elt) {
+            // console.log("body.show", elt);  
+            console.log("pause voidplayer (enter passenger mode)");
+            $("body").voidplayer("pause");
+            $(elt).show();
+            $(elt).get(0).play();
+        },
+        hide: function (elt) {
+            console.log("body.hide", elt);
+            $(elt).hide();
+            $(elt).get(0).pause();
+
+            //console.log("unpause voidplayer (enter driver mode)");
+            //$("body").voidplayer("play");
+        }
+        // debug: true
+    }).timeline("add", "audio");
+
+});
+
+})(jQuery);
+
+</script>
 </head>
 <body>
     <div id="player"></div>
@@ -71,7 +177,7 @@
     <span id="play">play</span>
     <span id="pause">pause</span>
 
-    <p><audio data-start="15" class="player" controls="controls" src="http://repo.oralsite.stdin.fr/Antonia%20Baehr/antonia%20baehr_edit.ogg" type="audio/ogg" preload="auto"/> 
+    <p><audio data-start="3" data-end="10" class="player" controls="controls" src="antonia%20baehr_edit.ogg" type="audio/ogg" preload="auto"/> 
         Your browser does not support the audio tag.
         </audio></p>
 </body>

@@ -1,3 +1,5 @@
+var timelinesByURL = {};
+
 function commit_attributes (elt) {
     "use strict";
     /*
@@ -68,8 +70,22 @@ function commit_attributes (elt) {
     });
 }
 
+function secs2date (s, baseDate) {
+    var d = baseDate ? baseDate : new Date();
+    var hours = Math.floor(s / 3600);
+    s -= hours * 3600;   
+    var mins = Math.floor(s / 60);
+    s -= mins*60;
+    var secs = Math.floor(s);
+    var millis = (s - secs);
+    millis = millis*1000;
+    console.log("secs2date", hours, mins, secs, millis);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, mins, secs, millis);
+}
+
 function resetTimelines() {
     // RESET (ALL) TIMELINES
+    /* OLD VERSION
     $(".player").each(function(){
         var url = $(this).attr('src') || $("[src]:first", this).attr('src');
         $(this).timeline({
@@ -82,10 +98,85 @@ function resetTimelines() {
             hide: function (elt) {
                 $(elt).removeClass("active");
             },
-            start: function (elt) { return $(elt).attr('data-start') },
-            end: function (elt) { return $(elt).attr('data-end') }
+            start: function (elt) { return $.timecode_parse($(elt).attr('data-start')) },
+            end: function (elt) { return $.timecode_parse($(elt).attr('data-end')) }
         }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
     });
+    */
+
+    $("body").timeline({
+        currentTime: function (elt) {
+            return $(elt).data("datetime");
+        },
+        show: function (elt) {
+            // console.log("show", elt);
+            // $(elt).show();
+            $(elt).addClass("active")
+                .closest('section.section1')
+                   .find('div.wrapper:first')
+                        .autoscrollable("scrollto", elt);
+        },
+        hide: function (elt) {
+            // console.log("hide", elt);
+            // $(elt).hide();
+            $(elt).removeClass("active");
+        },
+        start: function (elt) {
+            // console.log("body start for", elt);
+            return $.datetimecode_parse($(elt).attr("data-start"));
+        },
+        end: function (elt) {
+            // console.log("body end for", elt);
+            // start is defaultDate for end
+            var start = $.datetimecode_parse($(elt).attr("data-start"));
+            var end = $(elt).attr("data-end");
+            if (end) { return $.datetimecode_parse(end, start); }
+        }
+    });
+
+    /* Find/Init/Return a timeline-enabled media element for a given (about) url */
+    timelinesByURL = {};
+    function timelineForURL(url) {
+        if (timelinesByURL[url] === undefined) {
+            var driver = $("video[href='"+url+"'],video[src='"+url+"']").first();
+            if (driver) {
+                driver = driver.get(0);
+                timelinesByURL[url] = driver;
+                // console.log("timelinesByURL", url, driver);
+                $(driver).timeline({
+                    show: function (elt) {
+                        console.log("timelinesByURL, show", elt);
+                        $(elt).addClass("active")
+                            .closest('section.section1')
+                               .find('div.wrapper:first')
+                                    .autoscrollable("scrollto", elt);
+                    },
+                    hide: function (elt) {
+                        // console.log("hide", elt);
+//                        $(elt).hide();
+                        $(elt).removeClass("active");
+                    }
+                });
+            } else {
+                console.log("WARNING, no media found for about=", url);
+            }
+        }
+        return timelinesByURL[url];        
+    }
+
+    // Activate temporal html!
+    $("*[data-start]").each(function () {
+        var about_url = $.trim($(this).closest("*[about]").attr("about"));
+        // use the body as timeline if no about is given
+        var timeline = about_url ? timelineForURL(about_url) : $("body").get(0);
+        if (timeline) {
+            $(timeline).timeline("add", this);
+        }
+    });
+
+    var start = $("body").timeline("minTime");
+    var end = $("body").timeline("maxTime");
+    console.log("body start:", start, ", end: ", end);
 }
 
 (function($) {
@@ -213,9 +304,33 @@ $(document).bind("refresh", function (evt) {
     resetTimelines();
 
     /// CLICKABLE TIMECODES
+    /*
     $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
         var t = $.timecode_tosecs_attr($(this).attr("content"));
         var about = $(this).parents('*[about]').attr('about');
+        var player = $('[src="' + about + '"]')[0] 
+                    || $('source[src="' + about + '"]').parent('.player')[0];
+        if (player) {
+            player.currentTime = t;
+            player.play();
+        }
+    });
+    */
+    /// CLICKABLE TIMECODES
+    $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
+        var about = $(this).parents('*[about]').attr('about');
+        var timeline;
+        if (about) {
+            timeline = timelinesByURL[about];
+        } else {
+            timeline = $("body").get(0);
+        }
+        if (timeline) {
+            var t = $.datetimecode_parse($(this).attr("content"));
+            // console.log("timeline", timeline, t);
+            $(timeline).timeline("currentTime", t);
+        }
+        var t = $.timecode_tosecs_attr($(this).attr("content"));
         var player = $('[src="' + about + '"]')[0] 
                     || $('source[src="' + about + '"]').parent('.player')[0];
         if (player) {
@@ -372,13 +487,33 @@ $(document).ready(function() {
 
     /////////////////////////////
     // TIMELINE
+    function updatetimeFromSlider (elt) {
+        var v = $(elt).slider("option", "value");
+        var d = $("body").data("datetime");
+        var start = $("body").timeline("minTime");
+        var end = $("body").timeline("maxTime");
+        var curTime = start.getTime() + ((end - start) * (v/100000));
+        // console.log(v, start, end, curTime);
+        if (!d) {
+            d = new Date();
+            $("body").data("currentTime", d);
+        }
+        d.setTime(curTime);
+        // console.log("newtime", d);
+        return d;
+    }
     $('#timelineslider').slider({
-        max: 3600,
+        max: 100000,
         start: function(e) {
+            
         },
         slide: function(e) {
+            var d = updatetimeFromSlider(this);
+            $("body").timeline("currentTime", d);
         },
         stop: function(e) {
+            /*var d = updatetimeFromSlider(this);
+            console.log(d);*/
         },
     });
 
