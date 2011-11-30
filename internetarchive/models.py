@@ -29,7 +29,7 @@ class User (models.Model):
 
     @property
     def url (self):
-        return "http://www.archive.org/search.php?" + urllib.urlencode({"query": 'creator:"{0}"'.format(self.username)})
+        return "http://www.archive.org/search.php?" + urllib.urlencode({"query": 'creator:"%s"'%(self.username)})
 
 class Collection (models.Model):
     shortname = models.CharField(max_length=255)
@@ -67,7 +67,7 @@ class Subject (models.Model):
 
     @property
     def url (self):
-        return "http://www.archive.org/search.php?" + urllib.urlencode({"query": 'subject:"{0}"'.format(self.name)})
+        return "http://www.archive.org/search.php?" + urllib.urlencode({"query": 'subject:"%s"'%(self.name)})
 
     def __unicode__(self):
         return self.name
@@ -279,16 +279,22 @@ class Asset (models.Model):
             oname = f.filename.strip("/")
             subs = self.files.filter(original=oname).order_by("filename")
             if subs.count():
-                ret += ("  "*level)+'<ul about="{}">\n'.format(f.url)
+                ret += ("  "*level)+'<ul about="%s">\n'%(f.url)
                 for sub in subs:
-                    ret += ("  "*(level+1))+'<li rev="dc:source"><span about="{1}"><span property="dc:format">{2}</span> <a href="{1}">{0}</a></span></li>\n'.format(sub.filename.strip("/"), sub.url, sub.format)
+                    ret += ("  "*(level+1))+'<li rev="dc:source"><span about="%(url)s"><span property="dc:format">%(format)s</span> <a href="%(url)s">%(label)s</a></span></li>\n'%({'label': sub.filename.strip("/"), 'url': sub.url, 'format': sub.format})
+
+#                    ret += ("  "*(level+1))+'<li rev="dc:source"><span about="{1}"><span property="dc:format">{2}</span> <a href="{1}">{0}</a></span></li>\n'%(sub.filename.strip("/"), sub.url, sub.format)
+
                     ret += subitems(sub, level+1)
                 ret += ("  "*level)+"</ul>\n"
             return ret
 
         ret = "<ul>\n"
         for f in self.files.filter(source="original").order_by("filename"):
-            ret += '  <li rev="dcterms:isPartOf"><span about="{1}"><span property="dc:format">{2}</span> <a href="{1}">{0}</a></span></li>\n'.format(f.filename.strip("/"), f.url, f.format)
+            ret += '  <li rev="dcterms:isPartOf"><span about="{1}"><span property="dc:format">{2}</span> <a href="{1}">{0}</a></span></li>\n'%({'label': f.filename.strip("/"), 'url': f.url, 'format': f.format})
+
+#            ret += '  <li rev="dcterms:isPartOf"><span about="{1}"><span property="dc:format">{2}</span> <a href="{1}">{0}</a></span></li>\n'.format(f.filename.strip("/"), f.url, f.format)
+
             ret += subitems(f)
         ret += "</ul>\n"
         return ret

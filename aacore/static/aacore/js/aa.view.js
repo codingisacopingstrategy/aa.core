@@ -174,9 +174,11 @@ function resetTimelines() {
         }
     });
 
+    /*    debuggin
     var start = $("body").timeline("minTime");
     var end = $("body").timeline("maxTime");
     console.log("body start:", start, ", end: ", end);
+    */
 }
 
 (function($) {

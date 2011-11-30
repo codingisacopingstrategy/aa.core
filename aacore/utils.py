@@ -43,7 +43,8 @@ def full_site_url(url):
     try:
         base = projectsettings.SITE_URL
     except AttributeError:
-        pass
+        base = None
+
     base = base or "http://"+Site.objects.get_current().domain
     return urlparse.urljoin(base, url)
 
@@ -54,7 +55,7 @@ def is_local_url(url):
     try:
         base = projectsettings.SITE_URL
     except AttributeError:
-        pass
+        base = None
     base = base or "http://"+Site.objects.get_current().domain
     return url.startswith(base)
 
@@ -66,7 +67,7 @@ def relative_site_url(url):
     try:
         base = projectsettings.SITE_URL
     except AttributeError:
-        pass
+        base = None
     base = base or "http://"+Site.objects.get_current().domain
     if url.startswith(base):
         url=url[len(base):]
