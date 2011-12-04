@@ -24,11 +24,12 @@ def epock2datetime(value):
 
 @register.filter
 @stringfilter
-def escape_plain(value):
+def escape_newlines(value):
     """
-    Escapes unicode sequences 
+    Escapes newlines sequences 
     """
-    return value.encode('unicode-escape')
+    #return value.encode('unicode-escape')
+    return value.replace('\n', r'\n')
 
 @register.filter
 @stringfilter

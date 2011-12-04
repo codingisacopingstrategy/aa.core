@@ -21,7 +21,10 @@ urlpatterns = patterns('aacore.views',
     url(r'^pages/(?P<slug>[-\w]+)/flag/$', 'page_flag', {}, name='aa-page-flag'),
 
     ### Export
-    url(r'^pages/(?P<slug>[^/]+)/(?P<section>\d+)/$', 'annotation_export', {}, name='aa-annotation-export'),
+    url(r'^pages/(?P<slug>[^/]+)/annotations/(?P<section>\d+)/$', 'annotation_export', 
+        {}, name='aa-annotation-export'),
+    url(r'^pages/(?P<slug>[^/]+)/annotations/(?P<section>\d+)/import$', 'annotation_import', 
+        {}, name='aa-annotation-import'),
 
     ### EMBED
     url(r'^embed/$', 'embed', {}, name='aa-embed'),

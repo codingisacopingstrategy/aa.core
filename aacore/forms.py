@@ -18,3 +18,7 @@ class PageEditForm(forms.Form):
         label="This is a minor Edit",
         required=False,
     )
+
+
+class AnnotationImportForm(forms.Form):
+    file = forms.FileField()
