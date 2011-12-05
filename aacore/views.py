@@ -238,6 +238,9 @@ def annotation_import(request, slug, section):
     arbitrary script on the server.
     """
     context = {}
+    name = dewikify(slug)
+    page = Page.objects.get(name=name)
+
     if request.method == 'POST':
         form = AnnotationImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -245,37 +248,23 @@ def annotation_import(request, slug, section):
             data = ""
             for chunk in f.chunks():
                 data += chunk
-            print(data)
-            return HttpResponse("Import complete, close this window and reload the page")
+
+            from audacity import audacity_to_srt
+            srt = unicode(audacity_to_srt(data).decode('utf-8'))
+
+            # Preserves the old header, because audacity only keeps timed section.
+            # TODO: decide wether it should be handled here or in sectionalize_replace
+            section = int(section)
+            header = sectionalize(page.content)[section]['header'] + "\n\n"
+
+            context = {'content': header + srt, 'section': section, 'page': page}
+            return render_to_response("aacore/annotation_import_confirm.html", context, 
+                                      context_instance=RequestContext(request))
     else:
         form = AnnotationImportForm()
         context['form'] = form
         return render_to_response("aacore/annotation_import.html", context, 
                                   context_instance=RequestContext(request))
-
-
-#def annotation_import(request, slug, section, format_="audacity"):
-    #if request.method == "POST":
-        #form = AnnotationUploadForm(request.POST),
-        #import pdb; pdb.set_trace()
-        #if form.is_multipart():
-            #annotation = form.cleaned_data['annotation']
-            #print(annotation)
-        ##print(request.FILES['annotation'])
-        ##annotation = request.FILES.get(request.POST.get('annotation'))
-        ##print(annotation)
-        #context = {
-            #'form': AnnotationUploadForm(),
-        #}
-        #return render_to_response("aacore/annotation_import.html", context, 
-                                  #context_instance=RequestContext(request))
-    #elif request.method == "GET":
-        #context = {
-            #'form': AnnotationUploadForm(),
-        #}
-        #return render_to_response("aacore/annotation_import.html", context, 
-                                  #context_instance=RequestContext(request))
-    
 
 
 def annotation_export(request, slug, section, _format="audacity",
@@ -452,10 +441,12 @@ def page_edit(request, slug):
             if page:
                 old_content = page.content
                 if section:  # section edit
+                    keep_header = bool(request.REQUEST.get('keep_header'))
+                    print(keep_header)
                     if section == -1:
                         page.content = page.content.rstrip() + "\n\n" + content
                     else:
-                        page.content = sectionalize_replace(page.content, section, content)
+                        page.content = sectionalize_replace(page.content, section, content, keep_header=keep_header)
                     if page.content != old_content:
                         page.commit(message=message, author=author, is_minor=is_minor)
                 else:

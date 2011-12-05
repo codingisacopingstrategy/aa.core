@@ -51,4 +51,7 @@ configure serve to serve best html5 video/audio
 - Still a problem with non consecutive header levels...
 - embed webpages = iframe?
 
+A nice sniffer: `file`:
 
+    ➜  ~  file /tmp/marqueurs.txt    
+    /tmp/marqueurs.txt: ASCII English text, with very long lines
