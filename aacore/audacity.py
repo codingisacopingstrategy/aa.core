@@ -64,9 +64,9 @@ def audacity_to_srt(data, explicit=False):
         end = float(end.replace(',', '.'))
 
         start = timecode_fromsecs(start, alwaysfract=True, 
-                                  alwayshours=True, fractdelim='.')
+                                  alwayshours=True, fractdelim=',')
         end = timecode_fromsecs(end, alwaysfract=True, 
-                                alwayshours=True, fractdelim='.')
+                                alwayshours=True, fractdelim=',')
 
         # If the end time equals the start time we ommit it.
         if end == start:
@@ -78,7 +78,6 @@ def audacity_to_srt(data, explicit=False):
                 stack[-1]['end'] = ""
 
         body = body.replace(r'\n', '\n')
-        #print(unicode(body))
 
         stack.append({'start': start, 'end': end, 'body': body})
 
