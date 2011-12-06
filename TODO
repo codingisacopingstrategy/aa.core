@@ -55,3 +55,12 @@ A nice sniffer: `file`:
 
     ➜  ~  file /tmp/marqueurs.txt    
     /tmp/marqueurs.txt: ASCII English text, with very long lines
+
+
+
+- annotation negative position happens when one rescales the annotation "outside" the screen.
+- help to update with embed
+- manual to update
+- bug with the layer palette
+- zoom filter to reimplement
+- how to change the embed wrapper? how to execute script loaded in ajax?
