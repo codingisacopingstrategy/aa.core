@@ -96,11 +96,23 @@ WHERE {{
     # TODO: move to templates
     if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
         ret.append('<img src="{0}" />'.format(uri))
+        #bla = '<a class="lb" href="{0}"><img src="{0}" /></a>'.format(uri)
+        #bla += """
+#<link rel="stylesheet" type="text/css" href="http://leandrovieira.com/projects/jquery/lightbox/css/jquery.lightbox-0.5.css"></link> 
+#<script src="http://leandrovieira.com/projects/jquery/lightbox/js/jquery.lightbox-0.5.pack.js"></script>
+#<script>
+#$(function() {
+#console.log($('a.lb'));
+#$('a.lb').lightBox();
+#});
+#</script>
+#"""
+        #ret.append(bla)
     elif b.get('ctype') in ("video/ogg", "video/webm") or (b.get('videocodec') in ("theora", "vp8")):
         ret.append('<video class="player" controls src="{0}" />'.format(uri))
     elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
         ret.append('<audio class="player" controls src="{0}" />'.format(uri))
-    elif b.get('ctype') in ("text/html"):
+    elif b.get('ctype') in ("text/html", ):
         ret.append('<iframe src="{0}"></iframe>'.format(uri))
     elif b.get('ctype') in ("application/rss+xml", "text/xml"):
         feed = feedparser.parse(uri)

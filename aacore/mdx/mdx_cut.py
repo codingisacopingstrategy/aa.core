@@ -32,7 +32,7 @@ import markdown
 
 
 class CutProcessor(markdown.blockprocessors.BlockProcessor):
-    RE = r'8\<'
+    RE = r'8\<(?P<header>.*?)'
     # Detect cut on any line of a block.
     SEARCH_RE = re.compile(r'(^|\n)%s(\n|$)' % RE)
     # Match a cut on a single line of text.
@@ -46,14 +46,16 @@ class CutProcessor(markdown.blockprocessors.BlockProcessor):
     def run(self, parent, blocks):
         last_child = self.lastChild(parent)
         block = blocks.pop(0)
-        if self.MATCH_RE.match(block):
+        match = self.MATCH_RE.match(block)
+        if match:
+            print(match.groupdict())
             section = markdown.util.etree.SubElement(parent, 'section')
+            section.text = match.groupdict()['header']
         else:
             self.parser.parseChunk(last_child, block)
 
 
 class CutExtension(markdown.Extension):
-    """ Add tables to Markdown. """
 
     def extendMarkdown(self, md, md_globals):
         """ Add an instance of CutProcessor to BlockParser. """
