@@ -107,6 +107,7 @@ function resetTimelines() {
     $("body").timeline({
         currentTime: function (elt) {
             return $(elt).data("datetime");
+            return $(elt).currentTime;
         },
         show: function (elt) {
             // console.log("show", elt);
