@@ -11,7 +11,7 @@ $(document).bind("refresh", function (evt) {
             $.ajax(embed_url, {
                 data: {
                     url: $(that).attr("href"),
-                    filter: $(that).text()
+                    filter: $(that).attr("data-filter")
                 },
                 success: function (data) {
                     if (data.ok) {

@@ -109,7 +109,8 @@ class Resource (models.Model):
         Throws: AAWait when local file is not (yet) available
         """
         # local_dir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
-        local_dir = os.path.join(CACHE_DIR, "%06d"%self.id)
+        #import pdb; pdb.set_trace()
+        local_dir = os.path.join(CACHE_DIR, "%06d" % self.id)
         try:
             os.makedirs(local_dir)
         except OSError:

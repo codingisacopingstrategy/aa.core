@@ -21,7 +21,7 @@ from aacore.utils import url_for_pagename
 import urlparse
 
 
-def make_link(rel, target, label, default_link_rel=None):
+def make_link(rel, target, label, default_link_rel=None, filter_=None):
     """
     Custom implementation of the SemanticWikilinks make_link function.
     Returns ElementTree Element. 
@@ -38,7 +38,8 @@ def make_link(rel, target, label, default_link_rel=None):
         a.set('rel', rel)
     elif default_link_rel:
         a.set('rel', default_link_rel)
-
+    if filter_:
+        a.set('data-filter', filter_)
     return a
 
 

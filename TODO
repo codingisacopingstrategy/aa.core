@@ -65,3 +65,5 @@ A nice sniffer: `file`:
 - bug with the layer palette
 - zoom filter to reimplement
 - how to change the embed wrapper? how to execute script loaded in ajax?
+
+- metadata that says if it plays automatically or not
