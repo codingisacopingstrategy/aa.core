@@ -24,6 +24,7 @@ import feedparser
 from django.shortcuts import (render_to_response, redirect, get_object_or_404)
 from django.http import (HttpResponse, HttpResponseRedirect)
 from django.template import (RequestContext, Template, Context)
+from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.conf import settings as projsettings
@@ -121,6 +122,7 @@ def embed (request):
     Receives a request with parameters URL and filter.
     Returns a JSON containing content of the embed.
     """
+    #import pdb; pdb.set_trace()
     url = request.REQUEST.get("url")
     # ALLOW (authorized users) to trigger a resource to be added...
     model = get_rdf_model()
@@ -133,6 +135,8 @@ def embed (request):
     if filterstr and not filterstr.startswith("http:"):
         filters = [x.strip() for x in filterstr.split("|")]
         rendered = ""
+        #import pdb; pdb.set_trace();
+        fpath = None
         for fcall in filters:
             if ":" in fcall:
                 (fname, fargs) = fcall.split(":", 1) 
@@ -141,7 +145,10 @@ def embed (request):
                 fargs = ""
             f = get_filter_by_name(fname)
             if f:
-                rendered = f(fargs, url, rendered, rdfmodel=model)
+                (tpath, rendered) = f(fargs, url, rendered, rdfmodel=model, fpath=fpath)
+                fpath = tpath
+            else:
+                rendered = "<p>The filter named \"%s\" doesn't exist! Please fix you markup</p>" % fname
     else:
         embeds = get_embeds(url, model, request)
         if len(embeds):
@@ -435,7 +442,8 @@ def page_edit(request, slug):
                 context['form'] = PageEditForm(initial={"content": context['content']})
         else:
             context['name'] = name  # So templates nows about what page we are editing
-            context['form'] = PageEditForm(initial={"content": '# First section {: style="top: 30px; left: 30px;" }'})
+            rendered = render_to_string("aacore/partials/initial_page_content.md")
+            context['form'] = PageEditForm(initial={"content": rendered})
         
         return render_to_response("aacore/page_edit.html", context, \
                 context_instance=RequestContext(request))
@@ -614,18 +622,37 @@ def path_to_url (p):
         return full_site_url(projsettings.MEDIA_URL + p[len(projsettings.MEDIA_ROOT):])
     return p
 
-def thumbnail_filter (fargs, res, cur, rdfmodel=None):
+def bw_filter (fargs, res, cur, rdfmodel=None, fpath=None):
+    #import pdb; pdb.set_trace()
+    if not fpath:
+        fpath = Resource.objects.get(url=res).get_local_file()
+        (dname, fname) = os.path.split(fpath)
+        tpath = os.path.join(dname, "bw.jpg")
+    else:
+        tpath = fpath + "|bw.jpg"
+    if not os.path.exists(tpath):
+        cmd = 'convert -colorspace gray "%s" "%s"' % (fpath, tpath)
+        os.system(cmd)
+    return (tpath, '<img src="%s" />' % path_to_url(tpath))
+
+
+def thumbnail_filter (fargs, res, cur, rdfmodel=None, fpath=None):
+    #import pdb; pdb.set_trace()
+    import re
     sizepat = re.compile(r"(?P<width>\d+)px", re.I)
     m = sizepat.search(fargs)
     if m:
         width = m.groupdict()['width']
-        fpath = res.get_local_file()
-        (dname, fname) = os.path.split(fpath)
-        tpath = os.path.join(dname, "thumbnail_%dpx.jpg" % width)
+        if not fpath:
+            fpath = Resource.objects.get(url=res).get_local_file()
+            (dname, fname) = os.path.split(fpath)
+            tpath = os.path.join(dname, "thumbnail_%spx.jpg" % width)
+        else:
+            tpath = fpath + "|thumbnail_%spx.jpg" % width
         if not os.path.exists(tpath):
-            cmd = 'convert -resize %dx "%s" "%s"' % (width, fpath, tpath)
+            cmd = 'convert -resize %sx "%s" "%s"' % (width, fpath, tpath)
             os.system(cmd)
-        return '<img src="%s" />' % path_to_url(tpath)
+        return (tpath, '<img src="%s" />' % path_to_url(tpath))
 
 
 import urlparse, html5lib, urllib2, lxml.cssselect
@@ -652,7 +679,9 @@ def xpath_filter (fargs, url, cur, rdfmodel=None):
         return None
 
 def get_filter_by_name (n):
-    if n == "thumbnail":
+    if n == "bw":
+        return bw_filter
+    elif n == "thumbnail":
         return thumbnail_filter
     elif n == "xpath":
         return xpath_filter

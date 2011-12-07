@@ -44,19 +44,20 @@ Todo:
 import markdown
 import re
 
-wikilink_pattern = r"""
-\[\[\s*
-    (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
-    (?P<target>.+?) \s*
-    (?:\| \s* (?P<label>[^\]]+?) \s*)?
-\]\](?!\])
-""".strip()
+#wikilink_pattern = r"""
+#\[\[\s*
+    #(?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
+    #(?P<target>.+?) \s*
+    #(?:\| \s* (?P<label>[^\]]+?) \s*)?
+#\]\](?!\])
+#""".strip()
 
 wikilink_pattern = r"""
 \[\[\s*
     (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
     (?P<target>.+?) \s*
-    (?:\| \s* (?P<label>.+?) \s*)?
+    (?:\|[^\|] \s* (?P<label>.+?) \s*)?
+    (?:\|\| \s* (?P<filter>.+?) \s*)?
 \]\](?!\])
 """.strip()
 
@@ -69,7 +70,7 @@ wikilink_pattern = r"""
     </a>
 """
 
-def make_link (rel, target, label, default_link_rel=None):
+def make_link (rel, target, label, default_link_rel=None, filter_=None):
     a = markdown.util.etree.Element('a')
     a.set('href', target)
     a.text = label or target
@@ -77,6 +78,8 @@ def make_link (rel, target, label, default_link_rel=None):
         a.set('rel', rel)
     elif default_link_rel:
         a.set('rel', default_link_rel)
+    if filter_:
+        a.set('data-filter', filter_)
     return a
 
 class WikiLinkExtension(markdown.Extension):
@@ -116,7 +119,9 @@ class WikiLinkPattern(markdown.inlinepatterns.Pattern):
         rel = d.get("rel")
         if rel:
             rel = "%s:%s" % (namespace, d.get("rel"))
-        return fn(rel, d.get("target"), d.get("label"), self.config['default_link_rel'][0])
+        filter_ = d.get("filter")
+        return fn(rel, d.get("target"), d.get("label"), 
+                  self.config['default_link_rel'][0], filter_=filter_)
 
 def makeExtension(configs={}) :
     return WikiLinkExtension(configs=configs)
