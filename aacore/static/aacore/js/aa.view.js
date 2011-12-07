@@ -139,7 +139,7 @@ function resetTimelines() {
     timelinesByURL = {};
     function timelineForURL(url) {
         if (timelinesByURL[url] === undefined) {
-            var driver = $("video[href='"+url+"'],video[src='"+url+"']").first();
+            var driver = $("video[src='"+url+"'],audio[src='"+url+"']").first();
             if (driver) {
                 driver = driver.get(0);
                 timelinesByURL[url] = driver;
