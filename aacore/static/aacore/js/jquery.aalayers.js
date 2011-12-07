@@ -73,7 +73,7 @@
         $(data.selector).sort_by_zindex({reverse: true})
             .each(function() {
                 var $this = $(this);
-                var $h1 = $this.find('h1:first');
+                var $h1 = $this.find('h1:first').clone();
                 var $li = $('<li></li>');
 
                 var $input = $('<input type="checkbox" name="some_name" value="bla"/>')
@@ -94,7 +94,13 @@
                     .attr('target', '_blank')
                     .css('float', 'right');
 
-                $li.append($input, export_link)
+                var import_link = $("<a>").text("↶")
+                    .attr('title', 'import from audacity markers')
+                    .attr('href', './annotations/' + $this.attr('data-section') + '/import')
+                    //.attr('target', '_blank')
+                    .css('float', 'right');
+
+                $li.append($input, import_link, export_link)
                     .append($label);
                 data.$container.find('ul').append($li);
             });

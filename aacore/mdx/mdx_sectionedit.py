@@ -109,10 +109,15 @@ def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     return sections
 
 
-def sectionalize_replace (originaltext, sectionnumber, sectiontext):
+def sectionalize_replace (originaltext, sectionnumber, sectiontext, keep_header=False):
+    #import pdb;pdb.set_trace()
     sections = sectionalize(originaltext)
     pre = originaltext[:sections[sectionnumber]['start']]
     post = originaltext[sections[sectionnumber]['end']:]
+    #if keep_header:
+        #pattern = re.compile(HASH_HEADER % "1,10", re.I | re.M | re.X)
+        #if pattern:
+            #sectiontext = pattern.match(sections[sectionnumber]).group() + "\n\n" + sectiontext
     return pre + sectiontext + post
 
 

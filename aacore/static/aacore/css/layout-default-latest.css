@@ -84,7 +84,7 @@
  */
 .ui-layout-toggler {
 	/*border: 1px solid #BBB; [> match pane-border <]*/
-	background-color: gray;
+        background-color: lightgray;
 	}
 	.ui-layout-resizer-hover .ui-layout-toggler {
 		opacity: .60;
@@ -92,7 +92,7 @@
 	}
 	.ui-layout-toggler-hover , /* need when NOT resizable */
 	.ui-layout-resizer-hover .ui-layout-toggler-hover { /* need specificity when IS resizable */
-		background-color: red;
+		background-color: gray;
 		opacity: 1.00;
 		filter:  alpha(opacity=100);
 	}
@@ -103,6 +103,13 @@
 	.ui-layout-toggler-west ,
 	.ui-layout-toggler-east {
 		/*border-width: 1px 0; [> top/bottom borders <]*/
+        margin-top: 10px!important;
+	}
+	.ui-layout-toggler-west {
+        -moz-border-radius-topright: 6px 6px;
+        border-top-right-radius: 6px 6px;
+        -moz-border-radius-bottomright: 6px 6px;
+        border-bottom-right-radius: 6px 6px;
 	}
 	/* hide the toggler-button when the pane is 'slid open' */
 	.ui-layout-resizer-sliding  ui-layout-toggler {
@@ -112,10 +119,11 @@
 	 *	style the text we put INSIDE the togglers
 	 */
 	.ui-layout-toggler .content {
-		color:			#666;
-		font-size:		12px;
+		color:			white;
+		font-size:		18px;
 		font-weight:	bold;
 		width:			100%;
-		padding-bottom:	0.35ex; /* to 'vertically center' text inside text-span */
+        /*line-height: 24px;*/
+        padding-top:	2px; /* to 'vertically center' text inside text-span */
 	}
 

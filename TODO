@@ -13,6 +13,7 @@
     * Be able to revert a page
 * rev doesn't work
 - layer palette doesn't refresh
+- list pages filter ?
 
 
 ## Low priority
@@ -51,4 +52,16 @@ configure serve to serve best html5 video/audio
 - Still a problem with non consecutive header levels...
 - embed webpages = iframe?
 
+A nice sniffer: `file`:
 
+    ➜  ~  file /tmp/marqueurs.txt    
+    /tmp/marqueurs.txt: ASCII English text, with very long lines
+
+
+
+- annotation negative position happens when one rescales the annotation "outside" the screen.
+- help to update with embed
+- manual to update
+- bug with the layer palette
+- zoom filter to reimplement
+- how to change the embed wrapper? how to execute script loaded in ajax?
