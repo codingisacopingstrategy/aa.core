@@ -24,6 +24,7 @@ import feedparser
 from django.shortcuts import (render_to_response, redirect, get_object_or_404)
 from django.http import (HttpResponse, HttpResponseRedirect)
 from django.template import (RequestContext, Template, Context)
+from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.conf import settings as projsettings
@@ -435,7 +436,8 @@ def page_edit(request, slug):
                 context['form'] = PageEditForm(initial={"content": context['content']})
         else:
             context['name'] = name  # So templates nows about what page we are editing
-            context['form'] = PageEditForm(initial={"content": '# First section {: style="top: 30px; left: 30px;" }'})
+            rendered = render_to_string("aacore/partials/initial_page_content.md")
+            context['form'] = PageEditForm(initial={"content": rendered})
         
         return render_to_response("aacore/page_edit.html", context, \
                 context_instance=RequestContext(request))
