@@ -163,14 +163,15 @@ article {
     margin-top: 2em;
 }
 a {
-    color: Blue;
-    text-decoration: none;
-    /*border-bottom: 1px solid MediumSpringGreen;*/
+    color: inherit;
+    /*text-decoration: none;*/
+    /*border-bottom: 1px dotted black;*/
 }
 
 a:hover {
     /*border-bottom: 0px solid MediumSpringGreen;;*/
-    background-color: MediumSpringGreen;
+    background-color: Black;
+    color: white;
 }
 a.edit {
     color: white;
@@ -369,12 +370,52 @@ nav#east-pane ul.ui-sortable input[type=checkbox] {
 }
 
 nav#west-pane {
-    font-weight: normal
-    
+    font-weight: normal;
+    font-size: 18px;
+    font-family: serif;
+    -webkit-box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.1);
+    background-color: white;
 }
-nav#west-pane pre code {
-    
+nav#west-pane h1 {
+    margin: 0 15% 0 15%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 24px;
+    text-align: center;
+    text-decoration: none;
 }
+nav#west-pane hr {
+    color: black;
+    background-color: black;
+    height: 1px;
+    border: 0;
+    width: 30%;
+}
+
+nav#west-pane ul#toolbar {
+    text-align: center;
+    /*margin: 0 15%;*/
+}
+nav#west-pane ul#toolbar li {
+    display: inline-block;
+    list-style-type: none;
+    font-size: 13px;
+}
+nav#west-pane ul#toolbar li:before {
+    content: " • "
+}
+nav#west-pane ul#toolbar li:first-child:before {
+    content: ""
+}
+nav#west-pane ul#toolbar li a {
+    text-decoration: none;
+}
+nav#west-pane p {
+    text-indent: 2em;
+}
+
 .active {
     background: yellow;
 }

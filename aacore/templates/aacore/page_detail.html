@@ -18,31 +18,47 @@
 
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
 
-{% for css in extra_css %}
+
+{% get_markdown_for content as md meta %}
+{% for css in meta.extra_css %}
 <link rel="stylesheet" href="{{ css }}" type="text/css" media="screen" charset="utf-8" />
 {% endfor %}
 {% endblock %}
 
 {% block body %}
-<nav id="toolbar">
-    <ul>
-        {% if page %}
-        <li><a title="home" href="/pages/Index/">☗</a></li>
-        <li><a title="history" href="{{ page.get_history_url }}">↫</a></li>
-        <li><a title="edit" href="{{ page.get_edit_url }}">✎</a></li>
-        <li><a title="add" href="#">+</a></li>
-        <li><a title="commit" href="#">★</a></li>
-        <li><a title="menu" href="#">⚙</a></li>
-        {% endif %}
-    </ul>
-</nav>
 
 <article>
-    {{ content|aamarkdown|safe }}
+    {% get_markdown_for content as md meta %}
+    {{ md|safe }}
 </article>
 {% endblock %}
 
 {% block postbody %}
+<nav id="west-pane" class="ui-layout-west" style="display: none; text-align: left;"> 
+    <ul id="toolbar">
+        {% if page %}
+        <!--<li><a title="home" href="/pages/Index/">☗</a></li>-->
+        <li><a title="history" href="{{ page.get_history_url }}">View History</a></li>
+        <li><a title="edit" href="{{ page.get_edit_url }}">Edit Page</a></li>
+        <li><a title="add" href="#">Add Annotation</a></li>
+        <li><a title="commit" href="#">Save Version</a></li>
+        <!--<li><a title="menu" href="#">⚙</a></li>-->
+        {% endif %}
+    </ul>
+    <hr />
+    {% get_markdown_for content as md meta %}
+    <h1>{{ meta.title|first }}</h1>
+    <hr />
+    {% for summary in meta.summary %}
+        {% get_markdown_for summary as md meta %}
+        {{ md|safe }}
+    {% endfor %}
+
+<!--Amos Hetz was one of the artists that was to feature in the portfolio of WHAT’S THE SCORE NOW in Multitudes 2005. Yet, because of time pressure his contribution could not be included. Now, in the frame of the expanded republication of this issue, Amos Hetz can finally appear. He developed a long standing expertise in the field of notation and score-based work.-->
+
+<!--The core element of his contribution to Oral Site consists in the so far unpublished text The notated Gesture, a text that Amos Hetz wrote in 2010 on the subject of his practice of drawing and dance making (often using scores and notation). At first, these two practices unfolded parallel to one another, until they started intertwining in more recent works.-->
+<!--The Notated Gesture is accompanied by a selection of visuals of scores, notations, diagrams and maps selected by Amos Hetz.-->
+</nav>
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>
         <li><a title="Layers" href="#tabs-2">&#8738;</a></li>

@@ -327,18 +327,36 @@ $(document).ready(function() {
     $('body').layout({
         applyDefaultStyles: false,
         enableCursorHotkey: false,
+        west: {
+            size: 350,
+            fxSpeed: "slow",
+            initClosed: false,
+            enableCursorHotkey: false,
+            slidable: false,
+            resizable: false,
+            togglerAlign_closed : 'top',
+            togglerAlign_open : 'top',
+            togglerContent_open: '⚙',
+            togglerContent_closed: '⚙',
+            spacing_closed: 18,
+            spacing_open: 18,
+            togglerLength_open: 24,
+            togglerLength_closed: 24,
+        },
         east: {
-            size: 360,
+            size: 350,
             fxSpeed: "slow",
             initClosed: true,
             enableCursorHotkey: false,
+            slidable: false,
         },
         south: {
             fxName: "slide",
             fxSpeed: "slow",
-            size: 200,
+            size: 350,
             initClosed: true,
             enableCursorHotkey: false,
+            slidable: false,
         }           
     });
     

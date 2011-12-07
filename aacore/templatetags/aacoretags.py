@@ -31,6 +31,38 @@ def escape_newlines(value):
     #return value.encode('unicode-escape')
     return value.replace('\n', r'\n')
 
+
+from aacore.mdx import get_markdown
+
+class MarkdownConvertor(template.Node):
+    def __init__(self, value, var_name, meta_name):
+        self.value = template.Variable(value)
+        self.var_name = var_name
+        self.meta_name = meta_name
+    def render(self, context):
+        md = get_markdown()
+        html = md.convert(self.value.resolve(context))
+        context[self.var_name] = html
+        context[self.meta_name] = md.Meta
+        return ''
+
+import re
+def do_get_markdown_for(parser, token):
+    # This version uses a regular expression to parse tag contents.
+    try:
+        # Splitting by None == splitting by spaces.
+        tag_name, arg = token.contents.split(None, 1)
+    except ValueError:
+        raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
+    m = re.search(r'(.*?) as (\w+) (\w+)', arg)
+    if not m:
+        raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
+    format_string, var_name, meta_name = m.groups()
+    return MarkdownConvertor(format_string, var_name, meta_name)
+
+register.tag('get_markdown_for', do_get_markdown_for)
+
+
 @register.filter
 @stringfilter
 def aamarkdown (value):
