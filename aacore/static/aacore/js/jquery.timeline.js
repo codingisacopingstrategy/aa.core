@@ -40,7 +40,7 @@ function zeropostpad (n, toplaces) {
 }
 
 /**
- * Converts a timecode to seconds.  Seeks and returns first timecode pattern
+ * Converts a timecode to seconds (float).  Seeks and returns first timecode pattern
  * and returns it in secs nb:.  Timecode can appear anywhere in string, will
  * only convert first match.  
  * @private
@@ -484,7 +484,7 @@ var methods = {
                 $(this).data('timeline', data);
             }
             // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
-            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime})
+            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime});
             $this.bind("timeupdate", function (evt, controller) {
                 // console.log("timeline: timeupdate", evt);
                 // allow a wrapped getCurrentTime for the element (via playable?)
