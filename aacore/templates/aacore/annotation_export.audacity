@@ -1,3 +1,2 @@
-{% load aacoretags %}{% for section in sections %}{{ section.start }} {{ section.end }} {{ section.body|escape_plain }}
-{% endfor %}{% for section in foo %}{{ section.start }} {{ section.end }} {{ section.body|escape_plain }}
+{% load aacoretags %}{% for section in sections %}{{ section.start }} {{ section.end }} {{ section.body|escape_newlines }}
 {% endfor %}

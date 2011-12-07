@@ -33,11 +33,12 @@ from django.contrib.sites.models import Site
 from aacore.spider import spider
 #from plugins import sniffer
 from models import *
-from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename, convert_line_endings, pagename_for_url, add_resource)
+from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename,
+                   convert_line_endings, pagename_for_url, add_resource)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 import rdfutils
-from forms import PageEditForm
+from forms import (PageEditForm, AnnotationImportForm)
 
 
 #### RDFSource
@@ -228,37 +229,92 @@ def resource_sniff (request, id):
 ############################################################
 # WIKI
 
-def annotation_export(request, slug, section, _format="audacity"):
+def annotation_import(request, slug, section):
+    """
+    Saves the file directly from the request object.
+    Disclaimer:  This is code is just an example, and should
+    not be used on a real website.  It does not validate
+    file uploaded:  it could be used to execute an
+    arbitrary script on the server.
+    """
+    context = {}
+    if request.method == 'POST':
+        form = AnnotationImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            f = request.FILES['file']
+            data = ""
+            for chunk in f.chunks():
+                data += chunk
+            print(data)
+            return HttpResponse("Import complete, close this window and reload the page")
+    else:
+        form = AnnotationImportForm()
+        context['form'] = form
+        return render_to_response("aacore/annotation_import.html", context, 
+                                  context_instance=RequestContext(request))
+
+
+#def annotation_import(request, slug, section, format_="audacity"):
+    #if request.method == "POST":
+        #form = AnnotationUploadForm(request.POST),
+        #import pdb; pdb.set_trace()
+        #if form.is_multipart():
+            #annotation = form.cleaned_data['annotation']
+            #print(annotation)
+        ##print(request.FILES['annotation'])
+        ##annotation = request.FILES.get(request.POST.get('annotation'))
+        ##print(annotation)
+        #context = {
+            #'form': AnnotationUploadForm(),
+        #}
+        #return render_to_response("aacore/annotation_import.html", context, 
+                                  #context_instance=RequestContext(request))
+    #elif request.method == "GET":
+        #context = {
+            #'form': AnnotationUploadForm(),
+        #}
+        #return render_to_response("aacore/annotation_import.html", context, 
+                                  #context_instance=RequestContext(request))
+    
+
+
+def annotation_export(request, slug, section, _format="audacity",
+                      force_endtime=False):
+    import re
+    from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
+    from timecode import timecode_tosecs
+
     context = {}
     name = dewikify(slug)
     page = Page.objects.get(name=name)
 
-    sections = sectionalize(page.content)
-    sectiondict = sections[int(section)]
-
-    sections = sectionalize(sectiondict['header'] + sectiondict['body'])
-    print sections
-
-    context['sections'] = sections
-
-    context['foo'] = []
-
-    import re
-    from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
+    section = sectionalize(page.content)[int(section)]
     pattern = re.compile(TIMECODE_HEADER, re.I | re.M | re.X)
-    for header, body, start, end in spliterator(pattern, sectiondict['header'] + sectiondict['body'], returnLeading=0):
-        p = r"((?P<hours>\d\d):)?(?P<minutes>\d\d):(?P<seconds>\d\d)(?P<milliseconds>[,.]\d{1,3})?"
-        bar = re.search(p, header)
-        hours = int(bar.groupdict()['hours'])
-        minutes = int(bar.groupdict()['minutes'])
-        seconds = int(bar.groupdict()['seconds'])
-        print(hours, minutes, seconds)
-        context['foo'].append({'start': start, 'end': end, 'body': body})
-        
 
+    stack = []
+    for t in spliterator(pattern, section['header'] + section['body'], 
+                         returnLeading=0):
+        m = pattern.match(t[0]).groupdict()
 
-    c = RequestContext(request)
-    return render_to_response("aacore/annotation_export.audacity", context, context_instance=RequestContext(request), mimetype="text/plain;charset=utf-8")
+        if force_endtime:
+            if len(stack) and stack[-1]['end'] == '':
+                stack[-1]['end'] = timecode_tosecs(m['start'])
+            end = timecode_tosecs(m['end']) or ''
+        else:
+            end = timecode_tosecs(m['end']) or timecode_tosecs(m['start'])
+
+        stack.append({
+            'start': timecode_tosecs(m['start']),
+            'end': end,
+            'body': t[1].strip('\n'),
+        })
+
+    context = {'sections': stack}
+
+    return render_to_response("aacore/annotation_export.audacity", context, 
+                              context_instance=RequestContext(request), 
+                              mimetype="text/plain;charset=utf-8")
+
 
 def page_detail(request, slug):
     """

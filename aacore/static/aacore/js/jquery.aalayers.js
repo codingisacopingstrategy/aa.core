@@ -82,8 +82,19 @@
                         data.post_toggle.apply(data.container, [event, data, $this]);
                     });
 
-                var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.text() + '</a></label>');
-                $li.append($input)
+                var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.find('span').remove().end().text() + '</a></label>');
+                //var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.text() + '</a></label>');
+                //var $label = $('<label>').attr('for', 'name').append(
+                        //$('a').attr('href', '#' + $this.attr('id')).text($h1.text())
+                    //);
+
+                var export_link = $("<a>").text("↷")
+                    .attr('title', 'export to audacity markers')
+                    .attr('href', './annotations/' + $this.attr('data-section'))
+                    .attr('target', '_blank')
+                    .css('float', 'right');
+
+                $li.append($input, export_link)
                     .append($label);
                 data.$container.find('ul').append($li);
             });
