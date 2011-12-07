@@ -401,7 +401,12 @@ var aTimeline = function (options) {
         if (settings.setCurrentTime) {
             for (tid in activeItems) {
                 var elt = activeItems[tid];
-                settings.setCurrentTime(elt.elt, time-elt.start, controller); 
+                // console.log("timeline.setCurrentTime", elt.elt, controller);
+                if (elt.elt !== controller) {
+                    settings.setCurrentTime(elt.elt, time-elt.start, controller); 
+                } else {
+                    // console.log("SKIPPING");
+                }
             }
         }
 
@@ -491,10 +496,12 @@ var methods = {
                 var ct = opts.currentTime(elt);
                 // console.log("timeline: timeupdate", evt.target, ct);
                 data.timeline.setCurrentTime(ct, controller);
+                return true;
             });
         });
     },
     destroy : function( ) {
+        // console.log("timeline.destroy", this);
         return this.each(function(){
             var $this = $(this),
             data = $this.data('timeline');
@@ -513,6 +520,7 @@ var methods = {
             return data.timeline.getCurrentTime();
         } else {
             data.timeline.setCurrentTime(t);
+            // $(this.elt).trigger("updatetime");
             return this;
         }
     },
@@ -538,6 +546,18 @@ var methods = {
             // if (end) end = datetimecode_parse(end, start);
             if (options.debug) console.log("add", this, start, end);
             data.timeline.add(this, start, end, options.show, options.hide);
+
+            // NEW (Dec 2011) Watch added elements for timeupdate events
+            $(this).bind("timeupdate", function (e) {
+                // console.log("NEW timeline.timeupdate", this, e);
+                var sectionTime = $(this).data("currentTime");
+                // console.log("timeupdate", sectionTime, start);
+                var newDate = new Date();
+                newDate.setTime(start.getTime() + (sectionTime*1000));
+                data.timeline.setCurrentTime(newDate, this);
+                // data.timeline.setCurrentTimeFromChild(this, );
+                return false;
+            });
         });
         // console.log("end of add");
         return this;

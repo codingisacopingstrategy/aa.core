@@ -132,6 +132,14 @@ function resetTimelines() {
             var start = $.datetimecode_parse($(elt).attr("data-start"));
             var end = $(elt).attr("data-end");
             if (end) { return $.datetimecode_parse(end, start); }
+        },
+        setCurrentTime: function (elt, t) {
+            // console.log("body.timeline.setCurrentTime", t);
+            // shoot a setCurrentTime "event" to any contained player
+            // $(".aaplayer", elt).aaplayer("setCurrentTime", (t/1000));
+            try { $("audio,video", elt).get(0).currentTime = (t/1000); }
+            catch (e) {};
+
         }
     });
 
@@ -146,7 +154,7 @@ function resetTimelines() {
                 // console.log("timelinesByURL", url, driver);
                 $(driver).timeline({
                     show: function (elt) {
-                        console.log("timelinesByURL, show", elt);
+                        // console.log("timelinesByURL, show", elt);
                         $(elt).addClass("active")
                             .closest('section.section1')
                                .find('div.wrapper:first')
@@ -174,6 +182,7 @@ function resetTimelines() {
             $(timeline).timeline("add", this);
         }
     });
+
 
     /*    debuggin
     var start = $("body").timeline("minTime");
@@ -365,6 +374,24 @@ $(document).bind("refresh", function (evt) {
             commit_attributes(s1);
         }
     });
+
+
+    // Timeupdate Propagation
+    $(context).ffind("audio,video").bind("timeupdate", function (e) {
+        var ct = $(this).get(0).currentTime;
+        var containingtimedsection = $(this).closest("*[data-start]");
+        // console.log("timeupdate", containingtimedsection, ct);
+        if (containingtimedsection) {
+            $(containingtimedsection).data("currentTime", ct);
+            $(containingtimedsection).trigger("timeupdate");
+        }
+        // need to get the containing (parent) timeline of this section
+        // or simply ASSERT the "currentTime" of this section in a way that it's parent timeline reponds to
+        // (and which does NOT cycle the child time back)
+        // parent.setTimeFromChild(elt, t) --> or via a timeupdate event 
+    });
+
+
 });
 
 $(document).ready(function() {
@@ -510,7 +537,7 @@ $(document).ready(function() {
     // TIMELINE
     function updatetimeFromSlider (elt) {
         var v = $(elt).slider("option", "value");
-        var d = $("body").data("datetime");
+        var d = $("body").data("currentTime");
         var start = $("body").timeline("minTime");
         var end = $("body").timeline("maxTime");
         var curTime = start.getTime() + ((end - start) * (v/100000));
@@ -523,6 +550,14 @@ $(document).ready(function() {
         // console.log("newtime", d);
         return d;
     }
+    $("body").bind("timeupdate", function () {
+        var ct = $("body").data("currentTime");
+        var start = $("body").timeline("minTime");
+        var end = $("body").timeline("maxTime");
+        var v =  (ct / (end - start)) * 100000;
+        console.log("body.timeupdate", ct, v);
+        $(elt).slider("option", "value", v);
+    });
     $('#timelineslider').slider({
         max: 100000,
         start: function(e) {
