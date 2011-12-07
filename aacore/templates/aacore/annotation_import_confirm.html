@@ -1,0 +1,11 @@
+{% extends "aacore/base_wiki.html" %}
+
+{% block body %}
+<form method="post" enctype="multipart/form-data"
+      action="{{ page.get_edit_url }}">{% csrf_token %}
+    <input type="hidden" name="keep_header" value="1" />
+    <input type="hidden" name="section" value="{{ section }}" />
+    <p><textarea rows="24" cols="80" name="content">{{ content }}</textarea></p>
+    <p><input type="submit" value="upload" /></p>
+</form>
+{% endblock %}
