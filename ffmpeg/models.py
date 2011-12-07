@@ -71,7 +71,7 @@ class Media (models.Model):
             elif self.audio_channels == 2:
                 return "stereo"
             else:
-                return "{0} channels".format(self.audio_channels)
+                return "%d channels" % self.audio_channels
 
     def sync(self, info=None):
         if info == None:

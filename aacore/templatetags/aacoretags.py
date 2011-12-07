@@ -156,7 +156,7 @@ def rdfbrowselink (node):
     """ filter by aa-resource """
     if node.is_resource():
         uri = str(node.uri)
-        return mark_safe('<a href="{0}" title="{2}">{1}</a>'.format(browseurl(uri), compacturl(uri), uri))
+        return mark_safe('<a href="%s" title="%s">%s</a>' % (browseurl(uri), uri, compacturl(uri)))
     elif node.is_literal():
         literal = node.literal_value.get("string")
 #        return literal
@@ -175,7 +175,7 @@ def rdfrellink (node):
     if node.is_resource():
         uri = str(node.uri)
         link = reverse('aa-browse') + "?" + urllib.urlencode({'uri': uri})
-        return mark_safe('<a href="{0}" title="{2}">{1}</a>'.format(link, compacturl(uri), uri))
+        return mark_safe('<a href="%s" title="%s">%s</a>' % (link, uri, compacturl(uri)))
     elif node.is_literal():
         literal = node.literal_value.get("string")
 #        return literal
@@ -325,7 +325,7 @@ import datetime
 @register.filter
 def iso8601_date (date):
     if type(date) == datetime.datetime:
-        return "{0:04d}-{1:02d}-{2:02d}".format(date.year, date.month, date.day)
+        return "%04d-%02d-%02d" % (date.year, date.month, date.day)
     else:
         return date
 

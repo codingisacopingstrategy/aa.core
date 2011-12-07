@@ -11,6 +11,11 @@ A Timeline has a notion of a currentTime, and manages hiding / showing (via a ca
 Timelines follow the element's "timeupdate" events.
 A Timeline may also be passive and require an external element to "drive" it via calls to setCurrentTime.
 
+Nov 2011: Changed to use Date objects.
+provides timecode_parse, datetimecode_parse but doesn't require one or the other.
+custom start, end functions should parse the given date as necessary
+
+
 */
 
 ////////////////////////////////////////////////////////////////////
@@ -35,7 +40,7 @@ function zeropostpad (n, toplaces) {
 }
 
 /**
- * Converts a timecode to seconds.  Seeks and returns first timecode pattern
+ * Converts a timecode to seconds (float).  Seeks and returns first timecode pattern
  * and returns it in secs nb:.  Timecode can appear anywhere in string, will
  * only convert first match.  
  * @private
@@ -130,6 +135,45 @@ function timecode_tosecs_attr(val) {
     return val;
 }                        
 
+// yyyy-mm-dd HH:MM:SS,ms
+// 1    2  3  4  5  6  7
+datetimecode_pat = /^(?:(?:(\d\d\d\d)-(\d\d)-(\d\d))?[ T]?(\d\d):)(\d\d)(?::(\d\d))?(?:,(\d{1,3}))?$/;
+// Date is optional (defaults to current day)
+// Seconds & Milliseconds optional.
+
+function datetimecode_parse (str, defaultDate) {
+    // defaultDate == undefined : uses new Date() (ie NOW)
+    // returns javascript Date object
+    r = str.match(datetimecode_pat);
+
+    if (r) {
+        // console.log("datetimecode_parse, match", r);
+        var year, month, date;
+        if (r[1] && r[2] && r[3]) {
+            // console.log("parsing datetime with date");
+            year = parseInt(r[1], 10);
+            month = parseInt(r[2], 10) - 1;
+            date = parseInt(r[3], 10);
+        } else {
+            if (!defaultDate) { defaultDate = new Date() }
+            year = defaultDate.getFullYear();
+            month = defaultDate.getMonth();
+            date = defaultDate.getDate();
+        }
+        var hour, minute, second, millis;
+        hour = parseInt(r[4], 10);
+        minute = parseInt(r[5], 10);
+        second = r[6] ? parseInt(r[6], 10) : 0;
+        millis = r[7] ? parseInt(r[7], 10) : 0;
+        // console.log(year, month, date, hour, minute, second, millis);
+        return new Date(year, month, date, hour, minute, second, millis);
+    } else {
+        return null;
+    }
+}
+$.datetimecode_parse = datetimecode_parse;
+
+
 // export
 /**
  * Converts a timecode to seconds.  Seeks and returns first timecode pattern
@@ -204,6 +248,7 @@ var aTimeline = function (options) {
         return that;
     };
 
+    var minTime, maxTime;
     var currentTime = 0.0;
     var titlesByStart = [];
     var titlesByEnd = [];
@@ -216,6 +261,11 @@ var aTimeline = function (options) {
     
     function addTitle (newtitle) {
         // addTitleByStart
+        /* maintain min/maxTime */
+        if ((minTime == undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
+        if ((maxTime == undefined) || (newtitle.start > maxTime)) { maxTime = newtitle.start; }
+        if ((maxTime == undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
+
         /* insert annotation in the correct (sorted) location */
         var placed = false;
         for (var i=0; i<titlesByStart.length; i++) {
@@ -276,12 +326,13 @@ var aTimeline = function (options) {
         }
     }
 
-    function updateForTime (time) {
+    function updateForTime (time, controller) {
         if (titlesByStart.length === 0) { return; }
         var n;
         /* check against lastTime to optimize search */
         // valid range for i: -1            (pre first title)
         // to titles.length-1 (last title), can't be bigger, as this isn't defined (when would it go last -> post-last)
+        // console.log("updateForTime", time, lastTime);
         if (time < lastTime) {
             // SLIDE BACKWARD
             //
@@ -315,7 +366,14 @@ var aTimeline = function (options) {
             }    
         }
         // if (this.startIndex != si) this.setStartIndex(si);
-        lastTime = time;
+
+        // COPY lastTime (if Date)
+        if (time instanceof Date) {
+            lastTime = new Date();
+            lastTime.setTime(time.getTime());
+        } else {
+            lastTime = time;
+        }
 
         // perform show/hides
         var clearFlag = false;
@@ -338,12 +396,12 @@ var aTimeline = function (options) {
         }
         if (clearFlag) { toHide = {}; }
 
-        /* setCurrentTime */
+        /* setCurrentTime : MM: new NOV 2011 */
         // console.log("setCurrentTime", settings);
         if (settings.setCurrentTime) {
             for (tid in activeItems) {
                 var elt = activeItems[tid];
-                settings.setCurrentTime(elt.elt, time-elt.start); 
+                settings.setCurrentTime(elt.elt, time-elt.start, controller); 
             }
         }
 
@@ -351,12 +409,14 @@ var aTimeline = function (options) {
     }
 
     function add (thing, start, end, itemshow, itemhide) {
+        /*
         if (typeof(start) == "string") {
-            start = $.timecode_tosecs(start);
+            start = $.datetimecode_parse(start);
         }
         if (typeof(end) == "string") {
-            end = $.timecode_tosecs(end);
+            end = $.datetimecode_parse(end);
         }
+        */
         // do some sanity checking
         if (start === undefined) { return "no start time"; }
         if (end && (end < start)) { return "end is before start"; }
@@ -375,14 +435,15 @@ var aTimeline = function (options) {
     }
     that.add = add;
 
-    function setCurrentTime (ct, controller) {
+    function setCurrentTime (ct, evt_controller) {
         currentTime = ct;
-        updateForTime(ct);
+        updateForTime(ct, evt_controller);
     }
     that.setCurrentTime = setCurrentTime;
+    that.getCurrentTime = function () { return currentTime; };    
+    that.getMinTime = function () { return minTime; }
+    that.getMaxTime = function () { return maxTime; }
 
-    that.getCurrentTime = function () { return currentTime; };
-    
     function debug () {
         $.log("titlesByStart");
         for (var i=0; i<titlesByStart.length; i++) {
@@ -404,8 +465,8 @@ var aTimeline = function (options) {
 
 var settings = {
     currentTime: function (elt) { return elt.currentTime; },
-    start : function (elt) { return $(elt).attr("data-start"); },
-    end : function (elt) { return $(elt).attr("data-end"); }
+    start : function (elt) { return $.timecode_parse($(elt).attr("data-start")); },
+    end : function (elt) { return $.timecode_parse($(elt).attr("data-end")); }
 }
 
 var methods = {
@@ -423,11 +484,13 @@ var methods = {
                 $(this).data('timeline', data);
             }
             // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
-            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime})
-            $this.bind("timeupdate", function (evt) {
-                // console.log("timeupdate", evt.target, evt.target.currentTime);
+            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime});
+            $this.bind("timeupdate", function (evt, controller) {
+                // console.log("timeline: timeupdate", evt);
                 // allow a wrapped getCurrentTime for the element (via playable?)
-                data.timeline.setCurrentTime(opts.currentTime(elt));
+                var ct = opts.currentTime(elt);
+                // console.log("timeline: timeupdate", evt.target, ct);
+                data.timeline.setCurrentTime(ct, controller);
             });
         });
     },
@@ -453,6 +516,12 @@ var methods = {
             return this;
         }
     },
+    minTime: function () {
+        return this.data('timeline').timeline.getMinTime();
+    },
+    maxTime: function () {
+        return this.data('timeline').timeline.getMaxTime();
+    },
     add : function( selector, options ) {
         var data = this.data('timeline');
         options = options || {};
@@ -465,8 +534,8 @@ var methods = {
             if (typeof(end) == "function") {
                 end = end(this);
             }
-            if (start) start = timecode_tosecs_attr(start);
-            if (end) end = timecode_tosecs_attr(end);
+            // if (start) start = datetimecode_parse(start);
+            // if (end) end = datetimecode_parse(end, start);
             if (options.debug) console.log("add", this, start, end);
             data.timeline.add(this, start, end, options.show, options.hide);
         });

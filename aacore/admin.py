@@ -11,12 +11,10 @@ class ResourceDelegateInline(admin.TabularInline):
     extra = 0
     max_num = 0
 
-
 class ResourceAdmin(admin.ModelAdmin):
     list_display = ('url', 'content_type', 'charset', 'content_length', 'last_modified', 'etag')
     inlines = (ResourceDelegateInline, )
 admin.site.register(Resource, ResourceAdmin)
-
 
 class NamespaceAdmin(admin.ModelAdmin):
     ordering = ("name", )
@@ -25,12 +23,10 @@ class NamespaceAdmin(admin.ModelAdmin):
     list_editable = ("color", )
 admin.site.register(Namespace, NamespaceAdmin)
 
-
 class PageAdmin(admin.ModelAdmin):
     list_display = ("name", "content", )
     search_fields = ("name", "content")
 admin.site.register(Page, PageAdmin)
-
 
 class RDFDelegateAdmin(admin.ModelAdmin):
     list_display = ("url", "format")

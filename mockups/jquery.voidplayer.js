@@ -38,7 +38,7 @@
     var methods = {
         init : function (options) {
             var settings = {
-                autoplay: true,
+                autoplay: false,
                 //controls: false,
                 loop: false,
                 duration: 30,
@@ -94,7 +94,7 @@
                 data.$elt.trigger('pause');
             });
         }, 
-        currentTime: function (value) {
+        currentTime: function (value, controller) {
             /*
              * returns the current playback position, expressed in seconds.
              */
@@ -103,7 +103,9 @@
                     var $this = $(this);
                     var data = $this.data('player');
                     data.currentTime = value;
-                    $(this).trigger('seeking');
+                    // $(this).trigger('seeking');
+                    // console.log("triggering timeupdate with controller", controller);
+                    data.$elt.trigger('timeupdate', [controller]);
                 });
             } else {
                 var $this = $(this);
@@ -112,11 +114,8 @@
             }
         }, 
         paused: function () {
-            return this.each(function() {
-                var $this = $(this);
-                var data = $(this).data('player');
-                return data.paused
-            });
+            var data = $(this).data('player');
+            return data.paused
         }, 
         duration: function (value) {
             /*

@@ -78,12 +78,12 @@ PREFIX media:<http://search.yahoo.com/mrss/>
 
 SELECT ?ctype ?format ?audiocodec ?videocodec
 WHERE {{
-  OPTIONAL {{ <{0}> http:content_type ?ctype . }}
-  OPTIONAL {{ <{0}> dc:format ?format . }}
-  OPTIONAL {{ <{0}> media:audio_codec ?audiocodec . }}
-  OPTIONAL {{ <{0}> media:video_codec ?videocodec . }}
+  OPTIONAL {{ <%(URL)s> http:content_type ?ctype . }}
+  OPTIONAL {{ <%(URL)s> dc:format ?format . }}
+  OPTIONAL {{ <%(URL)s> media:audio_codec ?audiocodec . }}
+  OPTIONAL {{ <%(URL)s> media:video_codec ?videocodec . }}
 }}
-""".strip().format(uri)
+""".strip() % {'URL': uri}
 
     b = {}
     for row in rdfutils.query(q, model):
@@ -95,25 +95,13 @@ WHERE {{
 
     # TODO: move to templates
     if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
-        ret.append('<img src="{0}" />'.format(uri))
-        #bla = '<a class="lb" href="{0}"><img src="{0}" /></a>'.format(uri)
-        #bla += """
-#<link rel="stylesheet" type="text/css" href="http://leandrovieira.com/projects/jquery/lightbox/css/jquery.lightbox-0.5.css"></link> 
-#<script src="http://leandrovieira.com/projects/jquery/lightbox/js/jquery.lightbox-0.5.pack.js"></script>
-#<script>
-#$(function() {
-#console.log($('a.lb'));
-#$('a.lb').lightBox();
-#});
-#</script>
-#"""
-        #ret.append(bla)
+        ret.append('<img src="%s" />' % uri)
     elif b.get('ctype') in ("video/ogg", "video/webm") or (b.get('videocodec') in ("theora", "vp8")):
-        ret.append('<video class="player" controls src="{0}" />'.format(uri))
+        ret.append('<video class="player" controls src="%s" />' % uri)
     elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
-        ret.append('<audio class="player" controls src="{0}" />'.format(uri))
+        ret.append('<audio class="player" controls src="%s" />' % uri)
     elif b.get('ctype') in ("text/html", ):
-        ret.append('<iframe src="{0}"></iframe>'.format(uri))
+        ret.append('<iframe src="%s"></iframe>' % uri)
     elif b.get('ctype') in ("application/rss+xml", "text/xml"):
         feed = feedparser.parse(uri)
         output = ""
@@ -165,13 +153,13 @@ def embed (request):
     ret = """
 <div class="aa_embed">
     <div class="links">
-        <a class="directlink" href="{0[url]}">URL</a>
-        <a class="browselink" target="browser" href="{0[browseurl]}">browse</a>
+        <a class="directlink" href="%(url)s">URL</a>
+        <a class="browselink" target="browser" href="%(browseurl)s">browse</a>
     </div>
-    <div class="body">{0[embed]}</div>
+    <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret.format({'url': url, 'browseurl': browseurl, 'embed': rendered})
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': rendered}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 
@@ -277,6 +265,30 @@ def annotation_import(request, slug, section):
         context['form'] = form
         return render_to_response("aacore/annotation_import.html", context, 
                                   context_instance=RequestContext(request))
+
+
+#def annotation_import(request, slug, section, format_="audacity"):
+    #if request.method == "POST":
+        #form = AnnotationUploadForm(request.POST),
+        #import pdb; pdb.set_trace()
+        #if form.is_multipart():
+            #annotation = form.cleaned_data['annotation']
+            #print(annotation)
+        ##print(request.FILES['annotation'])
+        ##annotation = request.FILES.get(request.POST.get('annotation'))
+        ##print(annotation)
+        #context = {
+            #'form': AnnotationUploadForm(),
+        #}
+        #return render_to_response("aacore/annotation_import.html", context, 
+                                  #context_instance=RequestContext(request))
+    #elif request.method == "GET":
+        #context = {
+            #'form': AnnotationUploadForm(),
+        #}
+        #return render_to_response("aacore/annotation_import.html", context, 
+                                  #context_instance=RequestContext(request))
+    
 
 
 def annotation_export(request, slug, section, _format="audacity",
@@ -609,11 +621,11 @@ def thumbnail_filter (fargs, res, cur, rdfmodel=None):
         width = m.groupdict()['width']
         fpath = res.get_local_file()
         (dname, fname) = os.path.split(fpath)
-        tpath = os.path.join(dname, "thumbnail_{}px.jpg".format(width))
+        tpath = os.path.join(dname, "thumbnail_%dpx.jpg" % width)
         if not os.path.exists(tpath):
-            cmd = 'convert -resize {0}x "{1}" "{2}"'.format(width, fpath, tpath)
+            cmd = 'convert -resize %dx "%s" "%s"' % (width, fpath, tpath)
             os.system(cmd)
-        return '<img src="{}" />'.format(path_to_url(tpath))
+        return '<img src="%s" />' % path_to_url(tpath)
 
 
 import urlparse, html5lib, urllib2, lxml.cssselect

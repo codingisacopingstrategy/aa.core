@@ -56,7 +56,7 @@ def ffmpeg_get_info (path):
     """
 
     ret = {}
-    results = system_stdin_stderr('{0} -i "{1}"'.format(FFMPEG, path))
+    results = system_stdin_stderr('%s -i "%s"' % (FFMPEG, path))
 
     duration = 0
     meta = {}

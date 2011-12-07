@@ -112,7 +112,7 @@ class Tag (models.Model):
         return self.name
 
     def get_full_url (self):
-        return "http://www.youtube.com/results?search_query={}&search=tag".format(urllib.quote(self.name))
+        return "http://www.youtube.com/results?search_query=%s&search=tag"%(urllib.quote(self.name))
 
 
 youtubevid_pat = re.compile(r"""^http://(www\.)?youtube\.com/watch\?v=(?P<id>[^&]+)""", re.I)

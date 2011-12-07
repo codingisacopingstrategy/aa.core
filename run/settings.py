@@ -111,4 +111,5 @@ INSTALLED_APPS = (
 
 AA_RDF_STORAGE_DIR = DIRNAME
 AA_INDEXED_MODELS = ("aacore.models.Resource", "aacore.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
-SITE_URL = "http://localhost:8000"
+# SITE_URL = "http://localhost:8000"
+

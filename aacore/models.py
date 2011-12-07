@@ -108,7 +108,8 @@ class Resource (models.Model):
         Returns: an absolute path to a local file (if available)
         Throws: AAWait when local file is not (yet) available
         """
-        local_dir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
+        # local_dir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
+        local_dir = os.path.join(CACHE_DIR, "%06d"%self.id)
         try:
             os.makedirs(local_dir)
         except OSError:
@@ -129,9 +130,9 @@ class Resource (models.Model):
             rdfmodel = get_rdf_model()
         if rel:
             query = """SELECT DISTINCT ?obj 
-                    WHERE {{ <{0}> <{1}> ?obj. }} 
+                    WHERE {{ <%s> <%s> ?obj. }} 
                     ORDER BY ?rel ?obj
-                    """.format(self.url, rel)
+                    """ % (self.url, rel)
 
             query = query.encode("utf-8")
             bindings = RDF.Query(query, query_language="sparql").execute(rdfmodel)
@@ -222,13 +223,14 @@ class Page(models.Model):
 
         # Add the commit metadata in a git note, formatted as
         # a .ini config file
-        config = ConfigParser()
-        config.add_section('metadata')
-        config.set('metadata', 'is_minor', is_minor)
+    # THIS SEEMS TO CAUSE AN ERROR:  git: 'notes' is not a git-command. See 'git --help' in git 1.5.6.5 on debian at least
+#        config = ConfigParser()
+#        config.add_section('metadata')
+#        config.set('metadata', 'is_minor', is_minor)
 
-        output = cStringIO.StringIO()
-        config.write(output)
-        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
+#        output = cStringIO.StringIO()
+#        config.write(output)
+#        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
 
         self.save()
 

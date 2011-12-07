@@ -22,9 +22,9 @@ HASH_OR_TIMECODE_HEADER = r"""
 (
   ( (?P<level>[#]{%s}) [^#] (?P<header>.*?) [#]* )
 |
-  ( (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+  ( (?P<start> (?P<startdate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
   [ \t]* --> [ \t]*
-  (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+  (?P<end> (?P<enddate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
   (?P<other>.+)?
   [ \t]*  
   )
@@ -34,9 +34,9 @@ $
 
 TIMECODE_HEADER = r"""
 ^
-  ( (?P<start> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
+  ( (?P<start> (?P<startdate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)
   [ \t]* --> [ \t]*
-  (?P<end> ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
+  (?P<end> (?P<enddate>\d\d\d\d-\d\d-\d\d)? \s* ((\d\d):)? (\d\d): (\d\d) ([,.]\d{1,3})?)?
   (?P<other>.+)?
   [ \t]*  
   )
