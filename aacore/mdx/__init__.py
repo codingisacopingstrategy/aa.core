@@ -33,13 +33,19 @@ def make_link(rel, target, label, default_link_rel=None, filter_=None):
     else:
         href = url_for_pagename(target)
     a.set('href', href)
-    a.text = label or target
+    if filter_:
+        a.set('data-filter', filter_)
+    print(rel)
+    if rel == "aa:embed":
+        img = markdown.util.etree.Element('img')
+        img.set('src', '/static/aacore/img/ajax-loader.gif')
+        a.append(img)
+    else:
+        a.text = label or target
     if rel:
         a.set('rel', rel)
     elif default_link_rel:
         a.set('rel', default_link_rel)
-    if filter_:
-        a.set('data-filter', filter_)
     return a
 
 

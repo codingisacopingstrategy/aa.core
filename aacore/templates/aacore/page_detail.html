@@ -49,10 +49,8 @@
         <!--<li><a title="menu" href="#">⚙</a></li>-->
         {% endif %}
     </ul>
-    <hr />
     {% get_markdown_for content as md meta %}
     <h1>{{ meta.title|first }}</h1>
-    <hr />
     {% for summary in meta.summary %}
         {% get_markdown_for summary as md meta %}
         {{ md|safe }}

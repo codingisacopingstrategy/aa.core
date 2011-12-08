@@ -370,7 +370,6 @@ nav#east-pane ul.ui-sortable input[type=checkbox] {
 }
 
 nav#west-pane {
-    font-weight: normal;
     font-size: 18px;
     font-family: LiberationSans, sans;
     -webkit-box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.1);
@@ -381,12 +380,12 @@ nav#west-pane {
 }
 nav#west-pane h1 {
     font-weight: bold;
-    margin: 0 15% 0 15%;
     margin-top: 1em;
     margin-bottom: 1em;
-    font-size: 36px;
-    text-align: center;
+    /*font-size: 36px;*/
     text-decoration: none;
+    border-bottom: 3px solid black;
+    display: inline-block;
 }
 nav#west-pane hr {
     color: black;
@@ -397,7 +396,7 @@ nav#west-pane hr {
 }
 
 nav#west-pane ul#toolbar {
-    text-align: center;
+    /*text-align: center;*/
     /*margin: 0 15%;*/
 }
 nav#west-pane ul#toolbar li {
