@@ -52,14 +52,23 @@ import re
 #\]\](?!\])
 #""".strip()
 
+#wikilink_pattern = r"""
+#\[\[\s*
+#    (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
+#    (?P<target>.+?) \s*
+#    (?:\|[^\|] \s* (?P<label>.+?) \s*)?
+#    (?:\|\| \s* (?P<filter>.+?) \s*)?
+#\]\](?!\])
+#""".strip()
 wikilink_pattern = r"""
 \[\[\s*
     (?:((?P<namespace>\w+):)?(?P<rel>[^\]#]+?) \s* ::)? \s*
     (?P<target>.+?) \s*
-    (?:\|[^\|] \s* (?P<label>.+?) \s*)?
+    (?:\| \s* (?P<label>[^\|]+?) \s*)?
     (?:\|\| \s* (?P<filter>.+?) \s*)?
 \]\](?!\])
 """.strip()
+
 
 """
     <a rel="aa:link" href="/pages/Anthology_walk%2Btalk_Brussels">
