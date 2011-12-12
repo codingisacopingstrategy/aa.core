@@ -107,14 +107,14 @@ class AAFilterEmbed(AAFilter):
 class AAFilterBW(AAFilter):
     name = "bw"
     def run(self):
-        stdout = settings.DIRNAME + self.get_next_path()
-        if not os.path.exists(stdout):
+        destination = settings.DIRNAME + self.get_next_path()
+        if not os.path.exists(destination):
             cmd = 'convert -colorspace gray %s %s' % (settings.DIRNAME + self.stdin, 
-                                                      stdout)
+                                                      destination)
             p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
                                   stdin=subprocess.PIPE)
             (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = stdout
+        self.stdout = self.get_next_path()
 
 
 class AAFilterResize(AAFilter):
@@ -128,15 +128,15 @@ class AAFilterResize(AAFilter):
             return True
 
     def run(self):
-        stdout = settings.DIRNAME + self.get_next_path()
-        if not os.path.exists(self.stdout):
+        destination = settings.DIRNAME + self.get_next_path()
+        if not os.path.exists(destination):
             cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
                                                 settings.DIRNAME + self.stdin, 
-                                                stdout) 
+                                                destination)
             p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
                                   stdin=subprocess.PIPE)
             (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = stdout
+        self.stdout = self.get_next_path()
 
 
 if __name__ == '__main__':
