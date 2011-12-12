@@ -3,6 +3,7 @@ Implements active archives models
 """
 
 
+import re
 import RDF
 import codecs
 import os
@@ -19,9 +20,10 @@ from django.contrib.auth.models import User
 
 import utils
 from rdfutils import rdfnode, prep_uri
-from settings import CACHE_DIR
+from settings import (CACHE_DIR, CACHE_URL)
 import resource_opener
 from settings import GIT_DIR
+from django.conf import settings
 from diff_match_patch import diff_match_patch
 
 
@@ -103,6 +105,20 @@ class Resource (models.Model):
         """ this gets used to do reverse lookup to resource """
         return self.url
 
+    @staticmethod
+    def get_url_from_local_path(path):
+        # TODO: decide if it should be cached in a field or not
+        # FIXME: make it more robust
+        p = re.search(r"\d{6}", path)
+        if p:
+            return Resource.objects.get(id=p.group()).url
+        else:
+            return None
+
+    @staticmethod
+    def get_local_path_from_url(url):
+        return os.path.join(MEDIA_ROOT, url)
+
     def get_local_file(self, forcereload=False):
         """
         Returns: an absolute path to a local file (if available)
@@ -115,12 +131,19 @@ class Resource (models.Model):
             os.makedirs(local_dir)
         except OSError:
             pass
-        local_path = os.path.join(local_dir, "original.data")
+
+        local_path = os.path.join(local_dir, "original" + os.path.splitext(self.url)[1])
         if forcereload or (not os.path.exists(local_path)):
             outfile = open(local_path, "wb")
             src = resource_opener.ResourceOpener(self.url)
             src.writeToFile(outfile)
         return local_path
+
+    def get_local_url(self):
+        self.get_local_file()  # Ugly hack to cache the file
+        local_dir = os.path.join(CACHE_URL, "%06d" % self.id)
+        local_url = os.path.join(local_dir, "original" + os.path.splitext(self.url)[1])
+        return local_url
 
     def get_metadata(self, rel=None, rdfmodel=None):
         """

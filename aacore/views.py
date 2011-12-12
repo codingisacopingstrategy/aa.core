@@ -122,40 +122,36 @@ def embed (request):
     Receives a request with parameters URL and filter.
     Returns a JSON containing content of the embed.
     """
-    #import pdb; pdb.set_trace()
     url = request.REQUEST.get("url")
     # ALLOW (authorized users) to trigger a resource to be added...
     model = get_rdf_model()
-    if url.startswith("http"):
+    if url.startswith("http://"):
         # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
         add_resource(url, model, request)
 
+    from aacore.filters import *
     ### APPLY FILTERS (if any)
-    filterstr = request.REQUEST.get("filter", "").strip()
-    if filterstr and not filterstr.startswith("http:"):
-        filters = [x.strip() for x in filterstr.split("|")]
-        rendered = ""
-        #import pdb; pdb.set_trace();
-        fpath = None
-        for fcall in filters:
-            if ":" in fcall:
-                (fname, fargs) = fcall.split(":", 1) 
-            else:
-                fname = fcall.strip()
-                fargs = ""
-            f = get_filter_by_name(fname)
-            if f:
-                (tpath, rendered) = f(fargs, url, rendered, rdfmodel=model, fpath=fpath)
-                fpath = tpath
-            else:
-                rendered = "<p>The filter named \"%s\" doesn't exist! Please fix you markup</p>" % fname
-    else:
-        embeds = get_embeds(url, model, request)
-        if len(embeds):
-            rendered = embeds[0]
-        else:
-            rendered = url
+    pipeline = request.REQUEST.get("filter", "embed").strip()
+    filters = {}
 
+    for filter_ in AAFilter.__subclasses__():
+        filters[filter_.name] = filter_
+
+    stdin = Resource.objects.get(url=url).get_local_url()
+
+    for command in [x.strip() for x in pipeline.split("|")]:
+        if ":" in command:
+            (filter_, arguments) = command.split(":", 1)
+            filter_.strip()
+            command.strip()
+        else:
+            (filter_, arguments) = (command.strip(), None)
+        try:
+            stdin = filters[filter_](arguments, stdin).stdout
+        except KeyError:
+            stdin = """The "%s" filter doesn't exist""" % filter_
+            break
+    
     browseurl = reverse("aa-browse") + "?" + urllib.urlencode({'uri': url})
     ret = """
 <div class="aa_embed">
@@ -166,7 +162,7 @@ def embed (request):
     <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret % {'url': url, 'browseurl': browseurl, 'embed': rendered}
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 
@@ -623,7 +619,6 @@ def path_to_url (p):
     return p
 
 def bw_filter (fargs, res, cur, rdfmodel=None, fpath=None):
-    #import pdb; pdb.set_trace()
     if not fpath:
         fpath = Resource.objects.get(url=res).get_local_file()
         (dname, fname) = os.path.split(fpath)
@@ -637,7 +632,6 @@ def bw_filter (fargs, res, cur, rdfmodel=None, fpath=None):
 
 
 def thumbnail_filter (fargs, res, cur, rdfmodel=None, fpath=None):
-    #import pdb; pdb.set_trace()
     import re
     sizepat = re.compile(r"(?P<width>\d+)px", re.I)
     m = sizepat.search(fargs)
