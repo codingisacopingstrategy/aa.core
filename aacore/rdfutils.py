@@ -95,6 +95,8 @@ class BindingsIterator:
         return r
 
 def prep_uri (uri):
+    if (type(uri) == unicode):
+        uri = uri.encode("utf-8")
     """Turns a uri string (including raw file paths) into an RDF.Uri object"""
     if not uri.startswith("http") and not uri.startswith("file:"):
         return RDF.Uri(string="file:" + uri)
