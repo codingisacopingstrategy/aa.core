@@ -12,8 +12,8 @@ urlpatterns = patterns('aacore.views',
     url(r'^rdfdelegate/(?P<id>\d+)/$', 'rdf_delegate', {}, name='aa-rdf-source'),
 
     ### WIKI
-    url(r'^$', redirect_to, {'url': '/pages/Index/'}),
-    url(r'^pages/$', redirect_to, {'url': '/pages/Index/'}),
+    url(r'^$', 'index', {}, 'aa-index'),
+    url(r'^pages/$', 'index'),
     url(r'^pages/(?P<slug>[^/]+)/$', 'page_detail', {}, name='aa-page-detail'),
     url(r'^pages/(?P<slug>[^/]+)/edit/$', 'page_edit', {}, name='aa-page-edit'),
     url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),

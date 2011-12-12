@@ -1,4 +1,5 @@
 # High priority
+- Template Syntaxt Error with malformed/missing Meta attribute
 - BUG: negative positions
 - rework on the manual
     - Update the documentation to use [[ links ]] rather than default markdown links.

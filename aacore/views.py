@@ -16,31 +16,40 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-import RDF, urllib
+import urllib
+from django.template.loader import render_to_string
+import urlparse, html5lib, urllib2, lxml.cssselect
+
 try: import simplejson as json
 except ImportError: import json
-import feedparser
 
 from django.shortcuts import (render_to_response, redirect, get_object_or_404)
 from django.http import (HttpResponse, HttpResponseRedirect)
-from django.template import (RequestContext, Template, Context)
-from django.template.loader import render_to_string
+from django.template import RequestContext 
 from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
 from django.conf import settings as projsettings
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
 
-from aacore.spider import spider
-#from plugins import sniffer
-from models import *
-from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename,
-                   convert_line_endings, pagename_for_url, add_resource)
+from aacore.filters import *
+from aacore.models import *
+from aacore.utils import (get_rdf_model, full_site_url, dewikify,
+                          convert_line_endings, add_resource)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 import rdfutils
 from forms import (PageEditForm, AnnotationImportForm)
+from audacity import audacity_to_srt
+import re
+from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
+from timecode import timecode_tosecs
+from django.template.loader import render_to_string
+import lxml.cssselect
 
+
+def index (request):
+    """ The 'index' view redirects to the Index page view """
+    url = reverse("aa-page-detail", args=["Index"])
+    return HttpResponseRedirect(url)
 
 #### RDFSource
 def rdf_delegate(request, id):
@@ -68,94 +77,40 @@ def resources (request):
     context['resources'] = Resource.objects.all()
     return render_to_response("aacore/resources.html", context, context_instance = RequestContext(request))
 
-def get_embeds (uri, model, request):
-    """ UNSTABLE: Example get_embeds for basic HTML(5) types """
-
-    # Is this suitable for a audio/video tag?
-    q = """PREFIX dc:<http://purl.org/dc/elements/1.1/>
-PREFIX aa:<http://activearchives.org/terms/>
-PREFIX http:<http://www.w3.org/Protocols/rfc2616/>
-PREFIX media:<http://search.yahoo.com/mrss/>
-
-SELECT ?ctype ?format ?audiocodec ?videocodec
-WHERE {{
-  OPTIONAL {{ <%(URL)s> http:content_type ?ctype . }}
-  OPTIONAL {{ <%(URL)s> dc:format ?format . }}
-  OPTIONAL {{ <%(URL)s> media:audio_codec ?audiocodec . }}
-  OPTIONAL {{ <%(URL)s> media:video_codec ?videocodec . }}
-}}
-""".strip() % {'URL': uri}
-
-    b = {}
-    for row in rdfutils.query(q, model):
-        for name in row:
-            b[name] = rdfutils.rdfnode(row.get(name))
-        break
-
-    ret = []
-
-    # TODO: move to templates
-    if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
-        ret.append('<img src="%s" />' % uri)
-    elif b.get('ctype') in ("video/ogg", "video/webm") or (b.get('videocodec') in ("theora", "vp8")):
-        ret.append('<video class="player" controls src="%s" />' % uri)
-    elif b.get('ctype') in ("audio/ogg", ) or (b.get('audiocodec') == "vorbis" and (not b.get('videocodec'))):
-        ret.append('<audio class="player" controls src="%s" />' % uri)
-    elif b.get('ctype') in ("text/html", ):
-        ret.append('<iframe src="%s"></iframe>' % uri)
-    elif b.get('ctype') in ("application/rss+xml", "text/xml"):
-        feed = feedparser.parse(uri)
-        output = ""
-        for entry in feed['entries'][:4]:
-            output += '<div>'
-            output += '<h3><a href="%s">%s</a></h3>' % (entry.link.encode(feed.encoding), entry.title.encode(feed.encoding))
-            output += '<div>'
-            output += entry.summary.encode(feed.encoding)
-            output += '</div>'
-            output += '</div>'
-        ret.append(output)
-
-    return ret
-
 def embed (request):
     """
     Receives a request with parameters URL and filter.
     Returns a JSON containing content of the embed.
     """
-    #import pdb; pdb.set_trace()
     url = request.REQUEST.get("url")
     # ALLOW (authorized users) to trigger a resource to be added...
     model = get_rdf_model()
-    if url.startswith("http"):
+    if url.startswith("http://"):
         # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
         add_resource(url, model, request)
 
     ### APPLY FILTERS (if any)
-    filterstr = request.REQUEST.get("filter", "").strip()
-    if filterstr and not filterstr.startswith("http:"):
-        filters = [x.strip() for x in filterstr.split("|")]
-        rendered = ""
-        #import pdb; pdb.set_trace();
-        fpath = None
-        for fcall in filters:
-            if ":" in fcall:
-                (fname, fargs) = fcall.split(":", 1) 
-            else:
-                fname = fcall.strip()
-                fargs = ""
-            f = get_filter_by_name(fname)
-            if f:
-                (tpath, rendered) = f(fargs, url, rendered, rdfmodel=model, fpath=fpath)
-                fpath = tpath
-            else:
-                rendered = "<p>The filter named \"%s\" doesn't exist! Please fix you markup</p>" % fname
-    else:
-        embeds = get_embeds(url, model, request)
-        if len(embeds):
-            rendered = embeds[0]
-        else:
-            rendered = url
+    pipeline = request.REQUEST.get("filter", "embed").strip()
+    filters = {}
 
+    for filter_ in AAFilter.__subclasses__():
+        filters[filter_.name] = filter_
+
+    stdin = Resource.objects.get(url=url).get_local_url()
+
+    for command in [x.strip() for x in pipeline.split("|")]:
+        if ":" in command:
+            (filter_, arguments) = command.split(":", 1)
+            filter_.strip()
+            command.strip()
+        else:
+            (filter_, arguments) = (command.strip(), None)
+        try:
+            stdin = filters[filter_](arguments, stdin).stdout
+        except KeyError:
+            stdin = """The "%s" filter doesn't exist""" % filter_
+            break
+    
     browseurl = reverse("aa-browse") + "?" + urllib.urlencode({'uri': url})
     ret = """
 <div class="aa_embed">
@@ -166,7 +121,7 @@ def embed (request):
     <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret % {'url': url, 'browseurl': browseurl, 'embed': rendered}
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 
@@ -256,7 +211,6 @@ def annotation_import(request, slug, section):
             for chunk in f.chunks():
                 data += chunk
 
-            from audacity import audacity_to_srt
             srt = unicode(audacity_to_srt(data).decode('utf-8'))
 
             # Preserves the old header, because audacity only keeps timed section.
@@ -274,36 +228,8 @@ def annotation_import(request, slug, section):
                                   context_instance=RequestContext(request))
 
 
-#def annotation_import(request, slug, section, format_="audacity"):
-    #if request.method == "POST":
-        #form = AnnotationUploadForm(request.POST),
-        #import pdb; pdb.set_trace()
-        #if form.is_multipart():
-            #annotation = form.cleaned_data['annotation']
-            #print(annotation)
-        ##print(request.FILES['annotation'])
-        ##annotation = request.FILES.get(request.POST.get('annotation'))
-        ##print(annotation)
-        #context = {
-            #'form': AnnotationUploadForm(),
-        #}
-        #return render_to_response("aacore/annotation_import.html", context, 
-                                  #context_instance=RequestContext(request))
-    #elif request.method == "GET":
-        #context = {
-            #'form': AnnotationUploadForm(),
-        #}
-        #return render_to_response("aacore/annotation_import.html", context, 
-                                  #context_instance=RequestContext(request))
-    
-
-
 def annotation_export(request, slug, section, _format="audacity",
                       force_endtime=False):
-    import re
-    from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
-    from timecode import timecode_tosecs
-
     context = {}
     name = dewikify(slug)
     page = Page.objects.get(name=name)
@@ -376,8 +302,6 @@ def page_detail(request, slug):
     c = RequestContext(request)
 
     # TODO: Markdown extension for stylesheet embed
-#    if 'css' in md.Meta:
-#        context['extra_css'] = md.Meta['css']
 
     return render_to_response("aacore/page_detail.html", context, context_instance=RequestContext(request))
 
@@ -607,55 +531,11 @@ def sandbox(request):
 
 # map filter args to template context...
 
-from django.template.loader import render_to_string
-
-# USER_AGENT + MIME_TYPE
-
-def embed_filter (fargs, res, cur, rdfmodel=None):
-    contenttypes = res.get_metadata(rel="http://activearchives.org/terms/content_type")
-    if "image/jpeg" in contenttypes:
-        return render_to_string('aacore/embeds/image.html', { 'resource': res })
-    return ""
 
 def path_to_url (p):
     if p.startswith(projsettings.MEDIA_ROOT):
         return full_site_url(projsettings.MEDIA_URL + p[len(projsettings.MEDIA_ROOT):])
     return p
-
-def bw_filter (fargs, res, cur, rdfmodel=None, fpath=None):
-    #import pdb; pdb.set_trace()
-    if not fpath:
-        fpath = Resource.objects.get(url=res).get_local_file()
-        (dname, fname) = os.path.split(fpath)
-        tpath = os.path.join(dname, "bw.jpg")
-    else:
-        tpath = fpath + "|bw.jpg"
-    if not os.path.exists(tpath):
-        cmd = 'convert -colorspace gray "%s" "%s"' % (fpath, tpath)
-        os.system(cmd)
-    return (tpath, '<img src="%s" />' % path_to_url(tpath))
-
-
-def thumbnail_filter (fargs, res, cur, rdfmodel=None, fpath=None):
-    #import pdb; pdb.set_trace()
-    import re
-    sizepat = re.compile(r"(?P<width>\d+)px", re.I)
-    m = sizepat.search(fargs)
-    if m:
-        width = m.groupdict()['width']
-        if not fpath:
-            fpath = Resource.objects.get(url=res).get_local_file()
-            (dname, fname) = os.path.split(fpath)
-            tpath = os.path.join(dname, "thumbnail_%spx.jpg" % width)
-        else:
-            tpath = fpath + "|thumbnail_%spx.jpg" % width
-        if not os.path.exists(tpath):
-            cmd = 'convert -resize %sx "%s" "%s"' % (width, fpath, tpath)
-            os.system(cmd)
-        return (tpath, '<img src="%s" />' % path_to_url(tpath))
-
-
-import urlparse, html5lib, urllib2, lxml.cssselect
 
 def xpath_filter (fargs, url, cur, rdfmodel=None):
     """ Takes a url as input value and an xpath as argument.
@@ -678,12 +558,3 @@ def xpath_filter (fargs, url, cur, rdfmodel=None):
     else:
         return None
 
-def get_filter_by_name (n):
-    if n == "bw":
-        return bw_filter
-    elif n == "thumbnail":
-        return thumbnail_filter
-    elif n == "xpath":
-        return xpath_filter
-    elif n == "embed":
-        return embed_filter
