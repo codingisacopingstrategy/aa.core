@@ -14,6 +14,12 @@ def aa():
     env.hosts = ['activearchives@activearchives.org']
     env.path = '/var/www/vhosts/activearchives.org/wsgi/vj13/'
 
+def fix_permissions():
+    # fixes permission issues
+    sudo('chown -R %s:www-data %s' % (env.user, env.path))
+    sudo('chmod -R g+w %saa.core' % env.path)
+    sudo('apache2ctl graceful')
+
 def deploy(treeish='HEAD'):
     # makes a tarball of the django project and transfers it
     local('git archive %s . | gzip > project.tar.gz' % treeish)
@@ -40,7 +46,4 @@ def deploy(treeish='HEAD'):
         # make alias media
         #run('ln -s /root/src/Django-1.2.1/django/contrib/admin/media/')
 
-    # fixes permission issues
-    sudo('chown -R %s:www-data %s' % (env.user, env.path))
-    sudo('chmod -R g+w %saa.core' % env.path)
-    sudo('apache2ctl graceful')
+    fix_permissions()
