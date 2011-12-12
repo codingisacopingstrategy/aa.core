@@ -89,7 +89,6 @@ class AAFilterEmbed(AAFilter):
         elif embed_style == "iframe":
             stdout = '<iframe src="%s"></iframe>' % self.stdin
         elif embed_style == "feed":
-            #import pdb; pdb.set_trace()
             feed = feedparser.parse(settings.DIRNAME + self.stdin)
             stdout = u''
             for entry in feed['entries'][:4]:
@@ -108,14 +107,14 @@ class AAFilterEmbed(AAFilter):
 class AAFilterBW(AAFilter):
     name = "bw"
     def run(self):
-        #cmd = 'convert -colorspace gray %s %s' % (os.path.join(settings.DIRNAME, self.stdin), 
-                                                  #os.path.join(settings.DIRNAME, self.get_next_path()))
-        cmd = 'convert -colorspace gray %s %s' % (settings.DIRNAME + self.stdin, 
-                                                  settings.DIRNAME + self.get_next_path())
-        p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
-                              stdin=subprocess.PIPE)
-        (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = self.get_next_path()
+        stdout = settings.DIRNAME + self.get_next_path()
+        if not os.path.exists(stdout):
+            cmd = 'convert -colorspace gray %s %s' % (settings.DIRNAME + self.stdin, 
+                                                      stdout)
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+        self.stdout = stdout
 
 
 class AAFilterResize(AAFilter):
@@ -129,13 +128,15 @@ class AAFilterResize(AAFilter):
             return True
 
     def run(self):
-        cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
-                                            settings.DIRNAME + self.stdin, 
-                                            settings.DIRNAME + self.get_next_path())
-        p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
-                              stdin=subprocess.PIPE)
-        (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = self.get_next_path()
+        stdout = settings.DIRNAME + self.get_next_path()
+        if not os.path.exists(self.stdout):
+            cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
+                                                settings.DIRNAME + self.stdin, 
+                                                stdout) 
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+        self.stdout = stdout
 
 
 if __name__ == '__main__':
