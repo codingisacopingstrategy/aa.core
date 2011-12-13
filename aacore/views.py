@@ -46,7 +46,10 @@ from django.template.loader import render_to_string
 import lxml.cssselect
 
 
-
+def index (request):
+    """ The 'index' view redirects to the Index page view """
+    url = reverse("aa-page-detail", args=["Index"])
+    return HttpResponseRedirect(url)
 
 #### RDFSource
 def rdf_delegate(request, id):
