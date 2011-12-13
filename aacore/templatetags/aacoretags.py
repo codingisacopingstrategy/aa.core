@@ -43,7 +43,10 @@ class MarkdownConvertor(template.Node):
         md = get_markdown()
         html = md.convert(self.value.resolve(context))
         context[self.var_name] = html
-        context[self.meta_name] = md.Meta
+        if hasattr(md, "Meta"):
+            context[self.meta_name] = md.Meta
+        else:
+            context[self.meta_name] = {}
         return ''
 
 import re
