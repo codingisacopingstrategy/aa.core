@@ -113,9 +113,10 @@ function resetTimelines() {
             // console.log("show", elt);
             // $(elt).show();
             $(elt).addClass("active")
-                .closest('section.section1')
-                   .find('div.wrapper:first')
-                        .autoscrollable("scrollto", elt);
+                .closest('article[class!="play"]')
+                    .find('section.section1')
+                       .find('div.wrapper:first')
+                            .autoscrollable("scrollto", elt);
         },
         hide: function (elt) {
             // console.log("hide", elt);
@@ -203,6 +204,7 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
+        delay: 500,  // NOTE: Prevents unwanted saves 
         stop: function () { 
             var position = $(this).position();
             if (position.top < 0) {
@@ -494,6 +496,7 @@ $(document).ready(function() {
             spacing_open: 18,
             togglerLength_open: 24,
             togglerLength_closed: 24,
+            showOverflowOnHover: false
         },
         east: {
             size: 350,
@@ -501,6 +504,8 @@ $(document).ready(function() {
             initClosed: true,
             enableCursorHotkey: false,
             slidable: false,
+            spacing_closed: 0,
+            spacing_open: 0,
         },
         south: {
             fxName: "slide",
@@ -509,6 +514,8 @@ $(document).ready(function() {
             initClosed: true,
             enableCursorHotkey: false,
             slidable: false,
+            spacing_closed: 0,
+            spacing_open: 0,
         }           
     });
     
