@@ -10,10 +10,9 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.conf import settings as projectsettings
 
-from settings import RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS
 from rdfutils import get_model, rdf_parse_into_model, prep_uri
 import aacore.models
-
+import settings
 
 #####################
 
@@ -33,7 +32,7 @@ def get_rdf_model ():
     """
     Opens the Active ARchives RDF Store.
     """
-    rdfmodel = get_model(RDF_STORAGE_NAME, RDF_STORAGE_DIR)
+    rdfmodel = get_model(settings.RDF_STORAGE_NAME, settings.RDF_STORAGE_DIR)
     return rdfmodel
 
 def full_site_url(url):
@@ -141,7 +140,8 @@ import aacore.models
 
 def add_resource (url, rdfmodel=None, request=None, reload=False):
     """
-    This is what gets called when in the aa browser you type a URL.
+    Main way to get or create a Resource related to a particular URL.
+    When created, or when reload is True, relinks to "delegate" classes.
     """
     if rdfmodel == None:
         rdfmodel = get_rdf_model()
@@ -157,7 +157,7 @@ def add_resource (url, rdfmodel=None, request=None, reload=False):
 
         # relink delegates
         r.delegates.all().delete()
-        for model in get_indexed_models():
+        for model in get_delegate_models():
             if model == aacore.models.Resource:
                 continue
             try:
@@ -182,9 +182,21 @@ def add_resource (url, rdfmodel=None, request=None, reload=False):
         ## r.sync()
         aacore.models.reindex_request.send(sender=r.__class__, instance=r)
 
+def get_delegate_models():
+    modelnames = settings.RESOURCE_DELEGATES
+    ret = []
+    for modelname in modelnames:
+        try:
+            (modulename, classname) = modelname.rsplit(".", 1)
+            module = __import__(modulename, fromlist=[classname])
+            klass = getattr(module, classname)
+            ret.append(klass)
+        except ImportError:
+            print "ERROR IMPORTING", modelname
+    return ret
 
 def get_indexed_models():
-    modelnames = INDEXED_MODELS
+    modelnames = settings.INDEXED_MODELS
     ret = []
     for modelname in modelnames:
         try:

@@ -270,31 +270,6 @@ def rdfnode (n):
         ret = n.literal_value.get("string")
     return ret
 
-@register.filter
-def rel_for_url (url):
-    url = unicode(rdfnode(url))
-    try:    
-        return Relationship.objects.get(url=url)
-    except Relationship.DoesNotExist:
-        return None
-
-@register.filter
-def rel_name_for_url (url):
-    rel = rel_for_url(url)
-    if rel:
-        return rel.name
-    else:
-        return url
-        # (_, ret) = os.path.split(urlparse.urlparse(rel.url).path)
-
-@register.filter
-def rel_name_plural_for_url (url):
-    rel = rel_for_url(url)
-    if rel:
-        return rel.name_plural
-    else:
-        return url
-        # (_, ret) = os.path.split(urlparse.urlparse(rel.url).path)
 
 @register.filter
 def rdfnodedisplay (node):
