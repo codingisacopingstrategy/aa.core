@@ -5,6 +5,7 @@ Utilities specific to the core application
 import urllib, re, string, urlparse
 import RDF
 
+import django
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.conf import settings as projectsettings
@@ -210,6 +211,7 @@ def direct_get_response (url, request=None):
     # de-absolutize the URL
     if request == None:
         request = HttpRequest()
+        request.user = django.contrib.auth.models.AnonymousUser()
         request.REQUEST = {}
         request.POST = {}
         request.GET = {}
