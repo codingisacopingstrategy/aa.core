@@ -33,7 +33,7 @@ from django.contrib.auth.decorators import login_required
 from aacore.filters import *
 from aacore.models import *
 from aacore.utils import (get_rdf_model, full_site_url, dewikify,
-                          convert_line_endings, add_resource)
+                          convert_line_endings, add_resource, is_local_url)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 import rdfutils
@@ -132,7 +132,7 @@ def browse (request):
     uri = request.REQUEST.get("uri", "")
 
     # Avoids browsing an internal URL
-    if utils.is_local_url(uri):
+    if is_local_url(uri):
         return HttpResponseRedirect(uri)
 
     submit = request.REQUEST.get("_submit", "")
