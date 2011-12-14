@@ -45,9 +45,9 @@ def deploy(treeish='HEAD'):
         run('tar zxvf ../project.tar.gz')
         run('rm ../project.tar.gz')
         # put back the database and the git repository
-        run('cp ../aa.core.%s.bak/run/aa.db run/' % timestamp)
+        #run('cp ../aa.core.%s.bak/run/aa.db run/' % timestamp)
         #run('cp ../aa.core.%s.bak/run/*.db run/' % timestamp)
-        run('cp -r ../aa.core.%s.bak/run/repositories run/' % timestamp)
+        #run('cp -r ../aa.core.%s.bak/run/repositories run/' % timestamp)
         # make alias media
         #run('ln -s /root/src/Django-1.2.1/django/contrib/admin/media/')
 
