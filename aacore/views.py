@@ -96,7 +96,12 @@ def embed (request):
     for filter_ in AAFilter.__subclasses__():
         filters[filter_.name] = filter_
 
-    stdin = Resource.objects.get(url=url).get_local_url()
+    stdin = {
+        'original_url': url,
+        'local_url': Resource.objects.get(url=url).get_local_url(),
+        'local_path': Resource.objects.get(url=url).get_local_file(),
+        'output': 'None',
+    }
 
     for command in [x.strip() for x in pipeline.split("|")]:
         if ":" in command:
@@ -108,7 +113,7 @@ def embed (request):
         try:
             stdin = filters[filter_](arguments, stdin).stdout
         except KeyError:
-            stdin = """The "%s" filter doesn't exist""" % filter_
+            stdin['output'] = """The "%s" filter doesn't exist""" % filter_
             break
     
     browseurl = reverse("aa-browse") + "?" + urllib.urlencode({'uri': url})
@@ -121,7 +126,7 @@ def embed (request):
     <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin}
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin['output']}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 

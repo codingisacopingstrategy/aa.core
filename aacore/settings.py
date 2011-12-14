@@ -19,8 +19,7 @@ RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
 INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Resource", "aacore.models.Page",))
 RESOURCE_DELEGATES = getattr(settings, 'AA_RESOURCE_DELEGATES', ())
 
-import os
-CACHE_DIR = os.path.join(settings.MEDIA_ROOT, "cache")
-CACHE_URL = os.path.join(settings.MEDIA_URL, "cache")
+CACHE_DIR = getattr(settings, 'AA_CACHE_DIR', os.path.join(settings.MEDIA_ROOT, "cache"))
+CACHE_URL = getattr(settings, 'AA_CACHE_URL', os.path.join(settings.MEDIA_URL, "cache"))
 GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "repositories"))
 

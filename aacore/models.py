@@ -26,6 +26,11 @@ from settings import GIT_DIR
 from django.conf import settings
 from diff_match_patch import diff_match_patch
 
+from django.db.models.signals import post_save, post_delete, m2m_changed
+import rdfutils
+import django.dispatch
+
+
 
 class Resource (models.Model):
     """ Represents an (augmented) URL.
@@ -119,6 +124,9 @@ class Resource (models.Model):
     def get_local_path_from_url(url):
         return os.path.join(MEDIA_ROOT, url)
 
+    def foo(self):
+        return "%06d" % self.id
+        
     def get_local_file(self, forcereload=False):
         """
         Returns: an absolute path to a local file (if available)
@@ -387,11 +395,6 @@ class RDFDelegate (models.Model):
 #     ...
 #     reindex_request.send(sender=self.__class__, instance=self)
 
-import RDF
-from django.db.models.signals import post_save, post_delete, m2m_changed
-import rdfutils
-import django.dispatch
-
 reindex_request = django.dispatch.Signal(providing_args=[])
 
 def indexing_reindex_item (item):
@@ -425,7 +428,6 @@ def indexing_post_delete(sender, instance, **kwargs):
     indexing_drop_item(instance)
 
 def indexing_reindex(sender, instance, **kwargs):
-#    print "reindex_request", instance
     indexing_reindex_item(instance)
 
 for model in aacore.utils.get_indexed_models():
