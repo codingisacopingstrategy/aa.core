@@ -27,11 +27,14 @@ class Command(BaseCommand):
                 klass = getattr(module, classname)
                 models.append(klass)
         else:
-            models = aacore.utils.get_indexed_models()
+                models = aacore.utils.get_indexed_models()
 
         for model in models:
             for item in model.objects.all():
                 print item.get_absolute_url()
-                aacore.models.indexing_reindex_item(item)
+                try:
+                    aacore.models.indexing_reindex_item(item)
+                except RDF.RedlandError, e:
+                    print "\tERROR,", e
 
 
