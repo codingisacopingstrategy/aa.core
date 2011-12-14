@@ -33,7 +33,7 @@ from django.contrib.auth.decorators import login_required
 from aacore.filters import *
 from aacore.models import *
 from aacore.utils import (get_rdf_model, full_site_url, dewikify,
-                          convert_line_endings, add_resource)
+                          convert_line_endings, add_resource, is_local_url)
 from mdx import get_markdown
 from mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 import rdfutils
@@ -46,7 +46,10 @@ from django.template.loader import render_to_string
 import lxml.cssselect
 
 
-
+def index (request):
+    """ The 'index' view redirects to the Index page view """
+    url = reverse("aa-page-detail", args=["Index"])
+    return HttpResponseRedirect(url)
 
 #### RDFSource
 def rdf_delegate(request, id):
@@ -93,7 +96,12 @@ def embed (request):
     for filter_ in AAFilter.__subclasses__():
         filters[filter_.name] = filter_
 
-    stdin = Resource.objects.get(url=url).get_local_url()
+    stdin = {
+        'original_url': url,
+        'local_url': Resource.objects.get(url=url).get_local_url(),
+        'local_path': Resource.objects.get(url=url).get_local_file(),
+        'output': 'None',
+    }
 
     for command in [x.strip() for x in pipeline.split("|")]:
         if ":" in command:
@@ -105,7 +113,7 @@ def embed (request):
         try:
             stdin = filters[filter_](arguments, stdin).stdout
         except KeyError:
-            stdin = """The "%s" filter doesn't exist""" % filter_
+            stdin['output'] = """The "%s" filter doesn't exist""" % filter_
             break
     
     browseurl = reverse("aa-browse") + "?" + urllib.urlencode({'uri': url})
@@ -118,7 +126,7 @@ def embed (request):
     <div class="body">%(embed)s</div>
 </div>""".strip()
 
-    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin}
+    content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin['output']}
     return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
 
 
@@ -129,7 +137,7 @@ def browse (request):
     uri = request.REQUEST.get("uri", "")
 
     # Avoids browsing an internal URL
-    if utils.is_local_url(uri):
+    if is_local_url(uri):
         return HttpResponseRedirect(uri)
 
     submit = request.REQUEST.get("_submit", "")

@@ -15,7 +15,9 @@ class AAFilter(object):
         self.arguments = arguments or ""
         self.parsed_arguments = {}
         self.stdin = stdin
-        self.stdout = None
+        self.stdout = stdin.copy()
+        self.stdout['local_path'] = self.get_next_path()
+        self.stdout['local_url'] = self.get_next_url()
         if self.validate():
             return self.run()
 
@@ -27,8 +29,13 @@ class AAFilter(object):
         return urlparse(uri).path
 
     def get_next_path(self):
-        extension = os.path.splitext(self.stdin)[1]
-        return "%s|%s:%s%s" % (self.stdin, self.__class__.__name__, 
+        extension = os.path.splitext(self.stdin['local_path'])[1]
+        return "%s|%s:%s%s" % (self.stdin['local_path'], self.__class__.__name__, 
+                               self.arguments, extension)
+
+    def get_next_url(self):
+        extension = os.path.splitext(self.stdin['local_url'])[1]
+        return "%s|%s:%s%s" % (self.stdin['local_url'], self.__class__.__name__, 
                                self.arguments, extension)
 
 
@@ -40,7 +47,6 @@ class AAFilterEmbed(AAFilter):
         if self.arguments:
             embed_style = self.arguments
         else:
-            url = Resource.get_url_from_local_path(self.stdin)
             q = dedent("""\
                 PREFIX dc:<http://purl.org/dc/elements/1.1/>
                 PREFIX aa:<http://activearchives.org/terms/>
@@ -53,7 +59,7 @@ class AAFilterEmbed(AAFilter):
                   OPTIONAL {{ <%(URL)s> dc:format ?format . }}
                   OPTIONAL {{ <%(URL)s> media:audio_codec ?audiocodec . }}
                   OPTIONAL {{ <%(URL)s> media:video_codec ?videocodec . }}
-                }}""".strip() % {'URL': url})
+                }}""".strip() % {'URL': self.stdin['original_url']})
 
             model = get_rdf_model()
 
@@ -62,8 +68,6 @@ class AAFilterEmbed(AAFilter):
                 for name in row:
                     b[name] = rdfutils.rdfnode(row.get(name))
                 break
-
-            stdout = ""
 
             # TODO: move to templates
             if b.get('ctype') in ("image/jpeg", "image/png", "image/gif"):
@@ -81,40 +85,38 @@ class AAFilterEmbed(AAFilter):
 
         # TODO: move to templates
         if embed_style == "img":
-            stdout = '<img src="%s" />' % self.stdin
+            self.stdout['output'] = '<img src="%s" />' % self.stdin['local_url']
         elif embed_style == "html5video":
-            stdout = '<video class="player" controls src="%s" />' % self.stdin
+            self.stdout['output'] = '<video class="player" controls src="%s" />' %  self.stdin['local_url']
         elif embed_style == "html5audio":
-            stdout = '<audio class="player" controls src="%s" />' % self.stdin
+            self.stdout['output'] = '<audio class="player" controls src="%s" />' % self.stdin['local_url']
         elif embed_style == "iframe":
-            stdout = '<iframe src="%s"></iframe>' % self.stdin
+            self.stdout['output'] = '<iframe src="%s"></iframe>' % self.stdin['local_url']
         elif embed_style == "feed":
-            feed = feedparser.parse(settings.DIRNAME + self.stdin)
-            stdout = u''
+            feed = feedparser.parse(self.stdin['local_url'])
+            self.stdout['output'] = u''
             for entry in feed['entries'][:4]:
-                stdout += u'<div>'
-                stdout += u'<h3><a href="%s">%s</a></h3>' % (entry.link, entry.title)
-                stdout += u'<div>'
-                stdout += entry.summary
-                stdout += u'</div>'
-                stdout += u'</div>'
+                self.stdout['output'] += u'<div>'
+                self.stdout['output'] += u'<h3><a href="%s">%s</a></h3>' % (entry.link, entry.title)
+                self.stdout['output'] += u'<div>'
+                self.stdout['output'] += entry.summary
+                self.stdout['output'] += u'</div>'
+                self.stdout['output'] += u'</div>'
         else:
-            stdout = "<p>Unable to detect embed type</p>"
-
-        self.stdout = stdout
+            self.stdout['output'] = "<p>Unable to detect embed type</p>"
 
 
 class AAFilterBW(AAFilter):
     name = "bw"
     def run(self):
-        destination = settings.DIRNAME + self.get_next_path()
-        if not os.path.exists(destination):
-            cmd = 'convert -colorspace gray %s %s' % (settings.DIRNAME + self.stdin, 
-                                                      destination)
+        if not os.path.exists(self.stdout['local_path']):
+            cmd = 'convert -colorspace gray %s %s' % (self.stdin['local_path'], 
+                                                      self.stdout['local_path'])
             p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
                                   stdin=subprocess.PIPE)
-            (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = self.get_next_path()
+            (stdout_data, stderr_data) = p1.communicate()
+            #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+        self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
 
 
 class AAFilterResize(AAFilter):
@@ -128,15 +130,16 @@ class AAFilterResize(AAFilter):
             return True
 
     def run(self):
-        destination = settings.DIRNAME + self.get_next_path()
-        if not os.path.exists(destination):
+        if not os.path.exists(self.stdout['local_path']):
             cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
-                                                settings.DIRNAME + self.stdin, 
-                                                destination)
+                                                self.stdin['local_path'], 
+                                                self.stdout['local_path'])
             p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
                                   stdin=subprocess.PIPE)
-            (stdout_data, stderr_data) = p1.communicate(input=self.stdin)
-        self.stdout = self.get_next_path()
+            #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+            (stdout_data, stderr_data) = p1.communicate()
+
+        self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
 
 
 if __name__ == '__main__':

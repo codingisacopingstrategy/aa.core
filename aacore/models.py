@@ -18,13 +18,18 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 
-import utils
+import aacore.utils
 from rdfutils import rdfnode, prep_uri
 from settings import (CACHE_DIR, CACHE_URL)
 import resource_opener
 from settings import GIT_DIR
 from django.conf import settings
 from diff_match_patch import diff_match_patch
+
+from django.db.models.signals import post_save, post_delete, m2m_changed
+import rdfutils
+import django.dispatch
+
 
 
 class Resource (models.Model):
@@ -119,6 +124,9 @@ class Resource (models.Model):
     def get_local_path_from_url(url):
         return os.path.join(MEDIA_ROOT, url)
 
+    def foo(self):
+        return "%06d" % self.id
+        
     def get_local_file(self, forcereload=False):
         """
         Returns: an absolute path to a local file (if available)
@@ -193,26 +201,26 @@ class Page(models.Model):
 
     @models.permalink
     def get_diff_url(self):
-        return ("aa-page-diff", (), {'slug': utils.wikify(self.name)})
+        return ("aa-page-diff", (), {'slug': aacore.utils.wikify(self.name)})
 
     @models.permalink
     def get_history_url(self):
-        return ("aa-page-history", (), {'slug': utils.wikify(self.name)})
+        return ("aa-page-history", (), {'slug': aacore.utils.wikify(self.name)})
 
     @models.permalink
     def get_edit_url(self):
-        return ("aa-page-edit", (), {'slug': utils.wikify(self.name)})
+        return ("aa-page-edit", (), {'slug': aacore.utils.wikify(self.name)})
 
     @models.permalink
     def get_absolute_url(self):
-        return ("aa-page-detail", (), {'slug': utils.wikify(self.name)})
+        return ("aa-page-detail", (), {'slug': aacore.utils.wikify(self.name)})
 
     @property
     def slug(self):
         """
         Returns the wikified name of the page.
         """
-        return utils.wikify(self.name)
+        return aacore.utils.wikify(self.name)
 
     def get_repository(self):
         try:
@@ -375,8 +383,8 @@ class RDFDelegate (models.Model):
 ##############################################
 #
 # (1) Creates the "reindex_request" signal to:
-#     Allow Delegates to request (re)indexing of their RDF,
-# (2) Watches delegates post_delete signal to:
+#     Allow Indexed Models or Delegates to request (re)indexing of their RDF,
+# (2) Watches indexed models/delegates post_delete signal to:
 #     Clear RDF index related to Delegate instances when deleted
 #
 # NB: Delegates must themselves request reindexing by
@@ -387,17 +395,11 @@ class RDFDelegate (models.Model):
 #     ...
 #     reindex_request.send(sender=self.__class__, instance=self)
 
-import RDF
-from django.db.models.signals import post_save, post_delete, m2m_changed
-import utils
-import rdfutils
-import django.dispatch
-
 reindex_request = django.dispatch.Signal(providing_args=[])
 
 def indexing_reindex_item (item):
-    rdfmodel = utils.get_rdf_model()
-    full_url = utils.full_site_url(item.get_absolute_url())
+    rdfmodel = aacore.utils.get_rdf_model()
+    full_url = aacore.utils.full_site_url(item.get_absolute_url())
     if hasattr(item, 'get_rdf_as_stream'):
         # in a way the URL here is the resource.url directly ?!
         stream = item.get_rdf_as_stream()
@@ -413,12 +415,12 @@ def indexing_reindex_item (item):
 #        s = rdfaparser.parse_string_as_stream(page, furl)
 #        print "RDFA:", (len(list(s))), "triples"
 
-        utils.parse_localurl_into_model(rdfmodel, full_url, format="rdfa", baseuri=full_url, context=full_url)
+        aacore.utils.parse_localurl_into_model(rdfmodel, full_url, format="rdfa", baseuri=full_url, context=full_url)
     # rdfmodel.sync()
 
 def indexing_drop_item (item):
-    rdfmodel = utils.get_rdf_model()
-    full_url = utils.full_site_url(item.get_absolute_url())
+    rdfmodel = aacore.utils.get_rdf_model()
+    full_url = aacore.utils.full_site_url(item.get_absolute_url())
     rdfutils.rdf_context_remove_statements (rdfmodel, full_url)
     # rdfmodel.sync()
 
@@ -426,10 +428,9 @@ def indexing_post_delete(sender, instance, **kwargs):
     indexing_drop_item(instance)
 
 def indexing_reindex(sender, instance, **kwargs):
-#    print "reindex_request", instance
     indexing_reindex_item(instance)
 
-for model in utils.get_indexed_models():
+for model in aacore.utils.get_indexed_models():
     reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
     post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")
 
