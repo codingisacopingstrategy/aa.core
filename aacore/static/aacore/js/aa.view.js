@@ -184,6 +184,13 @@ function resetTimelines() {
         }
     });
 
+    // Hides the slider if there is no titles attached to the body
+    if (typeof($('body').timeline('maxTime')) == "undefined") {
+        $('nav#timeline').hide();
+    } else {
+        $('nav#timeline').show();
+    }
+
 
     /*    debuggin
     var start = $("body").timeline("minTime");
