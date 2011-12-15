@@ -589,6 +589,22 @@ span[property="aa:end"]:hover {
     cursor: pointer;
 }
 
+/* MASTER TIMELINE ---------- */
+nav#timeline div#timelineslider {
+   border: 1px solid #999; 
+}
+nav#timeline a {
+    border: 1px solid #444;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    background: #999;
+    cursor: move;
+}
+nav#timeline a:hover {
+    background: yellow;
+}
+
 /* EMBED ---------- */
 div.aa_embed {
     position: relative;
