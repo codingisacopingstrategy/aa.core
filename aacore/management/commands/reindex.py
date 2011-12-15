@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 klass = getattr(module, classname)
                 models.append(klass)
         else:
-                models = aacore.utils.get_indexed_models()
+            models = aacore.utils.get_indexed_models()
 
         for model in models:
             for item in model.objects.all():
