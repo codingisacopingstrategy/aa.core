@@ -420,6 +420,9 @@ $(document).bind("refresh", function (evt) {
         };
         $('section.section2').each(function() {
             var data_start = $(this).attr('data-start');
+            if (typeof(data_start) == "undefined") {
+                return;
+            };
             var elt_duration = $.timecode_tosecs(data_start);
             var elt_pos = elt_duration / duration;
             $('<a href="#" class="landmark"></a>').css({
