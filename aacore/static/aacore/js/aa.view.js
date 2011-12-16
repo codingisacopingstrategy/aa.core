@@ -553,14 +553,14 @@ $(document).ready(function() {
             enableCursorHotkey: false,
             slidable: false,
             resizable: false,
-            togglerAlign_closed : 'top',
-            togglerAlign_open : 'top',
+            togglerAlign_closed : 'center',
+            togglerAlign_open : 'center',
             togglerContent_open: '&larr;',
             togglerContent_closed: '&rarr;',
             spacing_closed: 30,
             spacing_open: 30,
-            togglerLength_open: "100%",
-            togglerLength_closed: "100%",
+            togglerLength_open: 30,
+            togglerLength_closed: 30,
             showOverflowOnHover: false,
         },
     });
@@ -647,7 +647,7 @@ $(document).ready(function() {
         }, 1000);
 
         $target.removeClass('collapsed');
-        //return false;
+        return false;
     });
 
 

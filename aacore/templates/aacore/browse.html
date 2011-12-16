@@ -23,7 +23,7 @@ window.onload = function () {
     <form method="get" action="">{% csrf_token %}
         <div>
             <a href="{{ uri }}" class="directlink">URL</a>
-            <input name="uri" id="uri" style="width: 70%;" value="{{ uri }}" />
+            <input name="uri" id="uri" style="width: 85%;" value="{{ uri }}" /><br>
             <input type="submit" name="_submit" value="ok" />
             {% if resource %}
             <input type="submit" name="_submit" value="reload" />

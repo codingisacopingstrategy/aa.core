@@ -18,6 +18,30 @@
 <script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
 
+
+<script>
+    $(document).ready(function(){
+        var hover = false;
+        $(".index-slideshow .wrapper").live("mouseenter", function() {
+            console.log("over");
+            var $this = $(this)
+            function scrollme() {
+                hover = true;
+                scrollto = $this.scrollTop();
+                console.log(scrollto);
+                $this.animate({
+                    scrollTop: scrollto + 100,
+                }, 500, function() {
+                    if (hover === true) scrollme();
+                });
+            }
+            scrollme();
+        }).live("mouseleave", function(){
+           hover = false; 
+        });
+    });
+</script>
+
 <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.play.css" type="text/css" media="screen" charset="utf-8" />
 
 {% get_markdown_for content as md meta %}
@@ -66,7 +90,7 @@
     <div id="tab-this">
         <ul id="aa-tabs">
             <li><a title="About" href="#tab-about">About</a></li>
-            <li><a title="Layers" href="#tab-layers">Layers</a></li>
+            <li><a title="Layers" href="#tab-layers">Table of Contents</a></li>
             {% if user.is_authenticated %}
                 <li><a title="Styles" href="#tab-styles">Styles</a></li>
                 <li><a title="Help" href="#tab-help">Help</a></li>
