@@ -159,6 +159,13 @@
         margin-right: 2px;
         margin-bottom: 18px;
         cursor: pointer;
+        font-family: "LiberationSans", Sans-Serif;
+        letter-spacing: 0.5px;
+        font-size: 13px;
+    }
+    input[type=submit] {
+        text-transform: uppercase;
+        letter-spacing: 0;
     }
     button:hover,
     input[type=submit]:hover {
@@ -167,7 +174,7 @@
     select {
         background-color: white;
         border: 1px solid darkgray;
-        
+        font-family: "LiberationSans", Sans-Serif;
     }
 
     /* MEDIA ---------- */
@@ -425,21 +432,20 @@ nav span.title {
         }
 
         /* BROWSER ---------- */
-        #south-pane {
-            background: #EEE;
-        }
         .browser a {
             border-bottom: none;
         }
         .browser a:hover {
-            background: black;
-            color: white;
+            background: blue;
         }
         .browser td {
             vertical-align: top;
         }
         #browser_top {
             margin-bottom: 20px;
+        }
+        div#tab-browse iframe {
+            width: 100%;
         }
 
 /* BACKGROUND / SECTIONS WRAPPPER ---------- */
@@ -770,6 +776,7 @@ div.aa_embed .links {
     top: 5px;
     display: none;
 }
+a.directlink,
 div.aa_embed .links a {
     padding: 4px 8px;
     background: rgba(0,0,0,0.5);
@@ -793,15 +800,15 @@ div.aa_embed .links a:hover {
 div.aa_embed audio {
     min-height: 60px;
 }
-/* draggable reference to a URL */ /* THIS SEEMS TO BE OVERRIDEN BY "div.aa_embed .links a"*/
-a.directlink {
-    background: black;
-    color: white;
-    padding: 4px 8px;
-    text-transform: uppercase;
-    border-bottom: none;
-    z-index: 100;
-}
+/* draggable reference to a URL in BROWSE page*/
+/*a.directlink {*/
+    /*background: black;*/
+    /*color: white;*/
+    /*padding: 4px 8px;*/
+    /*text-transform: uppercase;*/
+    /*border-bottom: none;*/
+    /*z-index: 100;*/
+/*}*/
 nav#west-pane div.aa_embed {    /* ----- EMBED MEDIA IN SIDEBAR ---- */
     text-align: center;
     margin: 1.3em;
