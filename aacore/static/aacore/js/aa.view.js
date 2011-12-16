@@ -633,8 +633,9 @@ $(document).ready(function() {
     //});
     
     // Smooth scrolling to and uncollapsing of anchors
+    $('a[href^="#"]').live('click', function() {
     //$('div#center a[href^="#"]').live('click', function() {
-    $('div#center').delegate('a[href^="#"]', 'click', function() {
+    //$('div#center').delegate('a[href^="#"]', 'click', function() {
         
         var $target = $($(this).attr('href'));
         var offset = $target.offset();
@@ -645,7 +646,7 @@ $(document).ready(function() {
         }, 1000);
 
         $target.removeClass('collapsed');
-        //return false;
+        return false;
     });
 
 
