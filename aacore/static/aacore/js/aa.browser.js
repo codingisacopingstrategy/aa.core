@@ -41,7 +41,7 @@ $(document).bind("refresh", function (evt) {
 function loadbrowserpage (url, targetsel, expandWhenLoaded, success_callback) {
     $("iframe#browser-panel").attr('src', url);
     $("div#tab-this").tabs("select" , "#tab-browse");
-    //$("body").layout().open("south");
+    $("body").layout().open("west");
     //targetsel = targetsel || "#browser";
     //if (expandWhenLoaded === undefined) expandWhenLoaded = true;
     //loading = true;
