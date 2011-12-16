@@ -5,18 +5,22 @@ from fabric.api import run, local, put, cd, sudo, env
 def lgru():
     env.hosts = ['constant@oscillator.worm.org:222']
     env.path = '/var/www/vhosts/aa.lgru.net/'
+    #env.git_path = '/home/sarma/www/be.sarma/db/repositories'
 
 def sarma():
     env.hosts = ['sarma@sarma.stdin.fr']
     env.path = '/home/sarma/www/be.sarma/'
+    env.git_path = '/home/sarma/www/be.sarma/db/repositories/'
 
 def aa():
     env.hosts = ['activearchives@activearchives.org']
     env.path = '/var/www/vhosts/activearchives.org/wsgi/vj13/'
+    #env.git_path = '/home/sarma/www/be.sarma/db/repositories'
 
 def fix_permissions():
     # fixes permission issues
     sudo('chown -R %s:www-data %s' % (env.user, env.path))
+    sudo('chown -R www-data:www-data %s' % env.git_path)
     sudo('chmod -R g+w %saa.core' % env.path)
     sudo('apache2ctl graceful')
 #/home/sarma/www/be.sarma/db/repositories

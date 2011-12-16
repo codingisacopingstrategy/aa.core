@@ -633,15 +633,17 @@ $(document).ready(function() {
     //});
     
     // Smooth scrolling to and uncollapsing of anchors
+    $('a[href^="#"]').live('click', function() {
     //$('div#center a[href^="#"]').live('click', function() {
-    $('div#center').delegate('a[href^="#"]', 'click', function() {
+    //$('div#center').delegate('a[href^="#"]', 'click', function() {
         
         var $target = $($(this).attr('href'));
         var offset = $target.offset();
+        //var container_offset = $('div#center').offset();
         
         $('div#center').animate({
             scrollTop: offset.top,
-            scrollLeft: offset.left,
+            scrollLeft: offset.left
         }, 1000);
 
         $target.removeClass('collapsed');

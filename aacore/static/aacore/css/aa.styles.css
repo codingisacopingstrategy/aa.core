@@ -181,7 +181,7 @@
     /* MEDIA ---------- */
     video,
     audio,
-    img {
+    img[rel="embed"] {
         max-width: 100%;
     }
 
@@ -823,4 +823,12 @@ h1.logo span {
 }
 h1.logo a {
     text-decoration: none;
+}
+
+/* PLUGINS */
+a[rel="zoomable"] {
+    border: 1px solid black;
+}
+a[rel="zoomable"] img {
+    max-width: auto!important;
 }

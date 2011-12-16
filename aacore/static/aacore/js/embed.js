@@ -15,8 +15,37 @@ $(document).bind("refresh", function (evt) {
                 },
                 success: function (data) {
                     if (data.ok) {
+                        // NEW: december 16 (Alex)
+                        // In addition to content there are three new keys:
+                        // - extra_css: loads extra linl rel="stylesheet"
+                        // - extra_js: load extra script
+                        // - script: extra javascript code to execute
+                        for (var i = 0; i < data.extra_css.length; i++) {
+                            var href = data.extra_css[i];
+                            //if (!$('link[href="' + href + '"]').length) {
+                            $('<link rel="stylesheet" type="text/css" media="screen">')
+                                .attr("href", href)
+                                .appendTo($('head'));
+                            //};
+                        };
+                        for (var i = 0; i < data.extra_js.length; i++) {
+                            var src = data.extra_js[i];
+                            $('<script>').attr("src", src).appendTo($('head'));
+                        };
+
                         var new_content = $(data.content);
                         $(that).replaceWith(new_content);
+
+                        // FIXME: This is a hack to make sure the html is load before executing the script.
+                        //new_content.ready(function() {
+                        setTimeout(function() {
+                            var script_elt = document.createElement('script');
+                            script_elt.text = data.script
+                            var head = document.getElementsByTagName('body')[0].appendChild(script_elt);
+                            //$(script_elt).appendTo($('head'));
+                        }, 1000);
+                        //});
+
                         $(new_content).trigger("refresh");
                     } else {
                         if (data.content) {
