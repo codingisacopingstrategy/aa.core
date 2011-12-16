@@ -35,3 +35,9 @@ urlpatterns = patterns('aacore.views',
     ### RDF ###
     (r'^rdf/', include('aacore.rdfviews')),
 )
+
+### LOGIN ###
+urlpatterns += patterns('',
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'aacore/login.html'}, name='aa-login'),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'template_name': 'aacore/logout.html'}, name='aa-logout'),
+)
