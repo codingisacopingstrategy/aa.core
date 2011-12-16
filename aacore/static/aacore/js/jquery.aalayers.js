@@ -88,16 +88,18 @@
                         //$('a').attr('href', '#' + $this.attr('id')).text($h1.text())
                     //);
 
-                var export_link = $("<a>").text("↷")
+                var export_link = $("<a>").text("⤌ ")
                     .attr('title', 'export to audacity markers')
                     .attr('href', './annotations/' + $this.attr('data-section'))
                     .attr('target', '_blank')
+                    .addClass('audacity')
                     .css('float', 'right');
 
-                var import_link = $("<a>").text("↶")
+                var import_link = $("<a>").text("⤍")
                     .attr('title', 'import from audacity markers')
                     .attr('href', './annotations/' + $this.attr('data-section') + '/import')
                     //.attr('target', '_blank')
+                    .addClass('audacity')
                     .css('float', 'right');
 
                 $li.append($input, import_link, export_link)

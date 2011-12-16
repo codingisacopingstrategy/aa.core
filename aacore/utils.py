@@ -13,6 +13,7 @@ from django.conf import settings as projectsettings
 from rdfutils import get_model, rdf_parse_into_model, prep_uri
 import aacore.models
 import settings
+import html5tidy
 
 #####################
 
@@ -240,6 +241,7 @@ def direct_get_response (url, request=None):
 def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=None, request=None):
 
     content = direct_get_response(uri, request).content
+    content = html5tidy.tidy(content)
     uri = prep_uri(uri)
 
     if format:
