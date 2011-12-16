@@ -75,16 +75,6 @@
         /*line-height: 18px;*/
         line-height: 1.3;  /* So we don't have to worry about the line-height when we change the font size */
     }
-    article {
-        background-color: white;
-        max-width: 100%;
-        width: 14em;
-        margin-top: 10px;
-        font-size: 42px;
-        line-height: 48px;
-        font-weight: bold;
-        color: LightGoldenRodYellow;
-    }
     code {
         font-family: LatinModernMono, mono;
         font-style: italic;
@@ -126,15 +116,12 @@
     }
     h4 {
         margin: 18px 0;
-
     }
     h5 {
         margin: 18px 0;
-
     }
     h6 {
         margin: 18px 0;
-
     }
 
     /* LISTS ---------- */
@@ -283,6 +270,17 @@ nav span.title {
         font-family: LiberationMono, Monospace;
         padding: 0 6px;
     }
+    nav#west-pane + div.ui-layout-resizer span { 
+        border: 1px solid black;
+        -moz-border-radius: 10px;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        margin: 0 6px;
+    }
+    nav#west-pane + div.ui-layout-resizer span:hover { 
+        background-color: yellow;
+    }
         /* TOOLBAR ---------- */
         /* TOOLBAR IN EDIT PAGE --------- */
         nav#toolbar {
@@ -351,6 +349,14 @@ nav span.title {
         ul#toolbar li a {
             text-decoration: none;
         }
+        /* ABOUT TAB ----------- */
+        div#tab-about li {
+            list-style: none;
+        }
+        div#tab-about h2 {
+            text-transform: uppercase;
+            margin-top: -22px;
+        }
         /* LAYERS ---------- */
         div#tab-layers {
             font-size: 11px;
@@ -415,17 +421,37 @@ nav span.title {
             margin-bottom: 20px;
         }
 
-
+/* BACKGROUND / SECTIONS WRAPPPER ---------- */
+article {
+    background-color: white;
+    max-width: 100%;
+    width: 30em;
+    margin-top: 10px;
+    font-size: 24px;
+    line-height: 1.2em;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+article strong {
+    background-color: Beige;
+    text-transform: uppercase;
+    padding: 0 6px;
+}
 
 /* SECTIONS ---------- */
 section {
-    color: black;
+    letter-spacing: 0;
     border-top: 1px dotted lightgray;
     /*border-bottom: 1px dotted lightgray;*/
     z-index: 2;
     font-size: 13px;
     line-height: 1.3em;
     font-weight: normal;
+}
+section strong {
+    background: none;
+    text-transform: none;
+    padding: 0;
 }
 section + section {
     /*border-top: 0px dotted black;*/
@@ -721,7 +747,7 @@ div.aa_embed .links a {
     padding: 4px 8px;
     background: rgba(0,0,0,0.5);
     color: white;
-    margin-right: 5px;
+    margin-right: 2px;
     text-transform: uppercase;
     font-size:smaller;
     letter-spacing: 1px;
@@ -729,15 +755,16 @@ div.aa_embed .links a {
     border-bottom: none;
     -moz-border-radius: 2px;
     border-radius: 2px;
+    font-size: 10px;
+    text-decoration: none;
 }
 div.aa_embed .links a:hover {
-    background: black;
-    color: white;
+    background: blue;
 }
 div.aa_embed audio {
     min-height: 60px;
 }
-/* draggable reference to a URL */
+/* draggable reference to a URL */ /* THIS SEEMS TO BE OVERRIDEN BY "div.aa_embed .links a"*/
 a.directlink {
     background: black;
     color: white;
@@ -745,6 +772,10 @@ a.directlink {
     text-transform: uppercase;
     border-bottom: none;
     z-index: 100;
+}
+nav#west-pane div.aa_embed {    /* ----- EMBED MEDIA IN SIDEBAR ---- */
+    text-align: center;
+    margin: 1.3em;
 }
 
 /* SWATCHES ---------- */
