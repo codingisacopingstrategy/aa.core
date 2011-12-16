@@ -180,7 +180,7 @@
     /* MEDIA ---------- */
     video,
     audio,
-    img[rel="embed"] {
+    img {
         max-width: 100%;
     }
 
@@ -902,5 +902,5 @@ a[rel="zoomable"] {
     border: 1px solid black;
 }
 a[rel="zoomable"] img {
-    max-width: auto!important;
+    max-width: none !important;
 }
