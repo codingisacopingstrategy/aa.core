@@ -46,24 +46,30 @@
             <span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span>
         </a>
     </h1>
-    <ul id="toolbar">
-        {% if page %}
-        <!--<li><a title="home" href="/pages/Index/">☗</a></li>-->
-        <li><a title="history" href="{{ page.get_history_url }}">View</a></li>
-        <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
-        <li><a title="add" href="#">Add</a></li>
-        <li><a title="commit" href="#">Save</a></li>
-        <!--<li><a title="menu" href="#">⚙</a></li>-->
-        {% endif %}
-    </ul>
-    <div class="ui-layout-content">
+    {% if user.is_authenticated %}
+        <ul id="toolbar">
+            {% if page %}
+                <li><a title="history" href="{{ page.get_history_url }}">View</a></li>
+                <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
+                <li><a title="add" href="#">Add</a></li>
+                <li><a title="commit" href="#">Save</a></li>
+                <!--<li><a title="menu" href="#">⚙</a></li>-->
+            {% endif %}
+        </ul>
+    {% endif %}
+    <hr>
+    <!--<div class="ui-layout-content">-->
+    <div id="tab-this">
         <ul id="aa-tabs">
             <li><a title="About" href="#tab-about">About</a></li>
             <li><a title="Layers" href="#tab-layers">Layers</a></li>
-            <li><a title="Styles" href="#tab-styles">Styles</a></li>
-            <li><a title="Help" href="#tab-help">Help</a></li>
+            {% if user.is_authenticated %}
+                <li><a title="Styles" href="#tab-styles">Styles</a></li>
+                <li><a title="Help" href="#tab-help">Help</a></li>
+            {% endif %}
             <li><a title="Browser" href="#tab-browse">Browse</a></li>
         </ul>
+
 
         <div id="tab-about" class="aa-tab">
             {% get_markdown_for content as md meta %}
@@ -81,15 +87,21 @@
                 {{ md|safe }}
             {% endfor %}
         </div>
+
         <div id="tab-layers" class="aa-tab">
         </div>
-        <div id="tab-styles" class="aa-tab">
-            {% include "aacore/partials/swatches.html" %}
-        </div>
-        <div id="tab-help" class="aa-tab">
-            {% include "aacore/partials/timecode_help.html" %}
-            {% include "aacore/partials/markdown_help.html" %}
-        </div>
+
+        {% if user.is_authenticated %}
+            <div id="tab-styles" class="aa-tab">
+                {% include "aacore/partials/swatches.html" %}
+            </div>
+
+            <div id="tab-help" class="aa-tab">
+                {% include "aacore/partials/timecode_help.html" %}
+                {% include "aacore/partials/markdown_help.html" %}
+            </div>
+        {% endif %}
+
         <div id="tab-browse">
             <iframe id="browser-panel"></iframe>
         </div>

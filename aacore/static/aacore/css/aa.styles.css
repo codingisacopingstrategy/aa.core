@@ -236,18 +236,16 @@ nav span.title {
 
     /* RIGHT PANEL ---------- */
     nav#west-pane {
-        font-size: 18px;
         font-family: LiberationSans, sans;
         z-index: 9999;
         text-align: center !important;
         background-color: white;
     }
     nav#west-pane hr {
-        color: white;
-        background-color: white;
+        background-color: black;
         height: 1px;
         border: 0;
-        width: 30%;
+        width: 50%;
     }
     nav#west-pane p {
         margin-bottom: 0;
@@ -256,12 +254,10 @@ nav span.title {
         letter-spacing: 0;
     }
     nav#west-pane h1 {
-        text-align: center;
+        /*text-align: center;*/
         font-weight: bold;
         margin: 1em auto;
-        /*font-size: 36px;*/
         text-decoration: none;
-        /*border-bottom: 3px solid black;*/
         font-size: 24px;
         line-height: 26px;
         display: inline-block;
@@ -280,21 +276,7 @@ nav span.title {
     nav#west-pane div.aa-tab {
         text-align: left;
     }
-    nav#west-pane li a:hover {
-        /*border-bottom: 1px solid !important;*/
-        /*background: none;*/
-    }
-    nav#west-pane ul.ui-sortable li {
-        margin-top: -1px;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-        padding: 4px 0;
-    }
-    nav#west-pane ul.ui-sortable input[type=checkbox] {
-        vertical-align: -2px;
-        margin-right: 3px;
-    }
-    nav#west-pane + div.ui-layout-resizer * {
+    nav#west-pane + div.ui-layout-resizer * { /* PANEL HANDLER */
         line-height: 15px;
         background: none;
         color: black;
@@ -346,8 +328,9 @@ nav span.title {
         nav#toolbar ul li:first-child:before {
             /*content: "";*/
         }  
+        /* VIEW-EDIT-ADD-SAVE TOOLBAR ---------- */
         ul#toolbar {
-            border-bottom: 1px solid black;
+            /*border-bottom: 1px solid black;*/
             text-align: center;
             padding-bottom: 13px;
             margin: 0 18%;
@@ -373,8 +356,13 @@ nav span.title {
             font-size: 11px;
         }
         div#tab-layers li {
+            margin-top: -1px;
+            border-top: 1px solid darkgray;
+            border-bottom: 1px solid darkgray;
+            padding: 4px 0;
             background-color: white;
             list-style: none;
+            cursor: move;
         }
         div#tab-layers a {
             text-decoration: none;
@@ -385,6 +373,8 @@ nav span.title {
         }
         div#tab-layers input[type=checkbox] {
             margin-bottom: 4px;
+            vertical-align: -2px;
+            margin-right: 3px;
         }
 
         /* CSS SWATCHES ---------- */
@@ -399,7 +389,9 @@ nav span.title {
             font-size: 13px;
         }
         nav#west-pane #tab-help h3 {
-            /*border-top: 1px dotted black;*/
+            border-top: 1px solid darkgray;
+            padding-top: 6px;
+            margin: 8px 0;
         }
         nav#west-pane #tab-help div {
             display: none;
@@ -708,10 +700,10 @@ a.directlink {
 span.swatch { 
     display: block; 
     float: left; 
-    margin-right: 3px; 
-    margin-bottom: 3px; 
+    margin-right: 8px; 
+    margin-bottom: 8px; 
     border: 1px solid lightgray; 
-    padding: 2px; 
+    padding: 2px 4px; 
     background-color: white; 
     cursor: move;
 }

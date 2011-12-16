@@ -475,7 +475,7 @@ $(document).ready(function() {
     // LAYOUT
     // FIXME: is it really necessary to set enableCursorHotKey for each
     // sidebar?
-    $("nav#west-pane .ui-layout-content").tabs();
+    $("nav#west-pane div#tab-this").tabs();
     //$("aa-tabs").tabs();
     $('body').layout({
         applyDefaultStyles: false,
