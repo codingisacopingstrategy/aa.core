@@ -27,8 +27,13 @@ def make_link(rel, target, label, default_link_rel=None, filter_=None):
     Returns ElementTree Element. 
     """
     a = markdown.util.etree.Element('a')
+    #import pdb; pdb.set_trace();
     parts = urlparse.urlparse(target)
-    if parts.scheme:
+    # FIXME: This was added to give anchor support within a wiki page.
+    #        Many link styles are not taken into account yet.
+    if parts.fragment and not (parts.scheme or parts.netloc):
+        href = "#%s" % parts.fragment
+    elif parts.scheme:
         href = target
     else:
         href = url_for_pagename(target)

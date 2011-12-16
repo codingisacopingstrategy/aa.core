@@ -146,6 +146,38 @@ class AAFilterResize(AAFilter):
         self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
 
 
+class AAFilterCrop(AAFilter):
+    """
+    [[ http://example.org/image.jpg||crop:40x30+10+10 ]]
+    """
+    name = "crop"
+
+    def validate(self):
+        sizepat = re.compile(r"(?P<width>\d+)x(?P<height>\d+)\+(?P<top>\d+)\+(?P<left>\d+)", re.I)
+        match = sizepat.match(self.arguments)
+        if match:
+            self.parsed_arguments['width'] = match.groupdict()['width']
+            self.parsed_arguments['height'] = match.groupdict()['height']
+            self.parsed_arguments['top'] = match.groupdict()['top']
+            self.parsed_arguments['left'] = match.groupdict()['left']
+            return True
+
+    def run(self):
+        if not os.path.exists(self.stdout['local_path']):
+            cmd = 'convert -crop %sx%s+%s+%s %s %s' % (self.parsed_arguments['width'],
+                                                self.parsed_arguments['height'], 
+                                                self.parsed_arguments['top'], 
+                                                self.parsed_arguments['left'], 
+                                                self.stdin['local_path'], 
+                                                self.stdout['local_path'])
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+            (stdout_data, stderr_data) = p1.communicate()
+
+        self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
+
+
 if __name__ == '__main__':
     filters = {}
 

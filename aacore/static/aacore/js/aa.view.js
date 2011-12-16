@@ -218,7 +218,7 @@ $(document).bind("refresh", function (evt) {
     // Draggable Sections
     $("section.section1").draggable({
         handle: 'h1',
-        delay: 500,  // NOTE: Prevents unwanted saves 
+        delay: 200,  // NOTE: Prevents unwanted saves 
         stop: function () { 
             var position = $(this).position();
             if (position.top < 0) {
@@ -631,6 +631,22 @@ $(document).ready(function() {
     //$("#pause").bind('click', function(e) {
         //$('body').voidplayer('pause');
     //});
+    
+    // Smooth scrolling to and uncollapsing of anchors
+    //$('div#center a[href^="#"]').live('click', function() {
+    $('div#center').delegate('a[href^="#"]', 'click', function() {
+        
+        var $target = $($(this).attr('href'));
+        var offset = $target.offset();
+        
+        $('div#center').animate({
+            scrollTop: offset.top,
+            scrollLeft: offset.left,
+        }, 1000);
+
+        $target.removeClass('collapsed');
+        //return false;
+    });
 
 
 });
