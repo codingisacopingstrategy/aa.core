@@ -103,6 +103,11 @@
 	.ui-layout-toggler-west ,
 	.ui-layout-toggler-east {
 		/*border-width: 1px 0; [> top/bottom borders <]*/
+        margin-top: 0!important;
+	}
+	.ui-layout-toggler-west span,
+	.ui-layout-toggler-east span{
+		/*border-width: 1px 0; [> top/bottom borders <]*/
         margin-top: 10px!important;
 	}
 	.ui-layout-toggler-west {

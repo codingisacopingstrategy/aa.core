@@ -453,7 +453,7 @@ $(document).ready(function() {
     });
     /////////////////////////
     // LAYERS
-    $('div#tabs-2').aalayers({
+    $('div#tab-layers').aalayers({
         selector: 'section.section1',
         post_reorder: function(event, ui, settings) {
             var $this = settings.$container;
@@ -475,12 +475,13 @@ $(document).ready(function() {
     // LAYOUT
     // FIXME: is it really necessary to set enableCursorHotKey for each
     // sidebar?
-    $("nav#east-pane").tabs();
+    $("nav#west-pane div#tab-this").tabs();
+    //$("aa-tabs").tabs();
     $('body').layout({
         applyDefaultStyles: false,
         enableCursorHotkey: false,
         west: {
-            size: 350,
+            size: "33%",
             fxSpeed: "slow",
             initClosed: false,
             enableCursorHotkey: false,
@@ -488,28 +489,14 @@ $(document).ready(function() {
             resizable: false,
             togglerAlign_closed : 'top',
             togglerAlign_open : 'top',
-            togglerContent_open: '⚙',
-            togglerContent_closed: '⚙',
-            spacing_closed: 18,
-            spacing_open: 18,
-            togglerLength_open: 24,
-            togglerLength_closed: 24,
+            togglerContent_open: '&larr;',
+            togglerContent_closed: '&rarr;',
+            spacing_closed: 30,
+            spacing_open: 30,
+            togglerLength_open: "100%",
+            togglerLength_closed: "100%",
+            showOverflowOnHover: false,
         },
-        east: {
-            size: 350,
-            fxSpeed: "slow",
-            initClosed: true,
-            enableCursorHotkey: false,
-            slidable: false,
-        },
-        south: {
-            fxName: "slide",
-            fxSpeed: "slow",
-            size: 350,
-            initClosed: true,
-            enableCursorHotkey: false,
-            slidable: false,
-        }           
     });
     
     $("a[title='add']:first").click(function() {

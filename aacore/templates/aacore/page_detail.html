@@ -28,7 +28,7 @@
 {% block body %}
 
 <nav id="timeline">
-<div id="timelineslider"></div>
+    <div id="timelineslider"></div>
 </nav>
 
 <article>
@@ -38,44 +38,72 @@
 {% endblock %}
 
 {% block postbody %}
+<!--<nav id="west-pane" class="ui-layout-west" style="display: none; text-align: left;"> -->
+<!--</nav>-->
 <nav id="west-pane" class="ui-layout-west" style="display: none; text-align: left;"> 
-    <ul id="toolbar">
-        {% if page %}
-        <!--<li><a title="home" href="/pages/Index/">☗</a></li>-->
-        <li><a title="history" href="{{ page.get_history_url }}">View History</a></li>
-        <li><a title="edit" href="{{ page.get_edit_url }}">Edit Page</a></li>
-        <li><a title="add" href="#">Add Annotation</a></li>
-        <li><a title="commit" href="#">Save Version</a></li>
-        <!--<li><a title="menu" href="#">⚙</a></li>-->
+    <h1 class="logo">
+        <a href="/oralsite/">
+            <span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span>
+        </a>
+    </h1>
+    {% if user.is_authenticated %}
+        <ul id="toolbar">
+            {% if page %}
+                <li><a title="history" href="{{ page.get_history_url }}">View</a></li>
+                <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
+                <li><a title="add" href="#">Add</a></li>
+                <li><a title="commit" href="#">Save</a></li>
+                <!--<li><a title="menu" href="#">⚙</a></li>-->
+            {% endif %}
+        </ul>
+    {% endif %}
+    <hr>
+    <!--<div class="ui-layout-content">-->
+    <div id="tab-this">
+        <ul id="aa-tabs">
+            <li><a title="About" href="#tab-about">About</a></li>
+            <li><a title="Layers" href="#tab-layers">Layers</a></li>
+            {% if user.is_authenticated %}
+                <li><a title="Styles" href="#tab-styles">Styles</a></li>
+                <li><a title="Help" href="#tab-help">Help</a></li>
+            {% endif %}
+            <li><a title="Browser" href="#tab-browse">Browse</a></li>
+        </ul>
+
+
+        <div id="tab-about" class="aa-tab">
+            {% get_markdown_for content as md meta %}
+            {% if meta.title %}
+                <h1>{{ meta.title|first }}</h1>
+            {% endif %}
+            {% if meta.subtitle %}
+                <h2>{{ meta.subtitle|first }}</h2>
+            {% endif %}
+            {% if meta.authors %}
+                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
+            {% endif %}
+            {% for summary in meta.summary %}
+                {% get_markdown_for summary as md meta %}
+                {{ md|safe }}
+            {% endfor %}
+        </div>
+
+        <div id="tab-layers" class="aa-tab">
+        </div>
+
+        {% if user.is_authenticated %}
+            <div id="tab-styles" class="aa-tab">
+                {% include "aacore/partials/swatches.html" %}
+            </div>
+
+            <div id="tab-help" class="aa-tab">
+                {% include "aacore/partials/timecode_help.html" %}
+                {% include "aacore/partials/markdown_help.html" %}
+            </div>
         {% endif %}
-    </ul>
-    {% get_markdown_for content as md meta %}
-    <h1>{{ meta.title|first }}</h1>
-    {% for summary in meta.summary %}
-        {% get_markdown_for summary as md meta %}
-        {{ md|safe }}
-    {% endfor %}
 
-<!--Amos Hetz was one of the artists that was to feature in the portfolio of WHAT’S THE SCORE NOW in Multitudes 2005. Yet, because of time pressure his contribution could not be included. Now, in the frame of the expanded republication of this issue, Amos Hetz can finally appear. He developed a long standing expertise in the field of notation and score-based work.-->
-
-<!--The core element of his contribution to Oral Site consists in the so far unpublished text The notated Gesture, a text that Amos Hetz wrote in 2010 on the subject of his practice of drawing and dance making (often using scores and notation). At first, these two practices unfolded parallel to one another, until they started intertwining in more recent works.-->
-<!--The Notated Gesture is accompanied by a selection of visuals of scores, notations, diagrams and maps selected by Amos Hetz.-->
-</nav>
-<nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
-    <ul>
-        <li><a title="Layers" href="#tabs-2">&#8738;</a></li>
-        <li><a title="Styles" href="#tabs-3">▦</a></li>
-        <li><a title="Help" href="#tabs-1">?</a></li>
-    </ul>
-    <div class="ui-layout-content">
-        <div id="tabs-2">
-        </div>
-        <div id="tabs-3">
-            {% include "aacore/partials/swatches.html" %}
-        </div>
-        <div id="tabs-1">
-            {% include "aacore/partials/timecode_help.html" %}
-            {% include "aacore/partials/markdown_help.html" %}
+        <div id="tab-browse">
+            <iframe id="browser-panel"></iframe>
         </div>
     </div>
 </nav>
@@ -84,5 +112,4 @@
     <!--[><div class="minipage"></div><]-->
     <!--<iframe class="minipage" src="/browse/"></iframe>-->
 <!--</div>-->
-<iframe id="south-pane" class="ui-layout-south"></iframe>
 {% endblock %}
