@@ -87,9 +87,13 @@ class AAFilterEmbed(AAFilter):
         if embed_style == "img":
             self.stdout['output'] = '<img src="%s" />' % self.stdin['local_url']
         elif embed_style == "html5video":
-            self.stdout['output'] = '<video class="player" controls src="%s" />' %  self.stdin['local_url']
+            #self.stdout['output'] = '<video class="player" controls src="%s" />' %  self.stdin['local_url']
+            # Temporarily fixes the local serveur serving ogg with the wronf mimetype
+            self.stdout['output'] = '<video class="player" controls src="%s" />' %  self.stdin['original_url']
         elif embed_style == "html5audio":
-            self.stdout['output'] = '<audio class="player" controls src="%s" />' % self.stdin['local_url']
+            #self.stdout['output'] = '<audio class="player" controls src="%s" />' % self.stdin['local_url']
+            # Temporarily fixes the local serveur serving ogg with the wronf mimetype
+            self.stdout['output'] = '<audio class="player" controls src="%s" />' % self.stdin['original_url']
         elif embed_style == "iframe":
             self.stdout['output'] = '<iframe src="%s"></iframe>' % self.stdin['local_url']
         elif embed_style == "feed":

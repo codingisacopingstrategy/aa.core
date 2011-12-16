@@ -15,7 +15,7 @@ import mdx_sectionedit
 import mdx_addsections
 import mdx_addsectionstoolbar
 import mdx_timecodes
-#import mdx_del_ins
+import mdx_del_ins
 #import mdx_cut
 from aacore.utils import url_for_pagename
 import urlparse
@@ -106,7 +106,7 @@ def get_markdown(default_link_rel = "aa:link"):
             #mdx_cut.makeExtension(),
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
-            #mdx_del_ins.makeExtension(),
+            mdx_del_ins.makeExtension(),
             # mdx_sectionedit.makeExtension(),
             mdx_addsections.makeExtension(configs=[('class','section%(LEVEL)d'),]),
             # mdx_addsectionstoolbar.makeExtension(),
@@ -126,7 +126,7 @@ def get_simple_markdown(default_link_rel = "aa:link"):
                 ('make_link', make_link),
                 ('default_link_rel', default_link_rel)]),
             mdx_semanticdata.makeExtension(),
-            #mdx_del_ins.makeExtension(),
+            mdx_del_ins.makeExtension(),
             #mdx_cut.makeExtension(),
             ],
         ) 

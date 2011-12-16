@@ -19,6 +19,7 @@ def fix_permissions():
     sudo('chown -R %s:www-data %s' % (env.user, env.path))
     sudo('chmod -R g+w %saa.core' % env.path)
     sudo('apache2ctl graceful')
+#/home/sarma/www/be.sarma/db/repositories
 
 def deploy(treeish='HEAD'):
     # makes a tarball of the django project and transfers it

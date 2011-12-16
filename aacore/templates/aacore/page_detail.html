@@ -5,7 +5,7 @@
 {% block extrahead %}
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
-<script src="{{ STATIC_URL }}lib/js-iso8601/iso8601.min.js"></script>   
+<!--<script src="{{ STATIC_URL }}lib/js-iso8601/iso8601.min.js"></script>   -->
 
 <script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
@@ -18,6 +18,7 @@
 <script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
 
+<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.play.css" type="text/css" media="screen" charset="utf-8" />
 
 {% get_markdown_for content as md meta %}
 {% for css in meta.extra_css %}
@@ -30,6 +31,11 @@
 <nav id="timeline">
 <div id="timelineslider"></div>
 </nav>
+<div id="controls">
+    <span id="play">play</span> |
+    <span id="pause">pause</span>
+</div>
+<span id="time">time</span>
 
 {% get_markdown_for content as md meta %}
 <article {% if meta.mode %}class="{{ meta.mode|first }}"{% endif %}>
@@ -55,11 +61,6 @@
         {% get_markdown_for summary as md meta %}
         {{ md|safe }}
     {% endfor %}
-
-<!--Amos Hetz was one of the artists that was to feature in the portfolio of WHAT’S THE SCORE NOW in Multitudes 2005. Yet, because of time pressure his contribution could not be included. Now, in the frame of the expanded republication of this issue, Amos Hetz can finally appear. He developed a long standing expertise in the field of notation and score-based work.-->
-
-<!--The core element of his contribution to Oral Site consists in the so far unpublished text The notated Gesture, a text that Amos Hetz wrote in 2010 on the subject of his practice of drawing and dance making (often using scores and notation). At first, these two practices unfolded parallel to one another, until they started intertwining in more recent works.-->
-<!--The Notated Gesture is accompanied by a selection of visuals of scores, notations, diagrams and maps selected by Amos Hetz.-->
 </nav>
 <nav id="east-pane" class="ui-layout-east" style="display: none; text-align: left;"> 
     <ul>

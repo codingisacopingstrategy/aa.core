@@ -5,7 +5,7 @@ import markdown
 import re
 
 
-DEL_INS_RE = r"(?P<type>--|\+\+)(?P<content>.+?)(--|\+\+)"
+DEL_INS_RE = r"(?P<type>\~\~|\+\+)(?P<content>.+?)(\~\~|\+\+)"
 
 
 class DelInsExtension(markdown.Extension):
@@ -41,7 +41,7 @@ class DelInsPattern(markdown.inlinepatterns.Pattern):
         d = m.groupdict()
         content = d.get("content")
         type_ = d.get("type")
-        if type_ == "--":
+        if type_ == "~~":
             elt = markdown.util.etree.Element('del')
         elif type_ == "++":
             elt = markdown.util.etree.Element('ins')

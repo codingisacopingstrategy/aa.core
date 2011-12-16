@@ -79,8 +79,12 @@ function secs2date (s, baseDate) {
     var secs = Math.floor(s);
     var millis = (s - secs);
     millis = millis*1000;
-    console.log("secs2date", hours, mins, secs, millis);
+    //console.log("secs2date", hours, mins, secs, millis);
     return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, mins, secs, millis);
+}
+
+function date2secs (date) {
+    return date.getSeconds() + (date.getMinutes() * 60);
 }
 
 function resetTimelines() {
@@ -115,7 +119,8 @@ function resetTimelines() {
             $(elt).addClass("active")
                 .closest('article[class!="play"]')
                     .find('section.section1')
-                       .find('div.wrapper:first')
+                       .find('div.wrapper')
+                       //.closest('div.wrapper')
                             .autoscrollable("scrollto", elt);
         },
         hide: function (elt) {
@@ -168,7 +173,7 @@ function resetTimelines() {
                     }
                 });
             } else {
-                console.log("WARNING, no media found for about=", url);
+                //console.log("WARNING, no media found for about=", url);
             }
         }
         return timelinesByURL[url];        
@@ -187,6 +192,8 @@ function resetTimelines() {
     // Hides the slider if there is no titles attached to the body
     if (typeof($('body').timeline('maxTime')) == "undefined") {
         $('nav#timeline').hide();
+        $('#time').hide();
+        $('#controls').hide();
     } else {
         $('nav#timeline').show();
     }
@@ -400,6 +407,53 @@ $(document).bind("refresh", function (evt) {
         // parent.setTimeFromChild(elt, t) --> or via a timeupdate event 
     });
 
+    // Landmarks
+    function placeLandmarks () {
+        var slider_elt = $('#timelineslider');
+        var slider_elt_width = slider_elt.width() - 26;;
+        var position = slider_elt.position();
+        var left = position.left;
+        var right = position.left + slider_elt.width();
+        var duration = $("body").timeline('maxTime');
+        if (typeof(duration) == "object") {
+            duration = date2secs(duration);
+        };
+        $('section.section2').each(function() {
+            var data_start = $(this).attr('data-start');
+            var elt_duration = $.timecode_tosecs(data_start);
+            var elt_pos = elt_duration / duration;
+            $('<a href="#" class="landmark"></a>').css({
+                'position': 'absolute',
+                'left': (100 * elt_pos) + "%",
+                'top': 25, 
+            }).attr('data-position', data_start)
+                .attr('title', data_start)
+                //.bind('click', function() {
+                    //$("body").timeline('currentTime', elt_duration + 0.01);
+                //})
+                .appendTo('#timeline');
+        });
+        
+        $('a[rel="aa:landmark"]').each(function() {
+            var data_start = $(this).closest('section').attr('data-start');
+            var elt_duration = $.timecode_tosecs(data_start);
+            var elt_pos = elt_duration / duration;
+            $('<a href="#"><img src="/static/aacore/img/landmark.png" /></a>').css({
+                'position': 'absolute',
+                'left': (100 * elt_pos) + "%",
+            }).attr('data-position', data_start)
+                .attr('title', $(this).text())
+                //.bind('click', function() {
+                    //$("body").timeline('currentTime', elt_duration + 0.01);
+                //})
+                .appendTo('#timeline');
+        });
+
+        
+    }
+    if ($('#timelineslider').is(':visible')) {
+        placeLandmarks();
+    }
 
 });
 
@@ -561,7 +615,7 @@ $(document).ready(function() {
             $("body").data("currentTime", d);
         }
         d.setTime(curTime);
-        // console.log("newtime", d);
+        //console.log("newtime", d);
         return d;
     }
     $("body").bind("timeupdate", function () {
@@ -569,7 +623,7 @@ $(document).ready(function() {
         var start = $("body").timeline("minTime");
         var end = $("body").timeline("maxTime");
         var v =  (ct / (end - start)) * 100000;
-        console.log("body.timeupdate", ct, v);
+        //console.log("body.timeupdate", ct, v);
         $(elt).slider("option", "value", v);
     });
     $('#timelineslider').slider({
@@ -586,6 +640,12 @@ $(document).ready(function() {
             console.log(d);*/
         },
     });
+    //$("#play").bind('click', function(e) {
+        //$('body').voidplayer('play');
+    //});
+    //$("#pause").bind('click', function(e) {
+        //$('body').voidplayer('pause');
+    //});
 
 
 });
