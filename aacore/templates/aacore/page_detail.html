@@ -78,8 +78,8 @@
             {% if page %}
                     <li><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></li>
                 {% if user.is_authenticated %}
-                    <li><a title="history" href="{{ page.get_history_url }}">View</a></li>
                     <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
+                    <li><a title="history" href="{{ page.get_history_url }}">History</a></li>
                     <li><a title="add" href="#">Add</a></li>
                     <li><a title="commit" href="#">Save</a></li>
                     <!--<li><a title="menu" href="#">⚙</a></li>-->
