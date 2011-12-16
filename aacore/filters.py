@@ -178,6 +178,64 @@ class AAFilterCrop(AAFilter):
         self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
 
 
+class AAFilterZoomable(AAFilter):
+    """
+    [[ embed::http://example.org/image-small.jpg||zoomable:200px ]]
+    """
+    name = "zoomable"
+
+    def validate(self):
+        # TODO: verify if stdin is a url
+        sizepat = re.compile(r"(?P<width>\d+)px", re.I)
+        match = sizepat.match(self.arguments)
+        if match:
+            self.parsed_arguments['width'] = match.groupdict()['width']
+            return True
+
+    def run(self):
+        if not os.path.exists(self.stdout['local_path']):
+            cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
+                                                self.stdin['local_path'], 
+                                                self.stdout['local_path'])
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            (stdout_data, stderr_data) = p1.communicate()
+
+        self.stdout['output'] = """<div class="panzoom"><a href="%s" rel="zoomable"><img src="%s"></a></div>""" %  (self.stdin['local_url'], self.stdout['local_url'])
+        self.stdout['extra_js'].append("http://andrew.hedges.name/experiments/pan-zoom/jquery.panzoom.min.js")
+        self.stdout['script'] += """$.panzoom();"""
+
+
+
+class AAFilterLightBox(AAFilter):
+    """
+    [[ embed::http://example.org/image-small.jpg||lightbox:200px ]]
+    """
+    name = "lightbox"
+
+    def validate(self):
+        # TODO: verify if stdin is a url
+        sizepat = re.compile(r"(?P<width>\d+)px", re.I)
+        match = sizepat.match(self.arguments)
+        if match:
+            self.parsed_arguments['width'] = match.groupdict()['width']
+            return True
+
+    def run(self):
+        if not os.path.exists(self.stdout['local_path']):
+            cmd = 'convert -resize %s %s %s' % (self.parsed_arguments['width'], 
+                                                self.stdin['local_path'], 
+                                                self.stdout['local_path'])
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+            (stdout_data, stderr_data) = p1.communicate()
+
+        self.stdout['output'] = """<a href="%s" rel="lightbox"><img src="%s"></a>""" %  (self.stdin['local_url'], self.stdout['local_url'])
+        self.stdout['extra_css'].append("http://leandrovieira.com/projects/jquery/lightbox/css/jquery.lightbox-0.5.css")
+        self.stdout['extra_js'].append("http://leandrovieira.com/projects/jquery/lightbox/js/jquery.lightbox-0.5.pack.js")
+        self.stdout['script'] += """$('a[rel="lightbox"]').lightBox();"""
+
 if __name__ == '__main__':
     filters = {}
 

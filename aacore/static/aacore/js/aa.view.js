@@ -639,10 +639,11 @@ $(document).ready(function() {
         
         var $target = $($(this).attr('href'));
         var offset = $target.offset();
+        //var container_offset = $('div#center').offset();
         
         $('div#center').animate({
             scrollTop: offset.top,
-            scrollLeft: offset.left,
+            scrollLeft: offset.left
         }, 1000);
 
         $target.removeClass('collapsed');

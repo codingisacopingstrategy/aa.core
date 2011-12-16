@@ -101,6 +101,9 @@ def embed (request):
         'local_url': Resource.objects.get(url=url).get_local_url(),
         'local_path': Resource.objects.get(url=url).get_local_file(),
         'output': 'None',
+        'extra_css': [],
+        'extra_js': [],
+        'script': "",
     }
 
     for command in [x.strip() for x in pipeline.split("|")]:
@@ -127,7 +130,9 @@ def embed (request):
 </div>""".strip()
 
     content = ret % {'url': url, 'browseurl': browseurl, 'embed': stdin['output']}
-    return HttpResponse(json.dumps({"ok": True, "content": content}), mimetype="application/json");
+    return HttpResponse(json.dumps({"ok": True, "content": content, 'extra_css': stdin['extra_css'], 
+                        'extra_js': stdin['extra_js'], 'script': stdin['script']}), 
+                        mimetype="application/json");
 
 
 def browse (request):

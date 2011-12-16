@@ -180,7 +180,7 @@
     /* MEDIA ---------- */
     video,
     audio,
-    img {
+    img[rel="embed"] {
         max-width: 100%;
     }
 
@@ -896,4 +896,11 @@ div#login label {
     display: block;
     text-transform: uppercase;
     font-size: 13px;
+}
+/* PLUGINS */
+a[rel="zoomable"] {
+    border: 1px solid black;
+}
+a[rel="zoomable"] img {
+    max-width: auto!important;
 }
