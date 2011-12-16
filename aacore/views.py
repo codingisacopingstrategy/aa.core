@@ -201,6 +201,7 @@ def resource_sniff (request, id):
 ############################################################
 # WIKI
 
+@login_required
 def annotation_import(request, slug, section):
     """
     Saves the file directly from the request object.
@@ -316,6 +317,7 @@ def page_detail(request, slug):
     return render_to_response("aacore/page_detail.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def page_flag(request, slug):
     """
     Flags the last commit the edit of a :model:`aacore.Page` as a major one
@@ -329,6 +331,7 @@ def page_flag(request, slug):
     return HttpResponse("Seems like it worked!")
 
 
+@login_required
 def page_edit(request, slug):
     """
     Displays the edit form for :model:`aacore.Page`

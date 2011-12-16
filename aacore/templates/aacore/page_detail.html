@@ -69,26 +69,30 @@
 {% block postbody %}
 <nav id="west-pane" class="ui-layout-west" style="display: none; text-align: left;"> 
     <h1 class="logo">
-        <a href="/oralsite/">
+        <a title="Back to main page" href="{% url aa-index %}">
             <span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span>
         </a>
     </h1>
-    {% if user.is_authenticated %}
         <ul id="toolbar">
             {% if page %}
-                <li><a title="history" href="{{ page.get_history_url }}">View</a></li>
-                <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
-                <li><a title="add" href="#">Add</a></li>
-                <li><a title="commit" href="#">Save</a></li>
-                <!--<li><a title="menu" href="#">⚙</a></li>-->
+                    <li><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></li>
+                {% if user.is_authenticated %}
+                    <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
+                    <li><a title="history" href="{{ page.get_history_url }}">History</a></li>
+                    <li><a title="add" href="#">Add</a></li>
+                    <li><a title="commit" href="#">Save</a></li>
+                    <!--<li><a title="menu" href="#">⚙</a></li>-->
+                    <li><a title="Logout" href="{% url aa-logout %}">Logout</a></li>
+                {% else %}
+                    <li><a title="Login" href="{% url aa-login %}">Login</a></li>
+                {% endif %}
             {% endif %}
         </ul>
-    {% endif %}
     <hr>
     <!--<div class="ui-layout-content">-->
     <div id="tab-this">
         <ul id="aa-tabs">
-            <li><a title="About" href="#tab-about">About</a></li>
+            <li><a title="About" href="#tab-about">Intro</a></li>
             <li><a title="Layers" href="#tab-layers">Table of Contents</a></li>
             {% if user.is_authenticated %}
                 <li><a title="Styles" href="#tab-styles">Styles</a></li>
