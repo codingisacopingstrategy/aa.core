@@ -1,41 +1,41 @@
 /* FONTS ---------- */
 @font-face {
     font-family: 'TeX Gyre Termes';
-    src: url('texgyretermes-regular-webfont.eot');
-    src: url('texgyretermes-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('texgyretermes-regular-webfont.woff') format('woff'),
-         url('texgyretermes-regular-webfont.ttf') format('truetype'),
-         url('texgyretermes-regular-webfont.svg#TeXGyreTermesRegular') format('svg');
+    src: url('/static/lib/fonts/termes-regular-webfont.eot');
+    src: url('/static/lib/fonts/termes-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/termes-regular-webfont.woff') format('woff'),
+         url('/static/lib/fonts/termes-regular-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/termes-regular-webfont.svg#TeXGyreTermesRegular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'TeX Gyre Termes';
-    src: url('texgyretermes-italic-webfont.eot');
-    src: url('texgyretermes-italic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('texgyretermes-italic-webfont.woff') format('woff'),
-         url('texgyretermes-italic-webfont.ttf') format('truetype'),
-         url('texgyretermes-italic-webfont.svg#TeXGyreTermesItalic') format('svg');
+    src: url('/static/lib/fonts/termes-italic-webfont.eot');
+    src: url('/static/lib/fonts/termes-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/termes-italic-webfont.woff') format('woff'),
+         url('/static/lib/fonts/termes-italic-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/termes-italic-webfont.svg#TeXGyreTermesItalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'TeX Gyre Termes';
-    src: url('texgyretermes-bold-webfont.eot');
-    src: url('texgyretermes-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('texgyretermes-bold-webfont.woff') format('woff'),
-         url('texgyretermes-bold-webfont.ttf') format('truetype'),
-         url('texgyretermes-bold-webfont.svg#TeXGyreTermesBold') format('svg');
+    src: url('/static/lib/fonts/termes-bold-webfont.eot');
+    src: url('/static/lib/fonts/termes-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/termes-bold-webfont.woff') format('woff'),
+         url('/static/lib/fonts/termes-bold-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/termes-bold-webfont.svg#TeXGyreTermesBold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'TeX Gyre Termes';
-    src: url('texgyretermes-bolditalic-webfont.eot');
-    src: url('texgyretermes-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('texgyretermes-bolditalic-webfont.woff') format('woff'),
-         url('texgyretermes-bolditalic-webfont.ttf') format('truetype'),
-         url('texgyretermes-bolditalic-webfont.svg#TeXGyreTermesBoldItalic') format('svg');
+    src: url('/static/lib/fonts/termes-bolditalic-webfont.eot');
+    src: url('/static/lib/fonts/termes-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/termes-bolditalic-webfont.woff') format('woff'),
+         url('/static/lib/fonts/termes-bolditalic-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/termes-bolditalic-webfont.svg#TeXGyreTermesBoldItalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -551,6 +551,15 @@ section div.wrapper textarea {
     margin: 0;
     margin-top: 2px;
 }
+section.float p  {   /* Allowing floating elements in sections. Shall it be applied to section2 instead? */
+    float: left;
+    text-align: left;
+    width: 45%;
+}
+section.float p + p {
+    margin-left: 5%;
+}
+    float: left;
     /* COLLAPSING ---------- */
     section.section1.collapsed,
     section.section2.collapsed {
@@ -905,7 +914,7 @@ del {
     color: red;
 }
 ins {
-    color: green;
+    color: limegreen;
 }
 /*span.equal {*/
     /*background-color: yellow;*/
@@ -914,20 +923,6 @@ ins {
 /* EDIT PAGE ---------- */
 #page-edit {
     padding: 30px;
-}
-
-/* IVIEWER ---------- */
-div.iviewer-nav a {
-    border: 1px solid black;
-    color: black;
-    padding: 2px 6px;
-    display: inline-block;
-    text-align: center;
-    min-width: 10px;
-    margin-bottom: 6px;
-}
-div.iviewer img {
-    max-width: none !important; 
 }
 
 /* LOGO ORAL SITE ---------- */
@@ -949,9 +944,8 @@ div#login label {
     font-size: 13px;
 }
 /* PLUGINS */
-a[rel="zoomable"] {
-    border: 1px solid black;
-}
 a[rel="zoomable"] img {
+    border: 1px solid black;
     max-width: none !important;
+    cursor: nwse-resize;
 }
