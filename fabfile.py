@@ -5,8 +5,8 @@ from fabric.api import run, local, put, cd, sudo, env
 def lgru():
     env.hosts = ['constant@oscillator.worm.org:222']
     env.path = '/var/www/vhosts/aa.lgru.net/'
-    #env.git_path = '/home/sarma/www/be.sarma/db/repositories'
-    #env.media_path = '/home/sarma/www/be.sarma/static/media/'
+    env.git_path = '/home/constant/www/aa.lgru.net/db/repositories'
+    env.media_path = '/home/constant/www/aa.lgru.net/static/media/'
 
 def sarma():
     env.hosts = ['sarma@sarma.stdin.fr']
