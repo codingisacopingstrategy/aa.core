@@ -1,6 +1,25 @@
 #!/usr/bin/env python
 
 
+'''
+Del/Ins Extension for Python-Markdown
+=====================================
+
+Wraps the inline content in ins/del tags.
+
+Tested with Python-Markdown 2.0+.
+
+Basic usage:
+
+    >>> import markdown
+    >>> src = """This is ++added content++ and this is ~~deleted content~~""" 
+    >>> html = markdown.markdown(src, ['del_ins'])
+    >>> print(html)
+    <p>This is <ins>added content</ins> and this is <del>deleted content</del>
+    </p>
+'''
+
+
 import markdown
 import re
 
@@ -9,15 +28,6 @@ DEL_INS_RE = r"(?P<type>\~\~|\+\+)(?P<content>.+?)(\~\~|\+\+)"
 
 
 class DelInsExtension(markdown.Extension):
-    def __init__(self, configs):
-        self.config = {
-            #'make_elt' : [make_elt, 'Callback to convert parts into an HTML/etree element (default <span>)'],
-            #'namespace' : ['aa', 'Default namespace'],
-        }
-        # Override defaults with user settings
-        for key, value in configs :
-            self.setConfig(key, value)
-        
     def extendMarkdown(self, md, md_globals):
         self.md = md
     
@@ -27,7 +37,6 @@ class DelInsExtension(markdown.Extension):
 
 
 class DelInsPattern(markdown.inlinepatterns.Pattern):
-
     def __init__(self, config, md=None):
         markdown.inlinepatterns.Pattern.__init__(self, '', md)
         self.compiled_re = re.compile(r'^(.*?)' + DEL_INS_RE + r'(.*?)$')

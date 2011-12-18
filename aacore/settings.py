@@ -1,6 +1,7 @@
 from django.conf import settings
 import os.path
 
+
 EXIFTOOL = getattr(settings, 'AA_EXIFTOOL', 'exiftool')
 FFMPEG = getattr(settings, 'AA_FFMPEG', 'ffmpeg')
 IDENTIFY = getattr(settings, 'AA_IDENTIFY', 'identify')
@@ -22,4 +23,3 @@ RESOURCE_DELEGATES = getattr(settings, 'AA_RESOURCE_DELEGATES', ())
 CACHE_DIR = getattr(settings, 'AA_CACHE_DIR', os.path.join(settings.MEDIA_ROOT, "cache"))
 CACHE_URL = getattr(settings, 'AA_CACHE_URL', os.path.join(settings.MEDIA_URL, "cache"))
 GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "repositories"))
-

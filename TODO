@@ -1,5 +1,5 @@
 # High priority
-- Template Syntaxt Error with malformed/missing Meta attribute
+- Hide edit button when not logged in
 - BUG: negative positions
 - rework on the manual
     - Update the documentation to use [[ links ]] rather than default markdown links.
@@ -9,7 +9,6 @@
     - more meaningful default text for new pages
     - add annotation button: predefined location + meaningful text too.
 - add more available styles
-- shift to enable the grid snapping
 * Improve history 
     * Be able to revert a page
 * rev doesn't work
@@ -18,6 +17,7 @@
 
 
 ## Low priority
+- shift to enable the grid snapping
 - menu overlaps the top of the page
 - javascript scrollbars (less ugly)
 - draggable help

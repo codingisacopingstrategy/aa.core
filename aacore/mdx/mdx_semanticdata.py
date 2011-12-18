@@ -13,9 +13,8 @@ Basic usage:
     >>> import markdown
     >>> text = "%%dc:author :: Sherry Turkle | Turkle's%% %%dc:title::Second Self%% was an early book on the social aspects of computation."
     >>> html = markdown.markdown(text, ['semanticdata'])
-    >>> html
-    u'<p><span content="Sherry Turkle" property="dc:author">Turkle\\'s</span> <span content="Second Self" property="dc:title">Second Self</span> was an early book on the social aspects of computation.</p>'
-
+    >>> print(html)
+    <p><span content="Sherry Turkle" property="dc:author">Turkle's</span> <span content="Second Self" property="dc:title">Second Self</span> was an early book on the social aspects of computation.</p>
 '''
 
 import markdown
@@ -37,6 +36,7 @@ pattern = r"""
 \%\%
 """.strip()
 
+
 def make_elt (rel, target, label):
     elt = markdown.util.etree.Element('span')
     elt.set('content', target)
@@ -44,6 +44,7 @@ def make_elt (rel, target, label):
     if rel:
         elt.set('property', rel)
     return elt
+
 
 class SemanticDataExtension(markdown.Extension):
     def __init__(self, configs):
@@ -62,8 +63,8 @@ class SemanticDataExtension(markdown.Extension):
         pat = SemanticDataPattern(self.config, md)
         md.inlinePatterns.add('semanticdata', pat, "<not_strong")
 
-class SemanticDataPattern(markdown.inlinepatterns.Pattern):
 
+class SemanticDataPattern(markdown.inlinepatterns.Pattern):
     def __init__(self, config, md=None):
         markdown.inlinepatterns.Pattern.__init__(self, '', md)
         # self.markdown = md # done by super
@@ -83,11 +84,6 @@ class SemanticDataPattern(markdown.inlinepatterns.Pattern):
             rel = "%s:%s" % (namespace, d.get("rel"))
         return fn(rel, d.get("target"), d.get("label"))
 
-#    def handleMatch(self, m):
-#        """ return etree """
-#        d = m.groupdict()
-#        fn = self.config['make_elt'][0]
-#        return fn(d.get("property"), d.get("value"), d.get("display"))    
 
 def makeExtension(configs={}) :
     return SemanticDataExtension(configs=configs)

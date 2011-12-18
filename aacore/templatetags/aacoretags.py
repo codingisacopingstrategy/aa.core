@@ -1,3 +1,4 @@
+import re
 import html5lib, urllib2, lxml
 import urlparse, xml.sax.saxutils, urllib, os.path
 import time
@@ -32,7 +33,6 @@ def escape_newlines(value):
     return value.replace('\n', r'\n')
 
 
-from aacore.mdx import get_markdown
 
 class MarkdownConvertor(template.Node):
     def __init__(self, value, var_name, meta_name):
@@ -49,7 +49,6 @@ class MarkdownConvertor(template.Node):
             context[self.meta_name] = {}
         return ''
 
-import re
 def do_get_markdown_for(parser, token):
     # This version uses a regular expression to parse tag contents.
     try:
