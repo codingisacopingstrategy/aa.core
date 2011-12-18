@@ -18,7 +18,6 @@ import mdx_semanticwikilinks
 import mdx_semanticdata
 import mdx_sectionedit
 import mdx_addsections
-import mdx_addsectionstoolbar
 import mdx_timecodes
 import mdx_del_ins
 #import mdx_cut
