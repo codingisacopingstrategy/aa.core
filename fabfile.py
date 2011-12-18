@@ -6,16 +6,19 @@ def lgru():
     env.hosts = ['constant@oscillator.worm.org:222']
     env.path = '/var/www/vhosts/aa.lgru.net/'
     #env.git_path = '/home/sarma/www/be.sarma/db/repositories'
+    #env.media_path = '/home/sarma/www/be.sarma/static/media/'
 
 def sarma():
     env.hosts = ['sarma@sarma.stdin.fr']
     env.path = '/home/sarma/www/be.sarma/'
     env.git_path = '/home/sarma/www/be.sarma/db/repositories/'
+    env.media_path = '/home/sarma/www/be.sarma/static/media/'
 
 def aa():
     env.hosts = ['activearchives@activearchives.org']
     env.path = '/var/www/vhosts/activearchives.org/wsgi/vj13/'
     #env.git_path = '/home/sarma/www/be.sarma/db/repositories'
+    #env.media_path = '/home/sarma/www/be.sarma/static/media/'
 
 def fix_permissions():
     # fixes permission issues
@@ -23,7 +26,6 @@ def fix_permissions():
     sudo('chown -R www-data:www-data %s' % env.git_path)
     sudo('chmod -R g+w %saa.core' % env.path)
     sudo('apache2ctl graceful')
-#/home/sarma/www/be.sarma/db/repositories
 
 def deploy(treeish='HEAD'):
     # makes a tarball of the django project and transfers it
