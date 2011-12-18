@@ -128,7 +128,38 @@
             </div>
 
             <div id="tab-help" class="aa-tab">
+                <script>
+                    $(document).ready(function(){
+                        // SHOW/HIDE help chapters
+                        $("#tab-help h2").toggle(
+                            function(){
+                                $(this).next().show();
+                            },function(){
+                                $(this).next().hide();
+                        });
+                        $("#tab-help h3").toggle(
+                            function(){
+                                $(this).next().show();
+                            },function(){
+                                $(this).next().hide();
+                        });
+                    });
+                </script>
+                <h2>LINKS</h2>
+                <dl>
+                    <dt>Internal link</dt>
+                    <dd><code>[[ Name of the page ]]</code></dd>
+                    <dd><code>[[ Name of the page | Title ]]</code></dd>
+                    <dt>External link</dt>
+                    <dd><code>[[ URL of the link ]]</code></dd>
+                    <dd><code>[[ URL of the link | Title ]]</code></dd>
+                    <dt>Link inside the page</dt>
+                    <dd><code>[[ #ID-OF-THE-ELEMENT ]]</code></dd>
+                    <dt>Landmarks</dt>
+                    <dd><code>[[ landmark::#|Title of the landmark ]]</code></dd>
+                </dl>
                 {% include "aacore/partials/timecode_help.html" %}
+                {% include "aacore/partials/filters_help.html" %}
                 {% include "aacore/partials/markdown_help.html" %}
             </div>
         {% endif %}
