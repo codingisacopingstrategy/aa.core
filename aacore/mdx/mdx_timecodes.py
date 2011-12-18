@@ -1,26 +1,49 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 #-*- coding:utf-8 -*-
 
+
 """
-    Active Archives: Timecodes
-    ========================================================
+Active Archives: Timecodes
+==========================
 
-    Preprocessor:
+Preprocessor:
 
-    Turns SRT-style timecode patterns into markdown level-2 headers and markups
-    timecodes with RDFA as aa:start/aa:end values (where aa is the active
-    archives namespace
+Turns SRT-style timecode patterns into markdown level-2 headers and markups
+timecodes with RDFA as aa:start/aa:end values (where aa is the active
+archives namespace
 
-    Tree Processor:
-    Fills in implicit end times:
-    Elements with data-start attributes, but no data-end get "auto-set" by subsequent
-    siblings data-start values. NB: only data-end attributes get set (inner/visible markup is not touched)
+Tree Processor:
+Fills in implicit end times:
+Elements with data-start attributes, but no data-end get "auto-set" by
+subsequent siblings data-start values. NB: only data-end attributes get set
+(inner/visible markup is not touched)
 
-    >>> import markdown
-    >>> from mdx_timecodes import TimeCodesExtension
+>>> src = '''
+... 2011-11-28 00:01:00 -->
+... 00:02:00 -->
+... 00:03:00 --> 00:04:00
+... Hello
+... '''.strip()
+
+>>> html = markdown.markdown(src, ['timecodes'])
+>>> print(html)
+<h2>%%aa:start::2011-11-28 00:01:00%% &rarr; {: data-start="2011-11-28 00:01:00" }</h2>
+<h2>%%aa:start::00:02:00%% &rarr; {: data-start="00:02:00" }</h2>
+<h2>%%aa:start::00:03:00%% &rarr; %%aa:end::00:04:00%% {: data-start="00:03:00" data-end="00:04:00" }</h2>
+<p>Hello</p>
+
+>>> html = markdown.markdown(src, ['attr_list', 'timecodes', 'semanticdata'])
+>>> print(html)
+<h2 data-end="00:02:00" data-start="2011-11-28 00:01:00"><span content="2011-11-28 00:01:00" property="aa:start">2011-11-28 00:01:00</span> &rarr;</h2>
+<h2 data-end="00:03:00" data-start="00:02:00"><span content="00:02:00" property="aa:start">00:02:00</span> &rarr;</h2>
+<h2 data-end="00:04:00" data-start="00:03:00"><span content="00:03:00" property="aa:start">00:03:00</span> &rarr; <span content="00:04:00" property="aa:end">00:04:00</span></h2>
+<p>Hello</p>
 """
 
-import markdown, re
+
+import markdown
+import re
+
 
 TIMECODE_RE = re.compile(
     r"""^
@@ -33,69 +56,61 @@ TIMECODE_RE = re.compile(
     re.X | re.M
 )
 
+
 def replace_timecodes(lines):
-    """docstring for replace_timecodes"""
-    param_type = type(lines)
-    if param_type == "str":
-        lines = lines.split('\n')
     newlines = []
     for line in lines:
         m = TIMECODE_RE.search(line)
         if m:
-            newline = u"## "
             start = m.group('start')
-            newline += "{@data-start=" + start + "}"
-            newline += "%%aa:start::" + m.group('start') + "%% &rarr;"
             end = m.group('end')
-            if end:
-                newline += "{@data-end=" + end + "}"
-                newline += u" %%aa:end::" + end + "%%"
-            if m.group('otherstuff'):
-                newline += m.group('otherstuff')
-            newlines.append(newline )
-        else:
-            newlines.append(line)
+            otherstuff = m.group('otherstuff') or ''
 
-    if param_type == "str":
-        return '\n'.join(newlines)
-    else:
-        return newlines
+            if end:
+                line = '## %%%%aa:start::%(start)s%%%% &rarr; %%%%aa:end::%(end)s%%%% %(otherstuff)s{: data-start="%(start)s" data-end="%(end)s" }' % locals()
+            else:
+                line = '## %%%%aa:start::%(start)s%%%% &rarr; %(otherstuff)s{: data-start="%(start)s" }' % locals()
+        newlines.append(line)
+    return newlines
+
 
 class TimeCodesPreprocessor(markdown.preprocessors.Preprocessor):
     def run(self, lines):
-        """ Match and store Fenced Code Blocks in the HtmlStash. """
         return replace_timecodes(lines)
 
-####################
+
 class TimeCodesTreeprocessor(markdown.treeprocessors.Treeprocessor):
-    """
-    This Tree Processor adds explicit endtimes to timed sections where a subsequent sibling element has a start time.
+    """ This Tree Processor adds explicit endtimes to timed sections where a
+    subsequent sibling element has a start time.
     """
     def run(self, doc):
         fill_missing_ends(doc)
         # print doc.find("*[@data-start]")
 
-def fill_missing_ends (node):
+
+def fill_missing_ends(node):
     children = list(node)
     for i, child in enumerate(children):
         fill_missing_ends(child)
         if child.get("data-start") and not child.get("data-end"):
             start = child.get("data-start")
             # print "start without end", child, start
-            for sibling in children[i+1:]:
+            for sibling in children[i + 1:]:
                 if sibling.get("data-start"):
                     # print "found matching end", sibling.get("data-start")
                     child.set("data-end", sibling.get("data-start"))
                     break
-####################
+
 
 class TimeCodesExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
-        md.preprocessors.add('timecodes_block', TimeCodesPreprocessor(md), "_begin")
+        md.preprocessors.add('timecodes_block', TimeCodesPreprocessor(md), 
+                             "_begin")
 
         ext = TimeCodesTreeprocessor(md)
         ext.config = self.config
         md.treeprocessors.add("timecodes", ext, "_end")
+
 
 def makeExtension(configs=None):
     return TimeCodesExtension()
@@ -104,14 +119,3 @@ def makeExtension(configs=None):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
-    text = """
-2011-11-28 00:01:00 -->
-00:02:00 --> 
-00:03:00 --> 00:04:00
-Hello
-""".strip()
-    print markdown.markdown(text, ['timecodes', 'semanticdata'])
-
-
-

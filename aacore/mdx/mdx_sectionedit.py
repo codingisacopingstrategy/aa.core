@@ -43,6 +43,7 @@ TIMECODE_HEADER = r"""
 $
 """.strip()
 
+
 def spliterator (pattern, text, returnLeading=False):
     """ yields: header (can be ''), body, start, end """
     cur = None
@@ -63,6 +64,7 @@ def spliterator (pattern, text, returnLeading=False):
     if returnLeading and cur == None:
         # NO MATCHES, return whole text as "leading"
         yield ('', text, 0, len(text))
+
 
 def sectionalize (wikitext, depth=1, sections=None, textstart=0):
     '''

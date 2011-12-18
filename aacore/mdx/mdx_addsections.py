@@ -1,11 +1,13 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
+
 
 '''
 AddSections Extension for Python-Markdown
-======================================
+=========================================
 
 Wraps Document in <section> tags based on a hierarchy of header tags.
-By default, adds a class = "sectionN" where N is the header level being wrapped.
+By default, adds a class = "sectionN" where N is the header level being
+wrapped.
 
 Requires Python-Markdown 2.0+.
 
@@ -27,8 +29,20 @@ Basic usage:
     ... Section 2
     ... """.strip()
     >>> html = markdown.markdown(src, ['addsections'])
-    >>> html.replace("\\n", "")
-    u'<section class="section1" typeof="aa:section"><h1>1</h1><p>Section 1</p><section class="section2" typeof="aa:section"><h2>1.1</h2><p>Subsection 1.1</p></section><section class="section2" typeof="aa:section"><h2>1.2</h2><p>Subsection 1.2</p><section class="section3" typeof="aa:section"><h3>1.2.1</h3><p>Hey 1.2.1 Special section</p></section><section class="section3" typeof="aa:section"><h3>1.2.2</h3><section class="section4" typeof="aa:section"><h4>1.2.2.1</h4></section></section></section></section><section class="section1" typeof="aa:section"><h1>2</h1><p>Section 2</p></section>'
+    >>> print(html)
+    <section class="section1"><h1>1</h1>
+    <p>Section 1</p>
+    <section class="section2"><h2>1.1</h2>
+    <p>Subsection 1.1</p>
+    </section><section class="section2"><h2>1.2</h2>
+    <p>Subsection 1.2</p>
+    <section class="section3"><h3>1.2.1</h3>
+    <p>Hey 1.2.1 Special section</p>
+    </section><section class="section3"><h3>1.2.2</h3>
+    <section class="section4"><h4>1.2.2.1</h4>
+    </section></section></section></section><section class="section1"><h1>2</h1>
+    <p>Section 2</p>
+    </section>
 
 Divs instead of sections, custom class names:
 
@@ -39,24 +53,55 @@ Divs instead of sections, custom class names:
     ... # Bibliography
     ... """.strip()
     >>> html = markdown.markdown(src, extensions=['addsections(tag=div,class=s%(LEVEL)d)'])
-    >>> html.replace("\\n", "")
-    u'<div class="s1" typeof="aa:section"><h1>Introduction</h1></div><div class="s1" typeof="aa:section"><h1>Body</h1><div class="s2" typeof="aa:section"><h2>Subsection</h2></div></div><div class="s1" typeof="aa:section"><h1>Bibliography</h1></div>'
+    >>> print(html)
+    <div class="s1"><h1>Introduction</h1>
+    </div><div class="s1"><h1>Body</h1>
+    <div class="s2"><h2>Subsection</h2>
+    </div></div><div class="s1"><h1>Bibliography</h1>
+    </div>
 
 
-Known Issue: structures like:
-# ONE
-### TOO Deep
-## Level 2
-# TWO
+Typeof attribute:
 
-Produces confusing results (the ## gets placed inside the ###)
+    >>> src = """
+    ... # Introduction
+    ... # Body
+    ... ## Subsection
+    ... # Bibliography
+    ... """.strip()
+    >>> html = markdown.markdown(src, extensions=['addsections(typeof=aa:annotation)'])
+    >>> print(html)
+    <section class="section1" typeof="aa:annotation"><h1>Introduction</h1>
+    </section><section class="section1" typeof="aa:annotation"><h1>Body</h1>
+    <section class="section2" typeof="aa:annotation"><h2>Subsection</h2>
+    </section></section><section class="section1" typeof="aa:annotation"><h1>Bibliography</h1>
+    </section>
 
+
+FIXME: Known Issue: structures like this one produces confusing results 
+(the ## gets placed inside the ###)
+
+    >>> src="""
+    ... # ONE
+    ... ### TOO Deep
+    ... ## Level 2
+    ... # TWO
+    ... """.strip()
+    >>> html = markdown.markdown(src, extensions=['addsections'])
+    >>> print(html)
+    <section class="section1"><h1>ONE</h1>
+    <section class="section3"><h3>TOO Deep</h3></section>
+    <section class="section2"><h2>Level 2</h2>
+    </section></section><section class="section1"><h1>TWO</h1>
+    </section>
 '''
+
+
 import markdown, re
 from markdown.util import etree
 
 
-def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
+def add_sections(tree, tag, tagclass, typeof, moveAttributes=True):
     def do(parent, n, tag, tagclass):
         tagname = "h%d" % n
         wrapper = None
@@ -80,9 +125,7 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
                     classes = wrapper.get("class", "")
                     if '%(LEVEL)d' in tagclass:
                         tagclass = tagclass % {'LEVEL': n}
-                        wrapper.set("class", " ".join([tagclass, classes]))
-                    else:
-                        wrapper.set("class", " ".join([tagclass, classes]))
+                    wrapper.set("class", " ".join([tagclass, classes]).strip())
                 parent.remove(child)
                 parent.insert(i, wrapper)
                 wrapper.append(child)
@@ -100,7 +143,8 @@ def add_sections (tree, tag, tagclass, typeof, moveAttributes=True):
 
 class AddSectionsTreeprocessor(markdown.treeprocessors.Treeprocessor):
     def run(self, doc):
-        add_sections(doc, self.config.get("tag")[0], self.config.get("class")[0], self.config.get("typeof")[0])
+        add_sections(doc, self.config.get("tag")[0], self.config.get("class")[0], 
+                     self.config.get("typeof")[0])
 
 
 class AddSectionsExtension(markdown.Extension):

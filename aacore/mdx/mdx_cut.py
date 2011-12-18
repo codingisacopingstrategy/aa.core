@@ -4,7 +4,7 @@
 """
     >>> import markdown
     >>> txt = '''
-    ... This is preliminary content 
+    ... This is preliminary content
     ... 
     ... 8<
     ... 
@@ -21,9 +21,9 @@
     ... 
     ... This is another one
     ... '''
-    >>> html = markdown.markdown(txt, extensions=['cut3'])
+    >>> html = markdown.markdown(txt, extensions=['cut'])
     >>> html.replace("\\n", "")
-    u'<p>This is preliminary content </p><section><h1>This is my first section</h1><p>This is some additional content</p><h2>This is another one</h2></section><section><ul><li>This is my first section</li><li>This is some additional content</li></ul><p>This is another one</p></section>'
+    u'<p>This is preliminary content</p><section><h1>This is my first section</h1><p>This is some additional content</p><h2>This is another one</h2></section><section><ul><li>This is my first section</li><li>This is some additional content</li></ul><p>This is another one</p></section>'
 """
 
 
@@ -59,8 +59,7 @@ class CutExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):
         """ Add an instance of CutProcessor to BlockParser. """
-        md.parser.blockprocessors.add('cut', 
-                                      CutProcessor(md.parser),
+        md.parser.blockprocessors.add('cut', CutProcessor(md.parser),
                                       '_begin')
 
 
@@ -71,4 +70,3 @@ def makeExtension(configs={}):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
