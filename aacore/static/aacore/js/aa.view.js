@@ -227,10 +227,16 @@ $(document).bind("refresh", function (evt) {
             if (position.left < 0) {
                 $(this).css('left', '0px');
             };
-            commit_attributes(this); 
+            if (! $('body').hasClass('anonymous')) {
+                commit_attributes(this);
+            }; 
         },
     }).resizable({
-        stop: function () { commit_attributes(this) },
+        stop: function () { 
+            if (! $('body').hasClass('anonymous')) {
+                commit_attributes(this);
+            }; 
+         },
     });
 
     // RENUMBER ALL SECTIONS
@@ -271,7 +277,9 @@ $(document).bind("refresh", function (evt) {
     }).bind("collapse", function (evt) {
         evt.stopPropagation();
         $(this).toggleClass('collapsed');
-        commit_attributes(this);
+        if (! $('body').hasClass('anonymous')) {
+            commit_attributes(this);
+        }; 
     }).bind("edit", function (evt) {
         function edit (data) {
             var position = $(that).css("position");
@@ -387,7 +395,9 @@ $(document).bind("refresh", function (evt) {
             var value = $select.find('option:selected').val();
             var s1 = $(this).closest(".section1, .section2");
             s1.css(key, value);
-            commit_attributes(s1);
+            if (! $('body').hasClass('anonymous')) {
+                commit_attributes(s1);
+            }; 
         }
     });
 
@@ -528,12 +538,16 @@ $(document).ready(function() {
                 .each(function(i) {
                     var target = $(this).find('a').attr('href');
                     $(target).css('z-index', i);
-                    commit_attributes($(target));
+                    if (! $('body').hasClass('anonymous')) {
+                        commit_attributes($(target));
+                    }; 
                 });
         },
         post_toggle: function(event, settings, target) {
             target.toggle();
-            commit_attributes(target);
+            if (! $('body').hasClass('anonymous')) {
+                commit_attributes(target);
+            }; 
         },
     });
 

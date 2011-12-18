@@ -227,6 +227,7 @@ class Page(models.Model):
             repo = Repo(GIT_DIR)
         except NoSuchPathError:
             repo = Repo.init(GIT_DIR)
+            #repo = Repo.init(GIT_DIR, bare="True")
         return repo
 
     def iter_commits(self):
