@@ -130,8 +130,8 @@
         margin-left: 2em;
     }
     code {
-        font-family: LatinModernMono, mono;
-        font-style: italic;
+        font-family: "Liberation Mono", mono;
+        font-size: 11px;
     }
     pre {
         white-space: pre-line;
@@ -480,6 +480,30 @@ nav span.title {
         }
         nav#west-pane #tab-help div {
             display: none;
+        }
+        div#tab-help h2 {
+            text-transform: uppercase;
+            margin-top: 22px;
+        }
+        div#tab-help #timecode-help dt {
+            float: left;
+            clear: left;
+            margin-right: 1em;
+            line-height: 1.6em;
+        }
+        div#tab-help #timecode-help  dd {
+            line-height: 1.7em;
+        }
+        div#tab-help #timecode-help  code span {
+            border: 1px solid black;
+            padding: 2px 4px 0;
+        }
+        div#tab-help #filters-help dt {
+            font-weight: bold;
+            margin-top: 1em;
+        }
+        div#tab-help #filters-help dt code {
+            whitespace: pre;
         }
 
         /* BROWSER ---------- */
