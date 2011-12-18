@@ -37,7 +37,7 @@
     {% endblock head %}
 </head>
 
-<body>
+<body{% if not user.is_authenticated %} class="anonymous"{% endif %}>
     {% block prebody %}{% endblock %}
 
     <div id="center" class="ui-layout-center"> 

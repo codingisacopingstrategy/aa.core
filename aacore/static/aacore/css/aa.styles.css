@@ -739,6 +739,9 @@ section.float p + p {
         }
 
         /* BUTTONS --------- */
+        body.anonymous span.section_edit_link {
+            display: none;
+        }
         section:hover .section_edit_link {
             display: block;
         }
