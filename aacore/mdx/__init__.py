@@ -110,7 +110,7 @@ def get_markdown(default_link_rel="aa:link"):
             "attr_list",
             #"abbr",
             "def_list",
-            #"fenced_code",
+            "fenced_code",
             "footnotes",
             #"tables"
             "meta",
@@ -135,7 +135,7 @@ def get_simple_markdown(default_link_rel="aa:link"):
             "attr_list",
             #"abbr",
             "def_list",
-            #"fenced_code",
+            "fenced_code",
             #"footnotes",
             #"tables"
             #"meta",
