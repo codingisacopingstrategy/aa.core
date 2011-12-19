@@ -102,8 +102,8 @@ function resetTimelines() {
             hide: function (elt) {
                 $(elt).removeClass("active");
             },
-            start: function (elt) { return $.timecode_parse($(elt).attr('data-start')) },
-            end: function (elt) { return $.timecode_parse($(elt).attr('data-end')) }
+            start: function (elt) { return $.timecode_parse($(elt).data('start')) },
+            end: function (elt) { return $.timecode_parse($(elt).data('end')) }
         }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
     });
     */
@@ -320,7 +320,7 @@ $(document).bind("refresh", function (evt) {
         evt.stopPropagation();
         var that = this;
         var new_section = false;
-        if ($(this).attr('data-section') == "-1") {
+        if ($(this).data('section') == "-1") {
             // Directly enter edit mode
             new_section = true;
             edit("# New");
@@ -429,18 +429,23 @@ $(document).bind("refresh", function (evt) {
             duration = date2secs(duration);
         };
         $('section.section2').each(function() {
-            var data_start = $(this).attr('data-start');
-            if (typeof(data_start) == "undefined") {
+            var start = $(this).data('start');
+            if (typeof(start) == "undefined") {
                 return;
             };
-            var elt_duration = $.timecode_tosecs(data_start);
-            var elt_pos = elt_duration / duration;
-            $('<a href="#" class="landmark"></a>').css({
+            var end = $(this).data('end');
+            if (typeof(end) == "undefined") {
+                return;
+            };
+            var offset = $.timecode_tosecs(start) / duration;
+            var width = ($.timecode_tosecs(end) - $.timecode_tosecs(start)) / duration;
+            $('<a>').attr('href', '#' + $(this).attr('id')).addClass('landmark').css({
                 'position': 'absolute',
-                'left': (100 * elt_pos) + "%",
+                'left': (100 * offset) + "%",
+                'width': (100 * width) + "%",
                 'top': 25, 
-            }).attr('data-position', data_start)
-                .attr('title', data_start)
+            }).data('position', start)
+                .attr('title', start + " --> " + end)
                 //.bind('click', function() {
                     //$("body").timeline('currentTime', elt_duration + 0.01);
                 //})
@@ -448,13 +453,13 @@ $(document).bind("refresh", function (evt) {
         });
         
         $('a[rel="aa:landmark"]').each(function() {
-            var data_start = $(this).closest('section').attr('data-start');
+            var data_start = $(this).closest('section').data('start');
             var elt_duration = $.timecode_tosecs(data_start);
             var elt_pos = elt_duration / duration;
             $('<a href="#"><img src="/static/aacore/img/landmark.png" /></a>').css({
                 'position': 'absolute',
                 'left': (100 * elt_pos) + "%",
-            }).attr('data-position', data_start)
+            }).data('position', data_start)
                 .attr('title', $(this).text())
                 //.bind('click', function() {
                     //$("body").timeline('currentTime', elt_duration + 0.01);
@@ -579,18 +584,18 @@ $(document).ready(function() {
         },
     });
     
-    $("a[title='add']:first").click(function() {
+    $("a[title='add']").click(function() {
         $('<section><h1>New section</h1></section>')
             .addClass('section1')
             .css('top', 30)
             .css('left', 30)
-            .attr('data-section', '-1')
+            .data('section', '-1')
             .prependTo('article')
             .trigger('refresh')
             .trigger('edit');
     });
 
-    $("a[title='commit']:first").click(function() {
+    $("a[title='commit']").click(function() {
         var message = window.prompt("Summary", "A nice configuration");
         if (message) {
             $.get("flag/", {
@@ -598,6 +603,10 @@ $(document).ready(function() {
             });
         };
         return false;
+    });
+
+    $("a[title='mode']").click(function() {
+        $("article").toggleClass("play");
     });
 
     /////////////////////////////

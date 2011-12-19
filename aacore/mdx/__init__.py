@@ -107,6 +107,7 @@ def get_markdown(default_link_rel="aa:link"):
     Returns a Markdown instance.
     """
     return markdown.Markdown(output_format="html5", extensions=[
+            "headerid",
             "attr_list",
             #"abbr",
             "def_list",
