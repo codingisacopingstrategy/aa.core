@@ -13,8 +13,86 @@
 <div id="controls">
 <span id="play">play</span>
 <span id="pause">pause</span>
+<span id="slow">slow</span>
+<span id="fast">fast</span>
+<!--<input type="range" value="0" class="scrubber" step="0.01" style="width: 400px;">-->
+<div id="slider"></div>
+
+<video src="http://video.constantvzw.org/AAworkshop/MVI_1673.ogv"
+       style="width:200px"></video>
 </div>
 </body>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 <script src="jquery.voidmedia.js"></script>
+<script>
+(function($) {
+
+Math._round = Math.round;
+Math.round = function(number, precision)
+{
+    precision = Math.abs(parseInt(precision)) || 0;
+    var coefficient = Math.pow(10, precision);
+    return Math._round(number*coefficient)/coefficient;
+}
+
+// Initializes the voidmedia 
+var media = new voidmedia();
+media.duration = 30;
+media.loop = true;
+
+var $video = $('video').get(0);
+
+var $slider = $('#slider').slider({
+    animate: true,
+    max: media.duration,
+    step: 0.1,
+    value: media.currentTime,
+    start: function() {
+        media.pause();
+        $video.pause();
+    },
+    slide: function() {
+        media.currentTime = $video.currentTime = $(this).slider('value');
+        $(media).trigger('seeking');
+    },
+    stop: function() {
+        media.currentTime = $(this).slider('value');
+        media.play();
+        $video.play();
+    },
+});
+
+$time = $('#time');
+
+
+$(media).on('timeupdate', function(event) {
+    $time.text(Math.round(media.currentTime, 2).toFixed(2)
+                    + "/" + media.duration);
+    $slider.slider('value', media.currentTime);
+})
+
+$("#play").on('click', function(event) {
+    media.play();
+})
+$("#pause").on('click', function(event) {
+    media.pause();
+})
+$("#fast").on('click', function(event) {
+    media.playbackRate = 2;
+    console.log(media.playbackRate);
+})
+$("#slow").on('click', function(event) {
+    media.playbackRate = 0.5;
+    console.log(media.playbackRate);
+})
+$(media).on('seeking', function(event) {
+    console.log(event.type);
+})
+
+// Finally, play the voidmedia
+media.play();
+$video.play();
+})(jQuery);
+</script>
 </html>

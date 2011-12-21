@@ -79,17 +79,6 @@
  *};
  */
 
-
-(function($) {
-
-Math._round = Math.round;
-Math.round = function(number, precision)
-{
-    precision = Math.abs(parseInt(precision)) || 0;
-    var coefficient = Math.pow(10, precision);
-    return Math._round(number*coefficient)/coefficient;
-}
-
 function voidmedia() { 
     return  elt = {
         _timer : null,
@@ -102,7 +91,12 @@ function voidmedia() {
 
         _duration : 0,
         get duration () { return this._duration; },
-        set duration(val) { this._duration = val; },
+        set duration(val) { 
+            if (val !== this._duration) {
+                this._duration = val; 
+                $(this).trigger('durationchange');
+            }
+        },
 
         _loop : false,
         get loop () { return this._loop; },
@@ -116,60 +110,47 @@ function voidmedia() {
         get currentTime () { return this._currentTime; },
         set currentTime(val) { this._currentTime = val; },
 
-        play: function () {
-            this._currentTime += (350 / 1000);
+        // FIXME: can't find why playbackrate set value isn't persistent...
+        _playbackRate: 1,
+        get playbackrate () { return this._playbackRate; },
+        set playbakRate(val) { 
+            this._playbackRate = val; 
+            $(this).trigger('ratechange');
+        },
+
+        _play: function () {
+            this._currentTime += ((15 / 1000) * this._playbackRate);
+            console.log(this._playbackRate);
             var _this = this;
             if (this._currentTime < this._duration) {
                 $(this).trigger('timeupdate');
-                this._timer = setTimeout(function() { _this.play() }, 350);
+                this._timer = setTimeout(function() { _this._play() }, 15);
             } else {
                 this._currentTime = this._duration;
                 $(this).trigger('ended');
                 if (this._loop) {
                     this._currentTime %= this._duration;
                     $(this).trigger('timeupdate');
-                    this._timer = setTimeout(function() { _this.play() }, 350);
+                    this._timer = setTimeout(function() { _this._play() }, 15);
                 } else {
                     this._currentTime = this._duration;
                     this.pause();
                 }
             }
-            this._paused = false;
+        },
+        play: function () {
+            if (this._paused) {
+                this._play()
+                this._paused = false;
+                $(this).trigger('play');
+            }
         },
         pause: function () {
-            clearTimeout(this._timer);
-            this._paused = true;
+            if (!this._paused) {
+                clearTimeout(this._timer);
+                this._paused = true;
+                $(this).trigger('pause');
+            }
         }, 
     }
 };
-
-var media = new voidmedia();
-media.currentTime = 0;
-console.log(media.currentTime);
-media.currentTime = 10;
-console.log(media.currentTime);
-
-var media2 = new voidmedia();
-console.log(media2.duration = 15);
-media2.duration = 3;
-media2.loop = true;
-media2.play();
-
-//$(media2).on('ended timeupdate', function(event) {
-    //console.log(event.type);
-//});
-$(media2).on('timeupdate', function(event) {
-    $('#time').text(Math.round(media2.currentTime, 2).toFixed(2)
-                    + "/" + media2.duration);
-})
-
-$("#play").on('click', function(event) {
-    media2.play();
-    console.log('click')
-})
-$("#pause").on('click', function(event) {
-    media2.pause();
-    console.log('click')
-})
-
-})(jQuery);
