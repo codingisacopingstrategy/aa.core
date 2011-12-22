@@ -116,6 +116,9 @@ function resetTimelines() {
         show: function (elt) {
             // console.log("show", elt);
             // $(elt).show();
+            try { $("audio,video", elt).get(0).play(); }
+            catch (e) {};
+
             $(elt).addClass("active")
                 .closest('article[class!="play"]')
                     .find('section.section1')
@@ -126,6 +129,8 @@ function resetTimelines() {
         hide: function (elt) {
             // console.log("hide", elt);
             // $(elt).hide();
+            try { $("audio,video", elt).get(0).pause(); }
+            catch (e) {};
             $(elt).removeClass("active");
         },
         start: function (elt) {
