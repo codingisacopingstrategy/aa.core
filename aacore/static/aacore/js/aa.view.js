@@ -1,10 +1,18 @@
+/**
+ * @requires jquery.datetimecode.js
+ * @requires jquery.caret.js
+ */
+
 var timelinesByURL = {};
 
+
+/* Edit {{{ */
 function commit_attributes (elt) {
     "use strict";
     /*
      * Updates and posts the annotation attributes
      */
+    // TODO: update the regex to match timecodes as well
     // RegExp
     var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
     var ATTR_RE = /{:[^}]*}/;
@@ -69,7 +77,10 @@ function commit_attributes (elt) {
         }
     });
 }
+/* }}} */
 
+
+/* helpers {{{ */
 function secs2date (s, baseDate) {
     var d = baseDate ? baseDate : new Date();
     var hours = Math.floor(s / 3600);
@@ -79,43 +90,22 @@ function secs2date (s, baseDate) {
     var secs = Math.floor(s);
     var millis = (s - secs);
     millis = millis*1000;
-    //console.log("secs2date", hours, mins, secs, millis);
     return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, mins, secs, millis);
 }
+
 
 function date2secs (date) {
     return date.getSeconds() + (date.getMinutes() * 60);
 }
+/* }}} */
+
 
 function resetTimelines() {
-    // RESET (ALL) TIMELINES
-    /* OLD VERSION
-    $(".player").each(function(){
-        var url = $(this).attr('src') || $("[src]:first", this).attr('src');
-        $(this).timeline({
-            show: function (elt) {
-                $(elt).addClass("active")
-                    .closest('section.section1')
-                       .find('div.wrapper:first')
-                            .autoscrollable("scrollto", elt);
-            },
-            hide: function (elt) {
-                $(elt).removeClass("active");
-            },
-            start: function (elt) { return $.timecode_parse($(elt).data('start')) },
-            end: function (elt) { return $.timecode_parse($(elt).data('end')) }
-        }).timeline("add", 'section.section1[about="' + url + '"] *[data-start]');
-    });
-    */
-
     $("body").timeline({
         currentTime: function (elt) {
             return $(elt).data("datetime");
-            return $(elt).currentTime;
         },
         show: function (elt) {
-            // console.log("show", elt);
-            // $(elt).show();
             try { $("audio,video", elt).get(0).play(); }
             catch (e) {};
 
@@ -123,12 +113,9 @@ function resetTimelines() {
                 .closest('article[class!="play"]')
                     .find('section.section1')
                        .find('div.wrapper')
-                       //.closest('div.wrapper')
                             .autoscrollable("scrollto", elt);
         },
         hide: function (elt) {
-            // console.log("hide", elt);
-            // $(elt).hide();
             try { $("audio,video", elt).get(0).pause(); }
             catch (e) {};
             $(elt).removeClass("active");
@@ -155,10 +142,9 @@ function resetTimelines() {
     });
 
     /* Find/Init/Return a timeline-enabled media element for a given (about) url */
-    timelinesByURL = {};
     function timelineForURL(url) {
         if (timelinesByURL[url] === undefined) {
-            var driver = $("video[src='"+url+"'],audio[src='"+url+"']").first();
+            var driver = $("video[src='" + url + "'], audio[src='" + url + "']").first();
             if (driver) {
                 driver = driver.get(0);
                 timelinesByURL[url] = driver;
@@ -215,41 +201,41 @@ function resetTimelines() {
 
 var currentTextArea = undefined; /* used for timecode pasting */
 
+/* REFRESH {{{ */
 // The refresh event gets fired on body initially
 // then on any <section> or other dynamically loaded/created element to "activate" it
 $(document).bind("refresh", function (evt) {
     var context = evt.target;
 
-    // Draggable Sections
+    /* Draggable + resizable Sections {{{ */
     $("section.section1").draggable({
         handle: 'h1',
         delay: 200,  // NOTE: Prevents unwanted saves 
         stop: function () { 
+            // Makes sur the annotation doesn't get a negative offset
             var position = $(this).position();
             if (position.top < 0) {
-                $(this).css('top', '0px');
+                $(this).css('top', 0);
             };
             if (position.left < 0) {
-                $(this).css('left', '0px');
+                $(this).css('left', 0);
             };
-            if (! $('body').hasClass('anonymous')) {
-                commit_attributes(this);
-            }; 
+            $(this).trigger('geometrychange');
         },
     }).resizable({
         stop: function () { 
-            if (! $('body').hasClass('anonymous')) {
-                commit_attributes(this);
-            }; 
+            $(this).trigger('geometrychange');
          },
     });
+    /* }}} */
 
-    // RENUMBER ALL SECTIONS
+    /* Renumber all sections {{{ */
     $("section:not([data-section='-1'])").each(function (i) {
-        $(this).attr("data-section", (i+1));
+        $(this).attr("data-section", (i + 1));
     });
+    /* }}} */
 
-    // SECTION EDIT LINKS
+    // Section edit {{{ */
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     $(context).ffind('section').each(function () {
         $("<span>✎</span>").addClass("section_edit_link").click(function () {
@@ -261,28 +247,23 @@ $(document).bind("refresh", function (evt) {
             $('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
         }, function() {
             $('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
-        }).prependTo($("h1:first", this));
+        }).prependTo($("h1", this).first());
         
-        //$(this).children("h1").bind('dblclick', function(e) {
-            //var section = $(this).closest("section");
-            //if (!section.hasClass('editing')) {
-                //section.trigger("collapse");
-            //};
-        //});
-        $(this).find("h1, h2").bind('dblclick', function(e) {
-            e.stopImmediatePropagation();
+        $(this).find("h1, h2").bind('dblclick', function(event) {
+            event.stopImmediatePropagation();
             var section = $(this).closest("section");
-            if (!section.hasClass('editing')) {
-                section.trigger("collapse");
+            if (! section.hasClass('editing')) {
+                section.toggleClass('collapsed');
+                section.trigger("geometrychange");
             };
         });
         var nonhead = $(this).children(":not(:header)");
-        var wrapped = $("<div class=\"wrapper\"></div>").append(nonhead);
+        var wrapped = $('<div class="wrapper"></div>').append(nonhead);
         $(this).append(wrapped);
-    }).bind("collapse", function (evt) {
-        evt.stopPropagation();
-        $(this).toggleClass('collapsed');
+    }).bind("geometrychange", function (event) {
+        event.stopPropagation();
         if (! $('body').hasClass('anonymous')) {
+            // Prevents anonymous users from recording the changes
             commit_attributes(this);
         }; 
     }).bind("edit", function (evt) {
@@ -339,25 +320,12 @@ $(document).bind("refresh", function (evt) {
             });
         }
     });
-    // end of IN-PLACE EDITING
+    /* }}} */
 
     /* Connect players to timed sections */
     resetTimelines();
 
-    /// CLICKABLE TIMECODES
-    /*
-    $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
-        var t = $.timecode_tosecs_attr($(this).attr("content"));
-        var about = $(this).parents('*[about]').attr('about');
-        var player = $('[src="' + about + '"]')[0] 
-                    || $('source[src="' + about + '"]').parent('.player')[0];
-        if (player) {
-            player.currentTime = t;
-            player.play();
-        }
-    });
-    */
-    /// CLICKABLE TIMECODES
+    /* Clickable timecodes {{{ */
     $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
         var about = $(this).parents('*[about]').attr('about');
         var timeline;
@@ -368,24 +336,25 @@ $(document).bind("refresh", function (evt) {
         }
         if (timeline) {
             var t = $.datetimecode_parse($(this).attr("content"));
-            // console.log("timeline", timeline, t);
             $(timeline).timeline("currentTime", t);
         }
         var t = $.timecode_tosecs_attr($(this).attr("content"));
         var player = $('[src="' + about + '"]')[0] 
-                    || $('source[src="' + about + '"]').parent('.player')[0];
+                  || $('source[src="' + about + '"]').parent('.player')[0];
         if (player) {
             player.currentTime = t;
             player.play();
         }
     });
+    /* }}} */
 
-    // Fixes the the clone select value being reset
+    /* Swatches {{{ */
+    /* Fixes the the clone select value being reset */
     $(context).ffind("span.swatch").each(function () {
         $(this).draggable({helper: function () {
             var $this = $(this);
-            var $clone = $(this).clone();
-            $clone.find('select:first').val($this.find('select:first').val());
+            var $clone = $this.clone();
+            $clone.find('select').first().val($this.find('select').first().val());
             return $clone.appendTo("body");
         }});
     });
@@ -394,17 +363,16 @@ $(document).bind("refresh", function (evt) {
         greedy: true,
         accept: ".swatch",
         hoverClass: "drophover",
-        drop: function (evt, ui) {
+        drop: function (event, ui) {
             var $select = $(ui.helper).find('select');
             var key = $select.attr("name");
             var value = $select.find('option:selected').val();
-            var s1 = $(this).closest(".section1, .section2");
-            s1.css(key, value);
-            if (! $('body').hasClass('anonymous')) {
-                commit_attributes(s1);
-            }; 
+            var section = $(this).closest(".section1, .section2");
+            section.css(key, value);
+            section.trigger('geometrychange');
         }
     });
+    /* }}} */
 
 
     // Timeupdate Propagation
@@ -422,13 +390,12 @@ $(document).bind("refresh", function (evt) {
         // parent.setTimeFromChild(elt, t) --> or via a timeupdate event 
     });
 
-    // Landmarks
+    /* Landmarks {{{ */
     function placeLandmarks () {
         var slider_elt = $('#timelineslider');
-        var slider_elt_width = slider_elt.width() - 26;;
-        var position = slider_elt.position();
-        var left = position.left;
-        var right = position.left + slider_elt.width();
+        var slider_elt_width = slider_elt.width() - 26;
+        var left = slider_elt.position().left;
+        var right = left + slider_elt.width();
         var duration = $("body").timeline('maxTime');
         if (typeof(duration) == "object") {
             duration = date2secs(duration);
@@ -477,8 +444,10 @@ $(document).bind("refresh", function (evt) {
     if ($('#timelineslider').is(':visible')) {
         placeLandmarks();
     }
+    /* }}} */
 
 });
+
 
 $(document).ready(function() {
 
@@ -510,7 +479,7 @@ $(document).ready(function() {
         $(".player").each(function () {
             if (!this.paused) return this;
         });
-        var vids = $(".player:first");
+        var vids = $(".player").first();
         if (vids.length) return vids[0];
     }
     shortcut.add("Ctrl+Shift+Down", function () {
@@ -537,130 +506,123 @@ $(document).ready(function() {
             var foo = this.paused ? this.play() : this.pause();
         });
     });
-    /////////////////////////
-    // LAYERS
-    $('div#tab-layers').aalayers({
-        selector: 'section.section1',
-        post_reorder: function(event, ui, settings) {
-            var $this = settings.$container;
-            $this.find('li')
-                .reverse()
-                .each(function(i) {
-                    var target = $(this).find('a').attr('href');
-                    $(target).css('z-index', i);
-                    if (! $('body').hasClass('anonymous')) {
-                        commit_attributes($(target));
-                    }; 
-                });
-        },
-        post_toggle: function(event, settings, target) {
-            target.toggle();
-            if (! $('body').hasClass('anonymous')) {
-                commit_attributes(target);
-            }; 
-        },
-    });
 
-    /////////////////////
-    // LAYOUT
-    // FIXME: is it really necessary to set enableCursorHotKey for each
-    // sidebar?
-    $("nav#west-pane div#tab-this").tabs();
-    //$("aa-tabs").tabs();
-    $('body').layout({
-        applyDefaultStyles: false,
-        enableCursorHotkey: false,
-        west: {
-            size: "33%",
-            fxSpeed: "slow",
-            initClosed: false,
-            enableCursorHotkey: false,
-            slidable: false,
-            resizable: false,
-            togglerAlign_closed : 'center',
-            togglerAlign_open : 'center',
-            togglerContent_open: '&larr;',
-            togglerContent_closed: '&rarr;',
-            spacing_closed: 30,
-            spacing_open: 30,
-            togglerLength_open: 30,
-            togglerLength_closed: 30,
-            showOverflowOnHover: false,
-        },
-    });
-    
-    $("a[title='add']").click(function() {
-        $('<section><h1>New section</h1></section>')
-            .addClass('section1')
-            .css('top', 30)
-            .css('left', 30)
-            .data('section', '-1')
-            .prependTo('article')
-            .trigger('refresh')
-            .trigger('edit');
-    });
-
-    $("a[title='commit']").click(function() {
-        var message = window.prompt("Summary", "A nice configuration");
-        if (message) {
-            $.get("flag/", {
-                message: "[LAYOUT] " + message,
+/* Layers {{{ */
+$('div#tab-layers').aalayers({
+    selector: 'section.section1',
+    post_reorder: function(event, ui, settings) {
+        var $this = settings.$container;
+        $this.find('li')
+            .reverse()
+            .each(function(i) {
+                $($(this).find('label a').attr('href'))
+                    .css('z-index', i)
+                    .trigger('geometrychange');
             });
-        };
-        return false;
-    });
+    },
+    post_toggle: function(event, settings, target) {
+        target.toggle().trigger('geometrychange');
+    },
+});
+/* }}} */
 
-    $("a[title='mode']").click(function() {
-        $("article").toggleClass("play");
-    });
+/* Layout {{{ */
+$("nav#west-pane div#tab-this").tabs();
+$('body').layout({
+    applyDefaultStyles: false,
+    enableCursorHotkey: false,
+    west: {
+        size: "33%",
+        fxSpeed: "slow",
+        initClosed: false,
+        enableCursorHotkey: false,
+        slidable: false,
+        resizable: false,
+        togglerAlign_closed : 'center',
+        togglerAlign_open : 'center',
+        togglerContent_open: '&larr;',
+        togglerContent_closed: '&rarr;',
+        spacing_closed: 30,
+        spacing_open: 30,
+        togglerLength_open: 30,
+        togglerLength_closed: 30,
+        showOverflowOnHover: false,
+    },
+});
+/* }}} */
 
-    /////////////////////////////
-    // TIMELINE
-    function updatetimeFromSlider (elt) {
-        var v = $(elt).slider("option", "value");
-        var d = $("body").data("currentTime");
-        var start = $("body").timeline("minTime");
-        var end = $("body").timeline("maxTime");
-        var curTime = start.getTime() + ((end - start) * (v/100000));
-        // console.log(v, start, end, curTime);
-        if (!d) {
-            d = new Date();
-            $("body").data("currentTime", d);
-        }
-        d.setTime(curTime);
-        //console.log("newtime", d);
-        return d;
+$("a[title='add']").click(function() {
+    $('<section><h1>New section</h1></section>')
+        .addClass('section1')
+        .css('top', 30)
+        .css('left', 30)
+        .data('section', '-1')
+        .prependTo('article')
+        .trigger('refresh')
+        .trigger('edit');
+});
+
+$("a[title='commit']").click(function() {
+    var message = window.prompt("Summary", "A nice configuration");
+    if (message) {
+        $.get("flag/", {
+            message: "[LAYOUT] " + message,
+        });
+    };
+    return false;
+});
+
+$("a[title='mode']").click(function() {
+    $("article").toggleClass("play");
+});
+
+/* Timeline {{{ */
+function updatetimeFromSlider (elt) {
+    var v = $(elt).slider("option", "value");
+    var d = $("body").data("currentTime");
+    var start = $("body").timeline("minTime");
+    var end = $("body").timeline("maxTime");
+    var curTime = start.getTime() + ((end - start) * (v/100000));
+    // console.log(v, start, end, curTime);
+    if (!d) {
+        d = new Date();
+        $("body").data("currentTime", d);
     }
-    $("body").bind("timeupdate", function () {
-        var ct = $("body").data("currentTime");
-        var start = $("body").timeline("minTime");
-        var end = $("body").timeline("maxTime");
-        var v =  (ct / (end - start)) * 100000;
-        //console.log("body.timeupdate", ct, v);
-        $(elt).slider("option", "value", v);
-    });
-    $('#timelineslider').slider({
-        max: 100000,
-        start: function(e) {
-            
-        },
-        slide: function(e) {
-            var d = updatetimeFromSlider(this);
-            $("body").timeline("currentTime", d);
-        },
-        stop: function(e) {
-            /*var d = updatetimeFromSlider(this);
-            console.log(d);*/
-        },
-    });
-    //$("#play").bind('click', function(e) {
-        //$('body').voidplayer('play');
-    //});
-    //$("#pause").bind('click', function(e) {
-        //$('body').voidplayer('pause');
-    //});
+    d.setTime(curTime);
+    //console.log("newtime", d);
+    return d;
+}
+
+$("body").bind("timeupdate", function () {
+    var ct = $("body").data("currentTime");
+    var start = $("body").timeline("minTime");
+    var end = $("body").timeline("maxTime");
+    var v =  (ct / (end - start)) * 100000;
+    //console.log("body.timeupdate", ct, v);
+    //$(elt).slider("option", "value", v);
+    $('#timeslider').slider("option", "value", v);
+});
+
+$('#timelineslider').slider({
+    max: 100000,
+    slide: function(e) {
+        var d = updatetimeFromSlider(this);
+        $("body").timeline("currentTime", d);
+    },
+});
+
+$(document).voidplayer();
+$(document).bind("timeupdate", function () {
+    var ct = $("document").data("currentTime");
+    $("body").data("currentTime", ct);
+});
+$(document).voidplayer('play');
+
+
+
+/* }}} */
     
-    // Smooth scrolling to and uncollapsing of anchors
+    /* Smooth scrolling to and uncollapsing of anchors {{{ */
     $('a[href^="#"]').live('click', function() {
     //$('div#center a[href^="#"]').live('click', function() {
     //$('div#center').delegate('a[href^="#"]', 'click', function() {
@@ -675,9 +637,14 @@ $(document).ready(function() {
         }, 1000);
 
         $target.removeClass('collapsed');
+        $target.trigger("geometrychange");
         return false;
     });
+    /* }}} */
 
 
 });
+/* }}} */
 })(jQuery);
+
+/* vim: set foldmethod=marker: */

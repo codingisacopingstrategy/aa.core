@@ -793,8 +793,8 @@ nav#timeline {
 div#timelineslider {
     position: absolute;
     top: 1em;
-    left: 1em;
-    right: 1em;
+    left: 0;
+    right: 0;
     height: 1px;
     background-color: white;
     border: 1px solid black;
@@ -802,7 +802,7 @@ div#timelineslider {
 }
 
 div#timelineslider a {
-    background-color: red;
+    background-color: white;
     border: 1px solid black;
     height: 8px;
     width: 8px;

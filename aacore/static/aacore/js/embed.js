@@ -17,7 +17,7 @@ $(document).bind("refresh", function (evt) {
                     if (data.ok) {
                         // NEW: december 16 (Alex)
                         // In addition to content there are three new keys:
-                        // - extra_css: loads extra linl rel="stylesheet"
+                        // - extra_css: loads extra link rel="stylesheet"
                         // - extra_js: load extra script
                         // - script: extra javascript code to execute
                         for (var i = 0; i < data.extra_css.length; i++) {
