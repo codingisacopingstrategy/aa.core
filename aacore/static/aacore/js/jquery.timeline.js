@@ -44,7 +44,7 @@ var aTimeline = function (options) {
     var currentTime = 0.0;
     var titlesByStart = [];
     var titlesByEnd = [];
-    var lastTime = undefined;
+    var lastTime;
     var startIndex = -1;
     var endIndex = -1;
     var toShow = {};
@@ -54,9 +54,9 @@ var aTimeline = function (options) {
     function addTitle (newtitle) {
         // addTitleByStart
         /* maintain min/maxTime */
-        if ((minTime == undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
-        if ((maxTime == undefined) || (newtitle.start > maxTime)) { maxTime = newtitle.start; }
-        if ((maxTime == undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
+        if ((minTime === undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
+        if ((maxTime === undefined) || (newtitle.start > maxTime)) { maxTime = newtitle.start; }
+        if ((maxTime === undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
 
         /* insert annotation in the correct (sorted) location */
         var placed = false;
@@ -274,14 +274,18 @@ var methods = {
             var elt = this;
             var $this = $(this),
             data = $this.data('timeline');
-            if ( ! data ) {
+            if (! data ) {
                 // FIRST TIME INIT
-                data = { target : $this };
+                data = { target: $this };
                 data.options = opts;
                 $(this).data('timeline', data);
             }
             // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
-            data.timeline = aTimeline({ show: opts.show, hide: opts.hide, setCurrentTime: opts.setCurrentTime});
+            data.timeline = aTimeline({ 
+                show: opts.show, 
+                hide: opts.hide, 
+                setCurrentTime: opts.setCurrentTime
+            });
             $this.bind("timeupdate", function (evt, controller) {
                 // console.log("timeline: timeupdate", evt);
                 // allow a wrapped getCurrentTime for the element (via playable?)
@@ -357,16 +361,14 @@ var methods = {
 };
 
 // boilerplate jquery plugin method dispatch code
-$.fn.timeline = function( method ) {
-    if ( methods[method] ) {
-        return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
-    } else if ( typeof method === 'object' || ! method ) {
-        return methods.init.apply( this, arguments );
+$.fn.timeline = function(method) {
+    if (methods[method]) {
+        return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+    } else if (typeof method === 'object' || ! method) {
+        return methods.init.apply(this, arguments);
     } else {
-        $.error( 'Method ' +  method + ' does not exist on jQuery.timeline' );
+        $.error('Method ' +  method + ' does not exist on jQuery.timeline');
     }
 };
 
 })(jQuery);
-
-

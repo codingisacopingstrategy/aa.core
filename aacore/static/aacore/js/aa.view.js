@@ -28,7 +28,7 @@ function commit_attributes (elt) {
         .css({
             // we only want the record the visibility if the element is hidden...
             'display': $(elt).is(":visible") ? "" : "none",
-            'position': '',
+            'position': ''
         });
 
     // Removes extra whitespaces
@@ -38,9 +38,9 @@ function commit_attributes (elt) {
 
     // Constructs the markdown source
     var attr_chunk = "{: ";
-    if (about) attr_chunk += "about='" + about + "' ";
-    if (style) attr_chunk += "style='" + style + "' ";
-    if (class_) attr_chunk += "class='" + class_ + "' ";
+    if (about) { attr_chunk += "about='" + about + "' "; }
+    if (style) { attr_chunk += "style='" + style + "' "; }
+    if (class_) { attr_chunk += "class='" + class_ + "' "; }
     attr_chunk += "}" ;
     attr_chunk = (attr_chunk == "{: }") ? "" : attr_chunk;  // Removes empty attribute list junk
 
@@ -52,7 +52,7 @@ function commit_attributes (elt) {
     }
 
     $.get("edit/", {
-        section: section,
+        section: section
     }, function(data) {
         // Searches for Header
         var header_match = HASH_HEADER_RE.exec(data);
@@ -66,13 +66,13 @@ function commit_attributes (elt) {
             } else {
                 start = header_match.slice(1,3).join('').length;
                 end = start;
-            };
+            }
             var before = data.substring(0, start);
-            var after = data.substring(end, data.length)
+            var after = data.substring(end, data.length);
             
             $.post("edit/", {
                 content: before + attr_chunk + after,
-                section: section,
+                section: section
             });
         }
     });
@@ -107,7 +107,7 @@ function resetTimelines() {
         },
         show: function (elt) {
             try { $("audio,video", elt).get(0).play(); }
-            catch (e) {};
+            catch (e) {}
 
             $(elt).addClass("active")
                 .closest('article[class!="play"]')
@@ -117,7 +117,7 @@ function resetTimelines() {
         },
         hide: function (elt) {
             try { $("audio,video", elt).get(0).pause(); }
-            catch (e) {};
+            catch (e) {}
             $(elt).removeClass("active");
         },
         start: function (elt) {
@@ -136,7 +136,7 @@ function resetTimelines() {
             // shoot a setCurrentTime "event" to any contained player
             // $(".aaplayer", elt).aaplayer("setCurrentTime", (t/1000));
             try { $("audio,video", elt).get(0).currentTime = (t/1000); }
-            catch (e) {};
+            catch (e) {}
 
         }
     });
@@ -199,7 +199,7 @@ function resetTimelines() {
 
 (function($) {
 
-var currentTextArea = undefined; /* used for timecode pasting */
+var currentTextArea; /* used for timecode pasting */
 
 /* REFRESH {{{ */
 // The refresh event gets fired on body initially
@@ -216,16 +216,16 @@ $(document).bind("refresh", function (evt) {
             var position = $(this).position();
             if (position.top < 0) {
                 $(this).css('top', 0);
-            };
+            }
             if (position.left < 0) {
                 $(this).css('left', 0);
-            };
+            }
             $(this).trigger('geometrychange');
-        },
+        }
     }).resizable({
         stop: function () { 
             $(this).trigger('geometrychange');
-         },
+         }
     });
     /* }}} */
 
@@ -255,7 +255,7 @@ $(document).bind("refresh", function (evt) {
             if (! section.hasClass('editing')) {
                 section.toggleClass('collapsed');
                 section.trigger("geometrychange");
-            };
+            }
         });
         var nonhead = $(this).children(":not(:header)");
         var wrapped = $('<div class="wrapper"></div>').append(nonhead);
@@ -265,7 +265,7 @@ $(document).bind("refresh", function (evt) {
         if (! $('body').hasClass('anonymous')) {
             // Prevents anonymous users from recording the changes
             commit_attributes(this);
-        }; 
+        }
     }).bind("edit", function (evt) {
         function edit (data) {
             var position = $(that).css("position");
@@ -314,9 +314,9 @@ $(document).bind("refresh", function (evt) {
             // Initiate the edit by GETting the markdown source
             $.ajax("edit/", {
                 data: {
-                    section: $(this).attr("data-section"),
+                    section: $(this).attr("data-section")
                 },
-                success: edit,
+                success: edit
             });
         }
     });
@@ -399,23 +399,23 @@ $(document).bind("refresh", function (evt) {
         var duration = $("body").timeline('maxTime');
         if (typeof(duration) == "object") {
             duration = date2secs(duration);
-        };
+        }
         $('section.section2').each(function() {
             var start = $(this).data('start');
             if (typeof(start) == "undefined") {
                 return;
-            };
+            }
             var end = $(this).data('end');
             if (typeof(end) == "undefined") {
                 return;
-            };
+            }
             var offset = $.timecode_tosecs(start) / duration;
             var width = ($.timecode_tosecs(end) - $.timecode_tosecs(start)) / duration;
             $('<a>').attr('href', '#' + $(this).attr('id')).addClass('landmark').css({
                 'position': 'absolute',
                 'left': (100 * offset) + "%",
                 'width': (100 * width) + "%",
-                'top': 25, 
+                'top': 25
             }).data('position', start)
                 .attr('title', start + " --> " + end)
                 //.bind('click', function() {
@@ -430,7 +430,7 @@ $(document).bind("refresh", function (evt) {
             var elt_pos = elt_duration / duration;
             $('<a href="#"><img src="/static/aacore/img/landmark.png" /></a>').css({
                 'position': 'absolute',
-                'left': (100 * elt_pos) + "%",
+                'left': (100 * elt_pos) + "%"
             }).data('position', data_start)
                 .attr('title', $(this).text())
                 //.bind('click', function() {
@@ -477,10 +477,10 @@ $(document).ready(function() {
          * or just first player otherwise
          */
         $(".player").each(function () {
-            if (!this.paused) return this;
+            if (! this.paused) { return this; }
         });
         var vids = $(".player").first();
-        if (vids.length) return vids[0];
+        if (vids.length) { return vids[0]; }
     }
     shortcut.add("Ctrl+Shift+Down", function () {
         if (currentTextArea) {
@@ -493,17 +493,21 @@ $(document).ready(function() {
     });
     shortcut.add("Ctrl+Shift+Left", function () {
         $(".player").each(function () {
-            this.currentTime = this.currentTime - 5;
+            this.currentTime -= 5;
         });
     });
     shortcut.add("Ctrl+Shift+Right", function () {
         $(".player").each(function () {
-            this.currentTime = this.currentTime + 5;
+            this.currentTime += 5;
         });
     });
     shortcut.add("Ctrl+Shift+Up", function () {
         $(".player").each(function () {
-            var foo = this.paused ? this.play() : this.pause();
+            if (this.paused) { 
+                this.play(); 
+            } else { 
+                this.pause(); 
+            }
         });
     });
 
@@ -522,7 +526,7 @@ $('div#tab-layers').aalayers({
     },
     post_toggle: function(event, settings, target) {
         target.toggle().trigger('geometrychange');
-    },
+    }
 });
 /* }}} */
 
@@ -546,8 +550,8 @@ $('body').layout({
         spacing_open: 30,
         togglerLength_open: 30,
         togglerLength_closed: 30,
-        showOverflowOnHover: false,
-    },
+        showOverflowOnHover: false
+    }
 });
 /* }}} */
 
@@ -566,9 +570,9 @@ $("a[title='commit']").click(function() {
     var message = window.prompt("Summary", "A nice configuration");
     if (message) {
         $.get("flag/", {
-            message: "[LAYOUT] " + message,
+            message: "[LAYOUT] " + message
         });
-    };
+    }
     return false;
 });
 
@@ -608,7 +612,7 @@ $('#timelineslider').slider({
     slide: function(e) {
         var d = updatetimeFromSlider(this);
         $("body").timeline("currentTime", d);
-    },
+    }
 });
 
 $(document).voidplayer();
