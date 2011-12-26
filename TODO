@@ -1,4 +1,5 @@
 # High priority
+- bug with column ":" in url: sould be escaped by the wikify function.
 - Hide edit button when not logged in
 - BUG: negative positions
 - rework on the manual
