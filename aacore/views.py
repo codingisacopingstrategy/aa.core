@@ -379,8 +379,8 @@ def page_edit(request, slug):
                 context['form'] = PageEditForm(initial={"content": context['content']})
         else:
             context['name'] = name  # So templates nows about what page we are editing
-            rendered = render_to_string("aacore/partials/initial_page_content.md")
-            context['form'] = PageEditForm(initial={"content": rendered})
+            rendered = render_to_string("aacore/partials/initial_page_content.md", context)
+            context['form'] = PageEditForm(initial={"content": rendered, "message": '/* Created a new page "%s" */' % name, })
         
         return render_to_response("aacore/page_edit.html", context, \
                 context_instance=RequestContext(request))
