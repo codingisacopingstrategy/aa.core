@@ -13,45 +13,47 @@ Timelines follow the element's "timeupdate" events.
 A Timeline may also be passive and require an external element to "drive" it via calls to setCurrentTime.
 */
 
-////////////////////////////////////////
-// timeline
-////////////////////////////////////////
-/*
-aTimeline -- private closure-class used by the plugin
-*/
-
 var aTimeline = function (options) {
-    var that = {};
-    var cc_item_uid = 0;
+    /*
+     * aTimeline
+     * private closure-class used by the plugin
+     */
+    var that = {},
+        cc_item_uid = 0,
+        minTime, 
+        maxTime,
+        currentTime = 0.0,
+        titlesByStart = [],
+        titlesByEnd = [],
+        lastTime,
+        startIndex = -1,
+        endIndex = -1,
+        toShow = {},
+        toHide = {},
+        activeItems = {},
+        settings = {};
 
-    var settings = {};
     $.extend(settings, options);
 
     // element wrapper
-    var timeline_item = function (elt, start, end, show, hide) {
+    function timeline_item (elt, start, end, show, hide) {
         var that = {};
+
         cc_item_uid += 1;
         that.id = "T" + cc_item_uid;
         that.start = start;
         that.end = end;
         that.elt = elt;
+
         if (show) { that.show = show; }
         if (hide) { that.hide = hide; }
+
         return that;
     };
 
-    var minTime, maxTime;
-    var currentTime = 0.0;
-    var titlesByStart = [];
-    var titlesByEnd = [];
-    var lastTime;
-    var startIndex = -1;
-    var endIndex = -1;
-    var toShow = {};
-    var toHide = {};
-    var activeItems = {};
-    
     function addTitle (newtitle) {
+        var placed = false;
+
         // addTitleByStart
         /* maintain min/maxTime */
         if ((minTime === undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
@@ -59,7 +61,6 @@ var aTimeline = function (options) {
         if ((maxTime === undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
 
         /* insert annotation in the correct (sorted) location */
-        var placed = false;
         for (var i=0; i<titlesByStart.length; i++) {
             if (titlesByStart[i].start > newtitle.start) {
                 // insert before this index
@@ -68,20 +69,22 @@ var aTimeline = function (options) {
                 break;
             }
         }
+
         // otherwise simply append
-        if (!placed) { titlesByStart.push(newtitle); }
+        if (! placed) { titlesByStart.push(newtitle); }
 
         // addTitleByEnd
         /* insert annotation in the correct (sorted) location */
         placed = false;
         for (i=0; i<titlesByEnd.length; i++) {
-            if ((titlesByEnd[i].end > newtitle.end) || (titlesByEnd[i].end === undefined && newtitle.end !== undefined)) {
+            if ((titlesByEnd[i].end > newtitle.end) || ((titlesByEnd[i].end === undefined) && (newtitle.end !== undefined))) {
                 // insert before this index
                 titlesByEnd.splice(i, 0, newtitle);
                 placed = true;
                 return;
             }
         }
+
         // otherwise simply append
         if (!placed) { titlesByEnd.push(newtitle); }
     }
@@ -267,30 +270,35 @@ var settings = {
 }
 
 var methods = {
-    init : function( options ) {
+    init : function(options) {
         var opts = {};
         $.extend(opts, settings, options);
-        return this.each(function(){
+
+        return this.each(function() {
             var elt = this;
             var $this = $(this),
+
             data = $this.data('timeline');
-            if (! data ) {
+            if (! data) {
                 // FIRST TIME INIT
-                data = { target: $this };
+                data = {target: $this};
                 data.options = opts;
                 $(this).data('timeline', data);
             }
-            // init ALWAYS creates a fresh timeline (so it can be used to reset the element and drop evt. dead refs)
+
+            // init ALWAYS creates a fresh timeline (so it can be used to reset
+            // the element and drop evt. dead refs)
             data.timeline = aTimeline({ 
                 show: opts.show, 
                 hide: opts.hide, 
                 setCurrentTime: opts.setCurrentTime
             });
-            $this.bind("timeupdate", function (evt, controller) {
-                // console.log("timeline: timeupdate", evt);
+
+            $this.bind("timeupdate", function (event, controller) {
+                //console.log("timeline: timeupdate", event);
                 // allow a wrapped getCurrentTime for the element (via playable?)
                 var ct = opts.currentTime(elt);
-                // console.log("timeline: timeupdate", evt.target, ct);
+                //console.log("timeline: timeupdate", event.target, ct);
                 data.timeline.setCurrentTime(ct, controller);
                 return true;
             });

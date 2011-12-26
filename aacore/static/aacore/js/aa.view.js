@@ -581,48 +581,41 @@ $("a[title='mode']").click(function() {
 });
 
 /* Timeline {{{ */
-function updatetimeFromSlider (elt) {
-    var v = $(elt).slider("option", "value");
-    var d = $("body").data("currentTime");
-    var start = $("body").timeline("minTime");
-    var end = $("body").timeline("maxTime");
-    var curTime = start.getTime() + ((end - start) * (v/100000));
-    // console.log(v, start, end, curTime);
-    if (!d) {
-        d = new Date();
-        $("body").data("currentTime", d);
-    }
-    d.setTime(curTime);
-    //console.log("newtime", d);
-    return d;
-}
-
 $("body").bind("timeupdate", function () {
-    var ct = $("body").data("currentTime");
-    var start = $("body").timeline("minTime");
-    var end = $("body").timeline("maxTime");
-    var v =  (ct / (end - start)) * 100000;
-    //console.log("body.timeupdate", ct, v);
-    //$(elt).slider("option", "value", v);
-    $('#timeslider').slider("option", "value", v);
+    var currentTime, minTime, maxTime, nextTime, $body;
+
+    $body = $('body');
+    currentTime = $body.data("currentTime");
+    minTime = $body.timeline("minTime");
+    maxTime = $body.timeline("maxTime");
+    nextTime =  (currentTime / (maxTime - minTime)) * 100000;
+
+    $('#timeslider').slider("option", "value", nextTime);
 });
 
 $('#timelineslider').slider({
     max: 100000,
-    slide: function(e) {
-        var d = updatetimeFromSlider(this);
-        $("body").timeline("currentTime", d);
+    slide: function(event) {
+        var value, currentTime, minTime, maxTime, nextTime, $body;
+
+        value = $(this).slider("option", "value");
+
+        $body = $('body');
+        currentTime = $body.data("currentTime");
+        minTime = $body.timeline("minTime");
+        maxTime = $body.timeline("maxTime");
+
+        nextTime = minTime.getTime() + ((maxTime - minTime) * (value/100000));
+
+        if (! currentTime) {
+            currentTime = new Date();
+            $body.data("currentTime", currentTime);
+        }
+        currentTime.setTime(nextTime);
+
+        $body.timeline("currentTime", currentTime);
     }
 });
-
-$(document).voidplayer();
-$(document).bind("timeupdate", function () {
-    var ct = $("document").data("currentTime");
-    $("body").data("currentTime", ct);
-});
-$(document).voidplayer('play');
-
-
 
 /* }}} */
     
