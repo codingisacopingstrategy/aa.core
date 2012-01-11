@@ -238,7 +238,7 @@ $(document).bind("refresh", function (evt) {
     // Section edit {{{ */
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     $(context).ffind('section').each(function () {
-        $("<span>✎</span>").addClass("section_edit_link").click(function () {
+        $("<span>✎</span>").addClass("edit").click(function () {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
         
@@ -272,9 +272,9 @@ $(document).bind("refresh", function (evt) {
             var section_height = Math.min($(window).height() - 28, $(that).height());
             var use_height = (position == "absolute") ? section_height : section_height;
             var f = $("<div></div>").addClass("section_edit").appendTo(that);
-            var textarea = $("<textarea></textarea>").css({height: use_height+"px"}).text(data).appendTo(f);
+            var textarea = $("<textarea></textarea>").css({height: use_height + "px"}).text(data).appendTo(f);
             $(that).addClass("editing");
-            var ok = $("<span>✔</span>").addClass("section_save_link").click(function () {
+            var ok = $("<span>✔</span>").addClass("save").click(function () {
                 $.ajax("edit/", {
                     type: 'post',
                     data: {
@@ -288,7 +288,7 @@ $(document).bind("refresh", function (evt) {
                     }
                 });
             }).prependTo($(that).find(':header:first'));
-            $("<span>✘</span>").addClass("section_cancel_link").click(function () {
+            $("<span>✘</span>").addClass("cancel").click(function () {
                 if (new_section) {
                     // removes the annotation
                     $(that).remove(); 
@@ -531,27 +531,35 @@ $('div#tab-layers').aalayers({
 /* }}} */
 
 /* Layout {{{ */
-$("nav#west-pane div#tab-this").tabs();
+$("nav#sidebar div#tab-this").tabs();
 $('body').layout({
     applyDefaultStyles: false,
     enableCursorHotkey: false,
     west: {
-        size: "33%",
-        fxSpeed: "slow",
+        size: "350",
+        fxName: "slide",
+        fxSpeed: "fast",
         initClosed: false,
         enableCursorHotkey: false,
         slidable: false,
         resizable: false,
         togglerAlign_closed : 'center',
         togglerAlign_open : 'center',
-        togglerContent_open: '&larr;',
-        togglerContent_closed: '&rarr;',
-        spacing_closed: 30,
-        spacing_open: 30,
-        togglerLength_open: 30,
-        togglerLength_closed: 30,
+        togglerContent_open: 'MENU',
+        togglerContent_closed: 'MENU',
+        spacing_closed: 16,
+        spacing_open: 16,
+        togglerLength_open: -1,
+        togglerLength_closed: -1,
         showOverflowOnHover: false
     }
+});
+$('#center').layout({
+    applyDefaultStyles: false,
+    enableCursorHotkey: false,
+    //slidable: false,
+    //resizable: false,
+    //closable: false,
 });
 /* }}} */
 
@@ -576,7 +584,7 @@ $("a[title='commit']").click(function() {
     return false;
 });
 
-$("a[title='mode']").click(function() {
+$("#mode").click(function() {
     $("article").toggleClass("play");
 });
 
@@ -628,7 +636,7 @@ $('#timelineslider').slider({
         var offset = $target.offset();
         //var container_offset = $('div#center').offset();
         
-        $('div#center').animate({
+        $('div#canvas').animate({
             scrollTop: offset.top,
             scrollLeft: offset.left
         }, 1000);

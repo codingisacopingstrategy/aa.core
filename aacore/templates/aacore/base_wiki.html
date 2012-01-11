@@ -17,8 +17,8 @@
 
     <title>{% block title %}active archives{% endblock %}</title>
 
-    <link rel="stylesheet" href="{{ STATIC_URL }}lib/css/reset.css" type="text/css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/layout-default-latest.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/jquery.layout.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/activearchives.css" type="text/css" />
     <link rel="aa-embed" href="{% url aa-embed %}" type="text/css" />
 
     {% block jquery %}
@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{% url aa-colors-css %}" media="screen" />
     {% endblock jquery %}
 
-    <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" media="screen" />
+    <!--<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" media="screen" />-->
 
     {% block extrahead %}{% endblock %}
     {% endblock head %}

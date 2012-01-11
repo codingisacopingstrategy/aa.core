@@ -291,29 +291,29 @@ nav span.title {
 }
 
     /* RIGHT PANEL ---------- */
-    nav#west-pane {
+    nav#sidebar {
         font-family: LiberationSans, sans;
         z-index: 9999;
         text-align: center !important;
         background-color: white;
         overflow: hidden;
     }
-    nav#west-pane:hover {
+    nav#sidebar:hover {
         overflow: auto;
     }
-    nav#west-pane hr {
+    nav#sidebar hr {
         background-color: black;
         height: 1px;
         border: 0;
         width: 50%;
     }
-    nav#west-pane p {
+    nav#sidebar p {
         margin-bottom: 0;
         font-size: 16px;
         line-height: 21px;
         letter-spacing: 0;
     }
-    nav#west-pane h1 {
+    nav#sidebar h1 {
         /*text-align: center;*/
         font-weight: bold;
         margin: 1em auto;
@@ -322,28 +322,28 @@ nav span.title {
         line-height: 26px;
         display: inline-block;
     }
-    nav#west-pane a {
+    nav#sidebar a {
         font-weight: bold;
     }
-    nav#west-pane p + p {
+    nav#sidebar p + p {
         text-indent: 1.3em;
     }
-    nav#west-pane ul#aa-tabs {
+    nav#sidebar ul#aa-tabs {
         font-size: 11px;
         text-transform: uppercase;
         display: inline-block;
     }
-    nav#west-pane div.aa-tab {
+    nav#sidebar div.aa-tab {
         text-align: left;
     }
-    nav#west-pane + div.ui-layout-resizer * { /* PANEL HANDLER */
+    nav#sidebar + div.ui-layout-resizer * { /* PANEL HANDLER */
         line-height: 15px;
         background: none;
         color: black;
         font-family: LiberationMono, Monospace;
         padding: 0 6px;
     }
-    nav#west-pane + div.ui-layout-resizer span { 
+    nav#sidebar + div.ui-layout-resizer span { 
         border: 1px solid black;
         -moz-border-radius: 10px;
         -webkit-border-radius: 10px;
@@ -353,7 +353,7 @@ nav span.title {
         padding: 0;
         margin: 0 6px;
     }
-    nav#west-pane + div.ui-layout-resizer span:hover { 
+    nav#sidebar + div.ui-layout-resizer span:hover { 
         background-color: yellow;
     }
         /* TOOLBAR ---------- */
@@ -470,15 +470,15 @@ nav span.title {
         div#tab-styles .ui-draggable:hover { cursor: move; background-color: blue; }
 
         /* MARKDOWN HELP ---------- */
-        nav#west-pane #tab-help {
+        nav#sidebar #tab-help {
             font-size: 13px;
         }
-        nav#west-pane #tab-help h3 {
+        nav#sidebar #tab-help h3 {
             border-top: 1px solid darkgray;
             padding-top: 6px;
             margin: 8px 0;
         }
-        nav#west-pane #tab-help div {
+        nav#sidebar #tab-help div {
             display: none;
         }
         div#tab-help h2 {
@@ -895,7 +895,7 @@ div.aa_embed audio {
     /*border-bottom: none;*/
     /*z-index: 100;*/
 /*}*/
-nav#west-pane div.aa_embed {    /* ----- EMBED MEDIA IN SIDEBAR ---- */
+nav#sidebar div.aa_embed {    /* ----- EMBED MEDIA IN SIDEBAR ---- */
     text-align: center;
     margin: 1.3em;
 }

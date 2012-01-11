@@ -2,10 +2,11 @@
 
 {% load aacoretags %}
 
+{% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
+
 {% block extrahead %}
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
-<!--<script src="{{ STATIC_URL }}lib/js-iso8601/iso8601.min.js"></script>   -->
 
 <script src="{{ STATIC_URL }}aacore/js/jquery.sort_by_zindex.js"></script>   
 <script src="{{ STATIC_URL }}aacore/js/jquery.caret.js"></script>   
@@ -19,162 +20,40 @@
 <script src="{{ STATIC_URL }}aacore/js/aa.view.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/aa.browser.js"></script>
 <script src="{{ STATIC_URL }}aacore/js/embed.js"></script>
+<script src="{{ STATIC_URL }}lib/iscroll/src/iscroll.js"></script>
 
-
-<script>
-    $(document).ready(function(){
-        var hover = false;
-        $(".index-slideshow .wrapper").live("mouseenter", function() {
-            var $this = $(this)
-            function scrollme() {
-                hover = true;
-                scrollto = $this.scrollTop();
-                console.log(scrollto);
-                $this.animate({
-                    scrollTop: scrollto + 100,
-                }, 500, function() {
-                    if (hover === true) scrollme();
-                });
-            }
-            scrollme();
-        }).live("mouseleave", function(){
-           hover = false; 
-        });
-    });
-</script>
-
-<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.play.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.play.css" media="screen"/>
 
 {% get_markdown_for content as md meta %}
 {% for css in meta.extra_css %}
-<link rel="stylesheet" href="{{ css }}" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="{{ css }}" media="screen"/>
 {% endfor %}
 {% endblock %}
 
-{% block body %}
 
-<nav id="timeline">
+{% block body %}
+<nav id="timeline" class="ui-layout-north">
 <div id="timelineslider"></div>
 </nav>
-<div id="controls">
-    <span id="play">play</span> |
-    <span id="pause">pause</span>
-</div>
-<span id="time">time</span>
 
 {% get_markdown_for content as md meta %}
-<article {% if meta.mode %}class="{{ meta.mode|first }}"{% endif %}>
+<article id="canvas" class="ui-layout-center{% if meta.mode %} {{ meta.mode|first }}{% endif %}">
+    <div id="wrapper">
     {{ md|safe }}
+    </div>
 </article>
+<script type="text/javascript">
+var myScroll = new iScroll('canvas', { zoom: true, wheelAction: 'zoom', zoomMin: 0.25, zoomMax: 1 });
+</script>
+
+<nav id="controls" class="ui-layout-south">
+    <span id="playpause">play</span>
+    <span id="mode">mode</span>
+    <span id="time">00:00:00 / 00:12:35</span>
+</nav>
 {% endblock %}
 
+
 {% block postbody %}
-<nav id="west-pane" class="ui-layout-west" style="display: none; text-align: left;"> 
-    <h1 class="logo">
-        <a title="Back to main page" href="{% url aa-index %}">
-            <span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span>
-        </a>
-    </h1>
-        <ul id="toolbar">
-            {% if page %}
-                    <li><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></li>
-                {% if user.is_authenticated %}
-                    <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
-                    <li><a title="history" href="{{ page.get_history_url }}">History</a></li>
-                    <li><a title="add" href="#">Add</a></li>
-                    <li><a title="commit" href="#">Save</a></li>
-                    <!--<li><a title="menu" href="#">⚙</a></li>-->
-                    <li><a title="Logout" href="{% url aa-logout %}">Logout</a></li>
-                {% else %}
-                    <li><a title="Login" href="{% url aa-login %}">Login</a></li>
-                {% endif %}
-                    <li><a title="mode" href="#">Mode</a></li>
-            {% endif %}
-        </ul>
-    <hr>
-    <!--<div class="ui-layout-content">-->
-    <div id="tab-this">
-        <ul id="aa-tabs">
-            <li><a title="About" href="#tab-about">Intro</a></li>
-            <li><a title="Layers" href="#tab-layers">Table of Contents</a></li>
-            {% if user.is_authenticated %}
-                <li><a title="Styles" href="#tab-styles">Styles</a></li>
-                <li><a title="Help" href="#tab-help">Help</a></li>
-            {% endif %}
-            <li><a title="Browser" href="#tab-browse">Browse</a></li>
-        </ul>
-
-
-        <div id="tab-about" class="aa-tab">
-            {% get_markdown_for content as md meta %}
-            {% if meta.title %}
-                <h1>{{ meta.title|first }}</h1>
-            {% endif %}
-            {% if meta.subtitle %}
-                <h2>{{ meta.subtitle|first }}</h2>
-            {% endif %}
-            {% if meta.authors %}
-                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
-            {% endif %}
-            {% for summary in meta.summary %}
-                {% get_markdown_for summary as md meta %}
-                {{ md|safe }}
-            {% endfor %}
-        </div>
-
-        <div id="tab-layers" class="aa-tab">
-        </div>
-
-        {% if user.is_authenticated %}
-            <div id="tab-styles" class="aa-tab">
-                {% include "aacore/partials/swatches.html" %}
-            </div>
-
-            <div id="tab-help" class="aa-tab">
-                <script>
-                    $(document).ready(function(){
-                        // SHOW/HIDE help chapters
-                        $("#tab-help h2").toggle(
-                            function(){
-                                $(this).next().show();
-                            },function(){
-                                $(this).next().hide();
-                        });
-                        $("#tab-help h3").toggle(
-                            function(){
-                                $(this).next().show();
-                            },function(){
-                                $(this).next().hide();
-                        });
-                    });
-                </script>
-                <h2>LINKS</h2>
-                <dl>
-                    <dt>Internal link</dt>
-                    <dd><code>[[ Name of the page ]]</code></dd>
-                    <dd><code>[[ Name of the page | Title ]]</code></dd>
-                    <dt>External link</dt>
-                    <dd><code>[[ URL of the link ]]</code></dd>
-                    <dd><code>[[ URL of the link | Title ]]</code></dd>
-                    <dt>Link inside the page</dt>
-                    <dd><code>[[ #ID-OF-THE-ELEMENT ]]</code></dd>
-                    <dt>Landmarks</dt>
-                    <dd><code>[[ landmark::#|Title of the landmark ]]</code></dd>
-                </dl>
-                {% include "aacore/partials/timecode_help.html" %}
-                {% include "aacore/partials/filters_help.html" %}
-                {% include "aacore/partials/markdown_help.html" %}
-            </div>
-        {% endif %}
-
-        <div id="tab-browse">
-            <iframe id="browser-panel"></iframe>
-        </div>
-    </div>
-</nav>
-<!--<nav id="south-pane" class="ui-layout-south" style="display: none; text-align: left;"> -->
-<!--<div id="browser">-->
-    <!--[><div class="minipage"></div><]-->
-    <!--<iframe class="minipage" src="/browse/"></iframe>-->
-<!--</div>-->
+{% include "aacore/partials/sidebar.html" %}
 {% endblock %}

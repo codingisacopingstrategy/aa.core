@@ -69,3 +69,44 @@ A nice sniffer: `file`:
 - how to change the embed wrapper? how to execute script loaded in ajax?
 
 - metadata that says if it plays automatically or not
+
+Meeting 01/2012
+===============
+
+- drop-down css don't work on time-based medias
+- end of january: workshop Lisa Nelson -> Launch 27/01 -> 05/02
+
+Navigation
+----------
+
+- say that you can zoom in/out
+- left bar: mode more explicit
+- how to come back to TOC when sidebar is closed
+- Previsualisation visuelle de la page
+- TOC links weird
+- Bug when resizing a box it goes up
+- collapsed section : tooltip
+- disappearing scrollbars ?
+- home page different than publication homepage
+- not enough margin in left bar
+- cinematic mode shows hidden boxes in edit mode
+- drag and drop classes
+- more explicit class names
+- timeline: avoir une butée à la fin de la timeline
+- different types of landmarks... what syntax?
+- show sound files in the timeline
+- in dissapearance: red is aggressive
+- background appears in cinematic mode?
+- remove decorations with classes
+- play/read mode: choose to put a border or not on the boxes
+- if timeline, mode name = play, otherwise mode name = read.
+- possibility to keep titles
+- play/pause/skip to next landmark
+- use the timeline to fly to a box (already working)
+
+Bug
+---
+
+- when editing a box, sometimes the content of another box appears.
+- when add a new box, save it first
+- when editing a box, sometimes it dissapears (content + begining of the next box)
