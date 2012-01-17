@@ -1,3 +1,26 @@
+article.play section.section1.hidden {
+    display: none!important;
+}
+article.play section.section1.alignbottom section.section2.active {
+    vertical-align: bottom!important;
+}
+article.play section.section1.aligntop section.section2.active {
+    vertical-align: top!important;
+}
+article.play section.section1.top section.section2 {
+    vertical-align: top;
+}
+article.play section.section1.xx-large * {
+    font-size: xx-large;
+    line-height: 1.1;
+}
+article.play section.section1 {
+    background-color: transparent;
+    overflow: hidden;
+}
+article.play section.section1.collapsed {
+    /*visibility: hidden;*/
+}
 article.play section.section1.tm {
     position: absolute;
     top: 0!important;
@@ -18,6 +41,7 @@ article.play section.section1.mm {
     top: 50%!important;
     left: 50%!important;
 }
+
 article.play section.section1.width50 {
     width: 50%!important;
 }
@@ -36,6 +60,21 @@ article.play section.section1 h1 {
 }
 article.play section.section1 {
     border: none;
+    border: 1px solid red;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    outline: 0px none transparent;
+}
+article.play section.section2 {
+    border: none;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    outline: 0px none transparent;
 }
 article.play section.section2 h2 {
     display: none;
@@ -94,9 +133,9 @@ article.play .active div.wrapper {
   }
 }
 article.play section.section2.active { 
-    display: table-cell!important; 
-    vertical-align: middle!important;
-    text-align: center!important;;
+    display: table-cell !important; 
+    /*vertical-align: middle!important;*/
+    /*text-align: center!important;;*/
     padding: 0 auto!important;
     width: 100%!important;
     height: 100%!important;
@@ -105,6 +144,7 @@ article.play section.section2.active {
 }
 article.play section.section1 { 
     display: table!important; 
+    table-layout: fixed;
     padding-bottom: 0!important;
 }
 article.play section {
@@ -119,12 +159,6 @@ article.play section.section1 > div.wrapper {
     height: 100%!important;
 }
 
-article.play section.section1.alignbottom section.section2.active {
-    vertical-align: bottom!important;
-}
-article.play section.section1.aligntop section.section2.active {
-    vertical-align: top!important;
-}
 article.play del {
     visibility: hidden;
 }
