@@ -214,10 +214,10 @@ $(document).bind("refresh", function (evt) {
         e.stopPropagation(); 
     }).draggable({
         //helper: 'clone',
-        containment: 'parent',
+        //containment: 'parent',
         cancel: 'span.edit',
         scroll: true,
-        appendTo: '#wrapper',
+        //appendTo: '#wrapper',
         handle: 'h1',
         delay: 200,  // NOTE: Prevents unwanted saves 
         stop: function () { 
@@ -566,12 +566,20 @@ $('body').layout({
 $('#center').layout({
     applyDefaultStyles: false,
     enableCursorHotkey: false,
-    //slidable: false,
-    //resizable: false,
-    //closable: false,
+    slidable: false,
+    resizable: false,
+    closable: false,
 });
 
-var myScroll = new iScroll('canvas', { zoom: true, wheelAction: 'zoom', zoomMin: 0.25, zoomMax: 1, hideScrollbar: true });
+if ($('#canvas').hasClass('map')) {
+    var myScroll = new iScroll('canvas', { 
+        zoom: true, 
+        wheelAction: 'zoom', 
+        zoomMin: 0.25, 
+        zoomMax: 1, 
+        hideScrollbar: true 
+    });
+};
 /* }}} */
 
 $("#add").click(function() {
@@ -609,15 +617,37 @@ $("#modeedit, #modeplay").change(function() {
 });
 
 /* Navigation {{{ */
-$("#zoomin").click(function() {
+$("#canvas").dblclick(function(event) {
+    var x = event.clientX;
+    var y = event.clientY;
     var value = $('#zoomslider').slider('value');
-    $('#zoomslider').slider('value', value + 0.1);
-    //myScroll.zoom(0, 0, value + 0.1, 300);
+    if (event.shiftKey){
+        var newValue = (value - 0.2 <= myScroll.options.zoomMin) 
+                       ? myScroll.options.zoomMin : value - 0.2;
+        myScroll.zoom(x, y, newValue, 300);
+    } else {
+        var newValue = (value + 0.2 >= myScroll.options.zoomMax) 
+                       ? myScroll.options.zoomMax : value + 0.2;
+        myScroll.zoom(x, y, newValue, 300);
+    };
+    $('#zoomslider').slider('value', newValue);
 });
-$("#zoomout").click(function() {
+
+$("#zoomin").click(function(event) {
+    //event.stopImmediatePropagation();
     var value = $('#zoomslider').slider('value');
-    $('#zoomslider').slider('value', value - 0.1);
-    //myScroll.zoom(0, 0, 0.25, 300);
+    var newValue = (value + 0.1 >= myScroll.options.zoomMax) 
+                   ? myScroll.options.zoomMax : value + 0.1;
+    myScroll.zoom(0, 0, newValue, 300);
+    $('#zoomslider').slider('value', newValue);
+});
+$("#zoomout").click(function(event) {
+    //event.stopImmediatePropagation();
+    var value = $('#zoomslider').slider('value');
+    var newValue = (value - 0.1 <= myScroll.options.zoomMin) 
+                   ? myScroll.options.zoomMin : value - 0.1;
+    myScroll.zoom(0, 0, newValue, 300);
+    $('#zoomslider').slider('value', newValue);
 });
 $('#zoomslider').slider({
     orientation: 'vertical',
@@ -625,14 +655,13 @@ $('#zoomslider').slider({
     min: 0.25,
     step: 0.01,
     value: 1,
-    change: function(event) {
+    slide: function(event) {
         var value = $(this).slider("option", "value");
-        //var centerx = $('#canvas').width() / 2;
-        //var centery = $('#canvas').height() / 2;
         myScroll.zoom(0, 0, value, 300);
-        //myScroll.zoom(centerx, centery, value, 300);
     }
 });
+
+
 
 function createMap() {
     var mapWidth = 200;

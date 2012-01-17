@@ -37,7 +37,9 @@
 </nav>
 
 {% get_markdown_for content as md meta %}
-<article id="canvas" class="ui-layout-center{% if meta.mode %} {{ meta.mode|first }}{% endif %}">
+<article id="canvas" class="ui-layout-center
+                            {% if meta.mode %}{{ meta.mode|first }}{% endif %}
+                            {% if meta.type %}{{ meta.type|first }}{% endif %}">
     <div id="wrapper">
     {{ md|safe }}
     </div>
@@ -49,18 +51,19 @@
     </nav>
 
     <!--<nav id="map"></nav>-->
-    <nav id="controls">
-        <span id="playpause">play</span>
-        <span id="time">00:00:00 / 00:12:35</span>
-        <form id="mode">
-            {% if meta.mode|first|lower == "play" %}
-            <input type="radio" id="modeedit" name="mode" value="edit"><label for="modeedit">landscape</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked"><label for="modeplay">cinematic</label>
-            {% else %}
-            <input type="radio" id="modeedit" name="mode" value="edit" checked="checked"><label for="modeedit">landscape</label><input type="radio" id="modeplay" name="mode" value="play"><label for="modeplay">cinematic</label>
-            {% endif %}
-        </form>
-    </nav>
 </article>
+
+<nav id="controls">
+    <span id="playpause">play</span>
+    <span id="time">00:00:00 / 00:12:35</span>
+    <form id="mode">
+        {% if meta.mode|first|lower == "play" %}
+        <input type="radio" id="modeedit" name="mode" value="edit"><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked"><label for="modeplay">cinematic</label>
+        {% else %}
+        <input type="radio" id="modeedit" name="mode" value="edit" checked="checked"><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play"><label for="modeplay">cinematic</label>
+        {% endif %}
+    </form>
+</nav>
 
 
 {% endblock %}

@@ -417,7 +417,7 @@ ul#toolbar li a {
 
 
 /* Canvas {{{ */
-article#canvas {
+article#canvas.map {
     overflow: hidden !important;
 }
 
@@ -643,6 +643,7 @@ a.landmark {
 
 /* controls {{{ */
 nav#controls {
+    z-index: 999999999;
     position: absolute;
     bottom: 1em;
     left: 1em;
@@ -672,10 +673,15 @@ nav#controls span#playpause {
 }
 
 nav#zoom {
+    display: none;
     position: absolute;
     bottom: 3em;
     right: 1em;
     text-align: center;
+}
+
+article.map nav#zoom {
+    display: block;
 }
 
 nav#zoom button#zoomin,
@@ -849,7 +855,7 @@ form#edit-all input[type=text] {
 }
 /* }}} */
 
-div#wrapper {
+article.map div#wrapper {
     width: 10000px;
     height: 10000px;
 }
