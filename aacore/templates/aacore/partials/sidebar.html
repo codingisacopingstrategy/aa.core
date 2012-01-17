@@ -22,18 +22,16 @@
     <!--</h1>-->
     <!--<p><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></p>-->
     <!--<hr>-->
-        <ul id="toolbar">
-            {% if page %}
-                {% if user.is_authenticated %}
-                    <li><a title="edit" href="{{ page.get_edit_url }}">Edit</a></li>
-                    <li><a title="history" href="{{ page.get_history_url }}">History</a></li>
-                    <li><a title="add" href="#">Add</a></li>
-                    <li><a title="commit" href="#">Save</a></li>
-                {% else %}
-                    <li><a title="Login" href="{% url aa-login %}">Login</a></li>
-                {% endif %}
+        {% if page %}
+            {% if user.is_authenticated %}
+                <ul id="toolbar">
+                    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+                    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+                    <li><a id="add" title="Add an annotation" href="#">Add</a></li>
+                    <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
+                </ul>
             {% endif %}
-        </ul>
+        {% endif %}
         <header>
             <hgroup>
                 {% if meta.title %}
@@ -50,11 +48,10 @@
             <p>This page is part of the publication{{ meta.ispartof|pluralize }} {{ meta.ispartof|join:"," }}.</p>
             {% endif %}
         </header>
-    <hr>
     <!--<div class="ui-layout-content">-->
     <div id="tab-this">
         <ul id="aa-tabs">
-            <li><a title="About" href="#tab-about">Intro</a></li>
+            <li><a title="About" href="#tab-about">Introduction</a></li>
             <li><a title="Layers" href="#tab-layers">Table of Contents</a></li>
             {% if user.is_authenticated %}
                 <li><a title="Styles" href="#tab-styles">Styles</a></li>

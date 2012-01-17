@@ -110,3 +110,7 @@ Bug
 - when editing a box, sometimes the content of another box appears.
 - when add a new box, save it first
 - when editing a box, sometimes it dissapears (content + begining of the next box)
+
+
+- dbl click to zoom
+- carriage return on titles

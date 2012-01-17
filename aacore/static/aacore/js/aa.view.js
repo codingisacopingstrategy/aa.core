@@ -184,9 +184,11 @@ function resetTimelines() {
     if (typeof($('body').timeline('maxTime')) == "undefined") {
         $('nav#timeline').hide();
         $('#time').hide();
-        $('#controls').hide();
+        $('#playpause').hide();
     } else {
         $('nav#timeline').show();
+        $('#time').show();
+        $('#playpause').show();
     }
 
 
@@ -208,7 +210,14 @@ $(document).bind("refresh", function (evt) {
     var context = evt.target;
 
     /* Draggable + resizable Sections {{{ */
-    $("section.section1").draggable({
+    $("section.section1").bind('mousedown', function(e) {
+        e.stopPropagation(); 
+    }).draggable({
+        //helper: 'clone',
+        containment: 'parent',
+        cancel: 'span.edit',
+        scroll: true,
+        appendTo: '#wrapper',
         handle: 'h1',
         delay: 200,  // NOTE: Prevents unwanted saves 
         stop: function () { 
@@ -238,7 +247,7 @@ $(document).bind("refresh", function (evt) {
     // Section edit {{{ */
     // Create & insert edit links in every section's Header that trigger the section's "edit" event
     $(context).ffind('section').each(function () {
-        $("<span>✎</span>").addClass("edit").click(function () {
+        $("<span>✎</span>").addClass("edit").attr('title', 'Edit this annotation in place').click(function () {
             $(this).closest("section").trigger("edit");
         }).prependTo($(":header:first", this));
         
@@ -274,7 +283,7 @@ $(document).bind("refresh", function (evt) {
             var f = $("<div></div>").addClass("section_edit").appendTo(that);
             var textarea = $("<textarea></textarea>").css({height: use_height + "px"}).text(data).appendTo(f);
             $(that).addClass("editing");
-            var ok = $("<span>✔</span>").addClass("save").click(function () {
+            var ok = $("<span>✔</span>").addClass("save").attr('title', 'Save').click(function () {
                 $.ajax("edit/", {
                     type: 'post',
                     data: {
@@ -288,7 +297,7 @@ $(document).bind("refresh", function (evt) {
                     }
                 });
             }).prependTo($(that).find(':header:first'));
-            $("<span>✘</span>").addClass("cancel").click(function () {
+            $("<span>✘</span>").addClass("cancel").attr('title', 'Cancel').click(function () {
                 if (new_section) {
                     // removes the annotation
                     $(that).remove(); 
@@ -415,7 +424,7 @@ $(document).bind("refresh", function (evt) {
                 'position': 'absolute',
                 'left': (100 * offset) + "%",
                 'width': (100 * width) + "%",
-                'top': 25
+                'top': 75
             }).data('position', start)
                 .attr('title', start + " --> " + end)
                 //.bind('click', function() {
@@ -539,14 +548,14 @@ $('body').layout({
         size: "350",
         fxName: "slide",
         fxSpeed: "fast",
-        initClosed: false,
+        initClosed: true,
         enableCursorHotkey: false,
         slidable: false,
         resizable: false,
         togglerAlign_closed : 'center',
         togglerAlign_open : 'center',
-        togglerContent_open: 'MENU',
-        togglerContent_closed: 'MENU',
+        togglerContent_open: '-',
+        togglerContent_closed: '+',
         spacing_closed: 16,
         spacing_open: 16,
         togglerLength_open: -1,
@@ -561,9 +570,11 @@ $('#center').layout({
     //resizable: false,
     //closable: false,
 });
+
+var myScroll = new iScroll('canvas', { zoom: true, wheelAction: 'zoom', zoomMin: 0.25, zoomMax: 1, hideScrollbar: true });
 /* }}} */
 
-$("a[title='add']").click(function() {
+$("#add").click(function() {
     $('<section><h1>New section</h1></section>')
         .addClass('section1')
         .css('top', 30)
@@ -574,7 +585,7 @@ $("a[title='add']").click(function() {
         .trigger('edit');
 });
 
-$("a[title='commit']").click(function() {
+$("#save").click(function() {
     var message = window.prompt("Summary", "A nice configuration");
     if (message) {
         $.get("flag/", {
@@ -584,9 +595,90 @@ $("a[title='commit']").click(function() {
     return false;
 });
 
-$("#mode").click(function() {
-    $("article").toggleClass("play");
+
+$("#mode").buttonset();
+$("#playpause, #time").button();
+
+$("#modeedit, #modeplay").change(function() {
+    var mode = $(this).val();
+    if (mode == "play") {
+        $("article").addClass("play");
+    } else {
+        $("article").removeClass("play");
+    }
 });
+
+/* Navigation {{{ */
+$("#zoomin").click(function() {
+    var value = $('#zoomslider').slider('value');
+    $('#zoomslider').slider('value', value + 0.1);
+    //myScroll.zoom(0, 0, value + 0.1, 300);
+});
+$("#zoomout").click(function() {
+    var value = $('#zoomslider').slider('value');
+    $('#zoomslider').slider('value', value - 0.1);
+    //myScroll.zoom(0, 0, 0.25, 300);
+});
+$('#zoomslider').slider({
+    orientation: 'vertical',
+    max: 1,
+    min: 0.25,
+    step: 0.01,
+    value: 1,
+    change: function(event) {
+        var value = $(this).slider("option", "value");
+        //var centerx = $('#canvas').width() / 2;
+        //var centery = $('#canvas').height() / 2;
+        myScroll.zoom(0, 0, value, 300);
+        //myScroll.zoom(centerx, centery, value, 300);
+    }
+});
+
+function createMap() {
+    var mapWidth = 200;
+    var mapHeight = 200;
+    var $elts = $('section.section1'); 
+    var maxLeft = 0;
+    var maxTop = 0;
+
+    $elts.each(function() {
+        var $this = $(this);
+        var position = $this.position();
+        var width = $this.width();
+        var height = $this.height();
+        var offsetLeft = position.left + width;
+        var offsetTop = position.top + height;
+        maxLeft = (offsetLeft > maxLeft) ? offsetLeft : maxLeft;
+        maxTop = (offsetTop > maxTop) ? offsetTop : maxTop;
+    });
+
+    $elts.each(function() {
+        var $this = $(this);
+        var position = $this.position();
+        var width = $this.width();
+        var height = $this.height();
+        var offsetLeft = position.left + width;
+        var offsetTop = position.top + height;
+        var h1 = $(this).find('h1').first().clone()
+        h1.find('span').remove();
+        $('<div>').css({
+            border: '1px solid black',
+            overflow: 'hidden',
+            //backgroundColor: 'red',
+            position: 'absolute',
+            fontSize: 7,
+            color: 'gray',
+            width: width / (maxLeft / 200),
+            height: height / (maxLeft / 200),
+            left: offsetLeft / (maxLeft / 200),
+            top: offsetTop / (maxLeft / 200),
+        }).text(h1.text()).appendTo($('#map'));
+    });
+}
+
+//createMap();
+
+/* }}} */
 
 /* Timeline {{{ */
 $("body").bind("timeupdate", function () {

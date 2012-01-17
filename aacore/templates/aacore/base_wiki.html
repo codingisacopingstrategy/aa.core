@@ -22,9 +22,12 @@
     <link rel="aa-embed" href="{% url aa-embed %}" type="text/css" />
 
     {% block jquery %}
-    <script src="{{ STATIC_URL }}lib/jquery/jquery.js"></script>
-    <script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    
-    <link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css" />
+    <!--<script src="{{ STATIC_URL }}lib/jquery/jquery.js"></script>-->
+    <!--<script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    -->
+    <!--<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css" />-->
+    <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.1.min.js"></script>
+    <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.17.custom.min.js"></script>    
+    <!--<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery-ui/css/south-street/jquery-ui-1.8.17.custom.css" type="text/css" />-->
 
     <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
     <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   

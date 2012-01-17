@@ -41,16 +41,28 @@
     <div id="wrapper">
     {{ md|safe }}
     </div>
-</article>
-<script type="text/javascript">
-var myScroll = new iScroll('canvas', { zoom: true, wheelAction: 'zoom', zoomMin: 0.25, zoomMax: 1 });
-</script>
 
-<nav id="controls" class="ui-layout-south">
-    <span id="playpause">play</span>
-    <span id="mode">mode</span>
-    <span id="time">00:00:00 / 00:12:35</span>
-</nav>
+    <nav id="zoom">
+    <button id="zoomin">+</button>
+    <div id="zoomslider"></div>
+    <button id="zoomout">-</button>
+    </nav>
+
+    <!--<nav id="map"></nav>-->
+    <nav id="controls">
+        <span id="playpause">play</span>
+        <span id="time">00:00:00 / 00:12:35</span>
+        <form id="mode">
+            {% if meta.mode|first|lower == "play" %}
+            <input type="radio" id="modeedit" name="mode" value="edit"><label for="modeedit">landscape</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked"><label for="modeplay">cinematic</label>
+            {% else %}
+            <input type="radio" id="modeedit" name="mode" value="edit" checked="checked"><label for="modeedit">landscape</label><input type="radio" id="modeplay" name="mode" value="play"><label for="modeplay">cinematic</label>
+            {% endif %}
+        </form>
+    </nav>
+</article>
+
+
 {% endblock %}
 
 
