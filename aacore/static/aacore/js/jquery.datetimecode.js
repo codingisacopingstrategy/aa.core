@@ -12,6 +12,26 @@ custom start, end functions should parse the given date as necessary
 
 */
 
+
+/* helpers {{{ */
+function secs2date (s, baseDate) {
+    var d = baseDate ? baseDate : new Date();
+    var hours = Math.floor(s / 3600);
+    s -= hours * 3600;   
+    var mins = Math.floor(s / 60);
+    s -= mins*60;
+    var secs = Math.floor(s);
+    var millis = (s - secs);
+    millis = millis*1000;
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, mins, secs, millis);
+}
+
+
+function date2secs (date) {
+    return date.getSeconds() + (date.getMinutes() * 60);
+}
+/* }}} */
+
 // hours optional
 timecode_tosecs_pat = /^(?:(\d\d):)?(\d\d):(\d\d)(,(\d{1,3}))?$/;
 
@@ -210,6 +230,11 @@ $.timecode_parse = timecode_tosecs_attr;
  * @function
  */
 $.timecode_unparse = timecode_fromsecs;
+
+
+$.secs2date = secs2date;
+
+$.date2secs = date2secs;
 })(jQuery);
 
 
