@@ -499,11 +499,10 @@ section.section1 h1:hover {
     background-color: #FFD;
 }
 section.section1 span.about {
-    float: left;
     display: none;
 }
 section.section1[about] span.about {
-    display: block;
+    display: inline;
 }
 
 section.section1 h2 {
@@ -634,10 +633,27 @@ div#timelineslider {
 
 a.landmark {
     display: block;
-    width: 2px;
-    background-color: yellow;
-    height: 6px;
-    border: 1px solid black;
+    height: 100%;
+    -ms-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.line {
+    width: 100%;
+    border: 1px solid white;
+    overflow: hidden;
+}
+
+a.landmark.normal:hover {
+    background-color: red;
+}
+
+a.landmark.normal,
+a.landmark.audio {
+    background-color: blue;
+    border: 1px solid white;
 }
 /* }}} */
 

@@ -102,36 +102,56 @@
     }
 
     function placeLandmarks () {
+        $('#lines').remove();
         var slider_elt = $('#timelineslider');
         var slider_elt_width = slider_elt.width() - 26;
         var left = slider_elt.position().left;
         var right = left + slider_elt.width();
         var duration = $("body").timeline('maxTime');
+        var lines = $('<div>').attr('id', 'lines');
         if (typeof(duration) == "object") {
             duration = $.date2secs(duration);
         }
-        $('section.section2').each(function() {
-            var start = $(this).data('start');
-            if (typeof(start) == "undefined") {
-                return;
+        var j = 0;
+        $('section.section1').each(function(i) {
+            var section2 = $('section.section2', this);
+            if (section2.length) {
+                var line = $("<div>").addClass('line').css({
+                    'position': 'absolute',
+                    'top': 26 + (5 * j),
+                    'height': 5
+                })
+                section2.each(function() {
+                    var extraClass = $(this).has('audio').length ? 'audio ' : 'normal'; 
+                    //var extraClass = $(this).has('audio').length ? '' : ''; 
+                    var start = $(this).data('start');
+                    if (typeof(start) == "undefined") {
+                        return;
+                    }
+                    var end = $(this).data('end');
+                    if (typeof(end) == "undefined") {
+                        return;
+                    }
+                    var offset = $.timecode_tosecs(start) / duration;
+                    var width = ($.timecode_tosecs(end) - $.timecode_tosecs(start)) / duration;
+                    //$('<a>').attr('href', '#' + $(this).attr('id')).addClass('landmark').css({
+                    $('<a>').attr('href', '#').addClass('landmark').css({
+                        'position': 'absolute',
+                        'left': (100 * offset) + "%",
+                        'width': (100 * width) + "%",
+                    }).addClass(extraClass).data('position', start)
+                        .attr('title', start + " --> " + end)
+                        //.bind('click', function() {
+                            //console.log('ok');
+                            //$("body").timeline('currentTime', duration + 0.01);
+                        //})
+                        .appendTo(line);
+                });
+
+                line.appendTo(lines);
+                j += 1;
             }
-            var end = $(this).data('end');
-            if (typeof(end) == "undefined") {
-                return;
-            }
-            var offset = $.timecode_tosecs(start) / duration;
-            var width = ($.timecode_tosecs(end) - $.timecode_tosecs(start)) / duration;
-            $('<a>').attr('href', '#' + $(this).attr('id')).addClass('landmark').css({
-                'position': 'absolute',
-                'left': (100 * offset) + "%",
-                'width': (100 * width) + "%",
-                'top': 75
-            }).data('position', start)
-                .attr('title', start + " --> " + end)
-                //.bind('click', function() {
-                    //$("body").timeline('currentTime', elt_duration + 0.01);
-                //})
-                .appendTo('#timeline');
+            lines.appendTo('#timeline');
         });
         
         $('a[rel="aa:landmark"]').each(function() {
