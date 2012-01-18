@@ -540,6 +540,11 @@ $('div#tab-layers').aalayers({
 /* }}} */
 
 /* Layout {{{ */
+$("#help").accordion({
+    autoHeight: false,
+    collapsible: true
+});
+
 $("nav#sidebar div#tab-this").tabs();
 $('body').layout({
     applyDefaultStyles: false,
