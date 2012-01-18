@@ -1,9 +1,6 @@
 # High priority
 - bug with column ":" in url: sould be escaped by the wikify function.
-- Hide edit button when not logged in
 - BUG: negative positions
-- rework on the manual
-    - Update the documentation to use [[ links ]] rather than default markdown links.
 - Create new page: default content that give clues
     - First page directly created?
     - Give a location to the first annotation
@@ -19,15 +16,12 @@
 
 ## Low priority
 - shift to enable the grid snapping
-- menu overlaps the top of the page
 - javascript scrollbars (less ugly)
 - draggable help
 - extra menu to show/hide annotation by criterias
 - Metadata in the sidebar
-- User accounts
 - edit locks?
-- Audacity
-- button to remove the about attribute
+- button to remove the about attribute/ drag the @ to remove the about attribute + confirmation
 - "attach" boxes
     - with data-anchor, data-position (north, south, east, west etc.)
 
@@ -39,17 +33,16 @@ configure serve to serve best html5 video/audio
 - rdf metadata to create relation between pages. EG. translation.
 - move page
 - How to preserve the title attribute with the new syntax ([[embed::ressource]])?
-- bug embed
-- manual sectioning "8<---"
+- bug embed ???
+- manual sectioning "8<---"? What about the <br /> tag which is semantically correct for this?
 
 - Notion of focus for media, to know which one is being controlled
 - support for RSS embeding
 
 # Oralsite workshop remarks:
 
-- collapse subsections?
 - URL and BROWSE buttons are too present.
-- "Browse" term leads to other expectations than getting metadata.
+- "Browse" term leads to other expectations than getting metadata. (but is there something better?)
 - video leads text/text leads video
 - Still a problem with non consecutive header levels...
 - embed webpages = iframe?
@@ -59,15 +52,11 @@ A nice sniffer: `file`:
     ➜  ~  file /tmp/marqueurs.txt    
     /tmp/marqueurs.txt: ASCII English text, with very long lines
 
-
-
 - annotation negative position happens when one rescales the annotation "outside" the screen.
-- help to update with embed
 - manual to update
 - bug with the layer palette
 - zoom filter to reimplement
 - how to change the embed wrapper? how to execute script loaded in ajax?
-
 - metadata that says if it plays automatically or not
 
 Meeting 01/2012
@@ -79,7 +68,6 @@ Meeting 01/2012
 Navigation
 ----------
 
-- say that you can zoom in/out
 - left bar: mode more explicit
 - how to come back to TOC when sidebar is closed
 - Previsualisation visuelle de la page
@@ -112,7 +100,6 @@ Bug
 - when editing a box, sometimes it dissapears (content + begining of the next box)
 
 
-- dbl click to zoom
 - carriage return on titles
 - history: date sections not accurate
 - url link in _blank (by default on external links?)
