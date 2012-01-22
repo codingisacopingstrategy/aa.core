@@ -6,7 +6,7 @@ class PageEditForm(forms.Form):
     Page Edit form.
     """
     content = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': '12'}),
+        widget=forms.Textarea(attrs={'rows': '12', 'wrap': 'off'}),
         label="",
         required=False,
     )
