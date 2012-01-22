@@ -17,7 +17,6 @@
 
 
 import urllib
-from django.template.loader import render_to_string
 import urlparse, html5lib, urllib2, lxml.cssselect
 
 try: import simplejson as json
@@ -26,6 +25,7 @@ except ImportError: import json
 from django.shortcuts import (render_to_response, redirect, get_object_or_404)
 from django.http import (HttpResponse, HttpResponseRedirect)
 from django.template import RequestContext 
+from django.template.loader import (render_to_string, get_template)
 from django.core.urlresolvers import reverse
 from django.conf import settings as projsettings
 from django.contrib.auth.decorators import login_required
@@ -42,7 +42,6 @@ from audacity import audacity_to_srt
 import re
 from aacore.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
 from timecode import timecode_tosecs
-from django.template.loader import render_to_string
 import lxml.cssselect
 
 
@@ -291,7 +290,7 @@ def page_detail(request, slug):
     :template:`aacore/page_detail.html`
 
     """
-    context = {}
+    context = RequestContext(request)
     context['namespaces'] = Namespace.objects.all()
     name = dewikify(slug)
 
@@ -310,11 +309,21 @@ def page_detail(request, slug):
 
     context['page'] = page
     context['content'] = content
-    c = RequestContext(request)
+
+    t = get_template('aacore/page_detail.html')
+
+    response = HttpResponse(t.render(context))
+
+    # Forces the page to reload
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Expires'] = '-1'
+    response['Pragma'] = 'no-cache'
+
+    return response
 
     # TODO: Markdown extension for stylesheet embed
 
-    return render_to_response("aacore/page_detail.html", context, context_instance=RequestContext(request))
+    #return render_to_response("aacore/page_detail.html", context)
 
 
 @login_required
