@@ -163,8 +163,8 @@ cite, dfn, em, i								{ font-style: italic; }
 textarea, code, kbd, samp, pre, tt, var		    { font-family: "Liberation Mono", mono-space, monospace; }
 h1, h2, h3, h4, h5, h6							{ word-spacing: -0.125em; }
 p												{ word-spacing: 0.125em; hyphenate: auto; hyphenate-lines: 3; }
-p+p												{ text-indent: 1.5em; }
-p+p.no-indent									{ text-indent: 0; }
+/*p+p												{ text-indent: 1.5em; }*/
+/*p+p.no-indent									{ text-indent: 0; }*/
 pre												{ white-space: pre; }
 del												{ text-decoration: line-through; }
 mark											{ background: rgba(255, 255, 0, 0.4); padding: 0 .25em; }
@@ -178,7 +178,7 @@ sup												{ vertical-align: super; }
 sub												{ vertical-align: sub; }
 blockquote										{ padding: 1.5em; }
 hr												{ border: none; background: #ddd; width: 100%; }
-/*ul, ol											{ margin-left: 1.5em; }*/
+ul, ol											{ margin-left: 1.5em; }
 ul												{ list-style: disc outside; }
 ol												{ list-style: decimal outside; }
 input, select, button							{ cursor: pointer; }
@@ -228,6 +228,7 @@ legend								{ position: relative; top: 5px; }
 table								{ font-size: 13px; }
 caption								{ font-size: 13px; line-height: 18px; position: relative; }
 hr									{ position: relative; height: 4px; margin: 18px 0 14px 0; }
+a[href^="http://"]:after            { content: "\2197"; color: gray; font-size: 9px; vertical-align: top; }
 /* }}} */
 
 
@@ -702,20 +703,6 @@ nav#zoom div#zoomslider {
     height: 200px;
     /*margin: 1em;*/
 }
-/*nav#map {*/
-    /*[>width: 20px;<]*/
-    /*[>height: 20px;<]*/
-    /*border: 1px solid black;*/
-    /*position: absolute;*/
-    /*left: 0;*/
-    /*bottom: 0;*/
-    /*background-color: rgba(255, 255, 255, 0.95);*/
-/*[>}<]*/
-/*[>nav#map:hover {<]*/
-    /*width: 400px;*/
-    /*height: 200px;*/
-/*}*/
-
 /*}}}*/
 
 
@@ -751,6 +738,9 @@ div.aa_embed .links a {
 div.aa_embed .links a:hover {
     background: blue;
 }
+div.aa_embed .links a:after {
+    content: none;
+}
 /*div.aa_embed audio {*/
     /*min-height: 60px;*/
 /*}*/
@@ -773,27 +763,48 @@ span.swatch {
     background-color: white; 
     cursor: move;
 }
+span.swatch label {
+    cursor: inherit;
+    top: 0;
+}
+span.swatch label,
+span.swatch select {
+    display: inline;
+}
 /* }}} */
 
+
+/* layers palette {{{ */
+#tab-layers label {
+    display: inline;
+}
+/* }}} */
+
+/* tags {{{ */
+span[property="foaf:person"] {
+    border-bottom: 1px dotted black;
+    cursor: help;
+}
+
+/* }}} */
 
 /*h1.logo {*/
 span.content.content-open,
 span.content.content-closed {
+    padding-bottom: 0;
+    width: 16px;
+    height: 16px;
     text-align: center;
     font-size: 16px;
-    line-height: 0;
-    letter-spacing: 2px;
+    line-height: 16px;
     font-weight: bold;
-    /*-webkit-transform: rotate(-90deg);	*/
-    /*-moz-transform: rotate(-90deg);*/
-    /*-ms-transform: rotate(-90deg);*/
-    /*-o-transform: rotate(-90deg);*/
-    /*transform: rotate(-90deg);*/
-    /*filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);*/
+    background-color: white;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 .ui-layout-toggler {
     background-color: whitesmoke !important;
-
 }
 
 
@@ -1033,3 +1044,18 @@ article.map div#wrapper {
 .ui-accordion .ui-accordion-content-active {
   display: block;
 }
+
+
+.ui-resizable { position: relative;}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
+.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
+.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
+.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
+.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
+.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
+.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+
+

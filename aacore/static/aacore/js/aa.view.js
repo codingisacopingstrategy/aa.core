@@ -27,10 +27,9 @@
     var timelinesByURL = {};
     var $canvas;
     var $sidebar;
-    var embed_url;
+    var embedUrl;
 
 
-    /* Edit {{{ */
     function commit_attributes (elt) {
         "use strict";
         /*
@@ -69,7 +68,7 @@
         attr_chunk = (attr_chunk == "{: }") ? "" : attr_chunk;  // Removes empty attribute list junk
 
 
-        var section = $(elt).attr("data-section");
+        var section = $(elt).data("section");
         if (section == -1) {
             // cancel anonymous section save -- BUG: duplicates sections by requesting section -1 (last)
             return;
@@ -101,9 +100,7 @@
             }
         });
     }
-    /* }}} */
 
-    /* Landmarks {{{ */
     function placeLandmarks () {
         var slider_elt = $('#timelineslider');
         var slider_elt_width = slider_elt.width() - 26;
@@ -151,27 +148,28 @@
                 //})
                 .appendTo('#timeline');
         });
-
-        
     }
-    /* }}} */
 
-    /* Reset Timeline {{{ */
     function resetTimelines() {
-        /* create timeline {{{ */
+        /* create timeline */
         $("body").timeline({
             currentTime: function (elt) {
                 return $(elt).data("datetime");
             },
             show: function (elt) {
+                var modePlay = $canvas.hasClass('play');
+
                 try { $("audio,video", elt).get(0).play(); }
                 catch (e) {}
 
+
                 $(elt).addClass("active")
-                    .closest('article[class!="play"]')
-                        .find('section.section1')
-                           .find('div.wrapper')
-                                .autoscrollable("scrollto", elt);
+
+                if (!modePlay) {
+                    $(elt).closest('section.section1')
+                       .find('div.wrapper')
+                            .autoscrollable("scrollto", elt);
+                };
             },
             hide: function (elt) {
                 try { $("audio,video", elt).get(0).pause(); }
@@ -186,7 +184,7 @@
                 // console.log("body end for", elt);
                 // start is defaultDate for end
                 var start = $.datetimecode_parse($(elt).attr("data-start"));
-                var end = $(elt).attr("data-end");
+                var end = $(elt).data("end");
                 if (end) { return $.datetimecode_parse(end, start); }
             },
             setCurrentTime: function (elt, t) {
@@ -198,27 +196,22 @@
 
             }
         });
-        /* }}} */
 
-        /* Find/Init/Return a timeline-enabled media element for a given (about) url {{{ */
+        /* Find/Init/Return a timeline-enabled media element for a given (about) url */
         function timelineForURL(url) {
             if (timelinesByURL[url] === undefined) {
                 var driver = $("video[src='" + url + "'], audio[src='" + url + "']").first();
                 if (driver) {
                     driver = driver.get(0);
                     timelinesByURL[url] = driver;
-                    // console.log("timelinesByURL", url, driver);
                     $(driver).timeline({
                         show: function (elt) {
-                            // console.log("timelinesByURL, show", elt);
                             $(elt).addClass("active")
                                 .closest('section.section1')
                                    .find('div.wrapper:first')
                                         .autoscrollable("scrollto", elt);
                         },
                         hide: function (elt) {
-                            // console.log("hide", elt);
-    //                        $(elt).hide();
                             $(elt).removeClass("active");
                         }
                     });
@@ -228,10 +221,9 @@
             }
             return timelinesByURL[url];        
         }
-        /* }}} */
 
-        /* Activate temporal html! {{{ */
-        $("[data-start]").each(function () {
+        /* Activate temporal html! */
+        $("[data-start]", $canvas).each(function () {
             var about_url = $.trim($(this).closest("[about]").attr("about"));
             // use the body as timeline if no about is given
             var timeline = about_url ? timelineForURL(about_url) : $("body").get(0);
@@ -239,29 +231,26 @@
                 $(timeline).timeline("add", this);
             }
         });
-        /* }}} */
 
-        /* Hides the slider if there is no titles attached to the body {{{ */
+        /* Hides the slider if there is no titles attached to the body */
         if ($('body').timeline('maxTime') === undefined) {
-            $('nav#timeline, #time, #playpause').hide();
+            $('#timeline, #time, #playpause').hide();
         } else {
-            $('nav#timeline, #time, #playpause').show();
+            $('#timeline, #time, #playpause').show();
         }
-        /* }}} */
     }
-    /* }}} */
 
-    /* First run {{{ */
     $(document).ready(function() {
         $canvas = $("#canvas");
         $sidebar = $("#sidebar");
-        embed_url = $("link[rel='aa-embed']").attr("href");
+        embedUrl = $("link[rel='aa-embed']").attr("href");
 
-        /* REFRESH {{{ */
         // The refresh event gets fired on #canvas initially
         // then on any <section> or other dynamically loaded/created element to "activate" it
         $canvas.bind("refresh", function (evt) {
             var context = evt.target;
+
+            $("section.section1 > div.wrapper", $canvas).autoscrollable();
 
             /* Draggable + resizable Sections {{{ */
             $("section.section1", $canvas).bind('mousedown', function(e) {
@@ -298,16 +287,18 @@
             // Section edit {{{ */
             // Create & insert edit links in every section's Header that trigger the section's "edit" event
             $(context).ffind('section').each(function () {
+                var $h1 = $("h1", this);
+
                 $("<span>✎</span>").addClass("edit").attr('title', 'Edit this annotation in place').click(function () {
                     $(this).closest("section").trigger("edit");
                 }).prependTo($(":header:first", this));
                 
                 var about = $(this).closest("section.section1").attr('about');
                 $("<span>@</span>").addClass("about").hover(function () {
-                    $('.player[src="' + about + '"], section[about="' + about + '"]').addClass('highlight');
+                    $('.player[src="' + about + '"], section[about="' + about + '"]', $canvas).addClass('highlight');
                 }, function() {
-                    $('.player[src="' + about + '"], section[about="' + about + '"]').removeClass('highlight');
-                }).prependTo($("h1", this).first());
+                    $('.player[src="' + about + '"], section[about="' + about + '"]', $canvas).removeClass('highlight');
+                }).prependTo($h1);
                 
                 $(this).find("h1, h2").bind('dblclick', function(event) {
                     event.stopImmediatePropagation();
@@ -316,7 +307,8 @@
                         section.toggleClass('collapsed');
                         section.trigger("geometrychange");
                     }
-                });
+                }).attr('title', 'Double-click to toggle collapsing.');
+
                 var nonhead = $(this).children(":not(:header)");
                 var wrapped = $('<div class="wrapper"></div>').append(nonhead);
                 $(this).append(wrapped);
@@ -331,14 +323,14 @@
                     var position = $(that).css("position");
                     var section_height = Math.min($(window).height() - 28, $(that).height());
                     var use_height = (position == "absolute") ? section_height : section_height;
-                    var f = $("<div></div>").addClass("section_edit").appendTo(that);
-                    var textarea = $("<textarea></textarea>").css({height: use_height + "px"}).text(data).appendTo(f);
+                    var f = $("<div>").addClass("section_edit").appendTo(that);
+                    var textarea = $("<textarea>").css({height: use_height + "px"}).text(data).appendTo(f);
                     $(that).addClass("editing");
                     var ok = $("<span>✔</span>").addClass("save").attr('title', 'Save').click(function () {
                         $.ajax("edit/", {
                             type: 'post',
                             data: {
-                                section: $(that).attr("data-section"),
+                                section: $(that).data("section"),
                                 content: textarea.val()
                             },
                             success: function (data) {
@@ -366,7 +358,7 @@
                 evt.stopPropagation();
                 var that = this;
                 var new_section = false;
-                if ($(this).data('section') == "-1") {
+                if ($(this).data('section') == -1) {
                     // Directly enter edit mode
                     new_section = true;
                     edit("# New");
@@ -374,7 +366,7 @@
                     // Initiate the edit by GETting the markdown source
                     $.ajax("edit/", {
                         data: {
-                            section: $(this).attr("data-section")
+                            section: $(this).data("section")
                         },
                         success: edit
                     });
@@ -443,10 +435,10 @@
             $(context).ffind("[rel='aa:embed']").each(function () {
                 var that = this;
                 function poll () {
-                    $.ajax(embed_url, {
+                    $.ajax(embedUrl, {
                         data: {
                             url: $(that).attr("href"),
-                            filter: $(that).attr("data-filter")
+                            filter: $(that).data("filter")
                         },
                         success: function (data) {
                             if (data.ok) {
@@ -528,14 +520,9 @@
                     resetTimelines();
                 }
             });
-        });
-        /* }}} */
+        }).trigger("refresh");
 
-        $canvas.trigger("refresh");
-
-        $("section.section1 > div.wrapper", $canvas).autoscrollable();
-
-        /* SHORTCUTS {{{ */
+        /* SHORTCUTS */
         // maintain variable currentTextArea
         $("section textarea", $canvas).live("focus", function () {
             currentTextArea = this;
@@ -586,211 +573,198 @@
                 }
             });
         });
-        /* }}} */
 
-    /* Fixes the the clone select value being reset */
-    $("#tab-styles span.swatch").each(function () {
-        $(this).draggable({
-            helper: function () {
-                var $this = $(this);
-                var $clone = $this.clone();
-                $clone.find('select').first().val($this.find('select').first().val());
-                return $clone.appendTo("body");
+        /* Fixes the the clone select value being reset */
+        $("#tab-styles span.swatch").each(function () {
+            $(this).draggable({
+                helper: function () {
+                    var $this = $(this);
+                    var $clone = $this.clone();
+                    $clone.find('select').first().val($this.find('select').first().val());
+                    return $clone.appendTo("body");
+                }
+            });
+        });
+
+        $('#tab-layers').aalayers({
+            selector: 'section.section1',
+            post_reorder: function(event, ui, settings) {
+                var $this = settings.$container;
+                $this.find('li')
+                    .reverse()
+                    .each(function(i) {
+                        $($(this).find('label a').attr('href'))
+                            .css('z-index', i)
+                            .trigger('geometrychange');
+                    });
+            },
+            post_toggle: function(event, settings, target) {
+                target.toggle().trigger('geometrychange');
             }
         });
-    });
 
-    /* Layers {{{ */
-    $('#tab-layers').aalayers({
-        selector: 'section.section1',
-        post_reorder: function(event, ui, settings) {
-            var $this = settings.$container;
-            $this.find('li')
-                .reverse()
-                .each(function(i) {
-                    $($(this).find('label a').attr('href'))
-                        .css('z-index', i)
-                        .trigger('geometrychange');
-                });
-        },
-        post_toggle: function(event, settings, target) {
-            target.toggle().trigger('geometrychange');
-        }
-    });
-    /* }}} */
+        $("#help").accordion({
+            autoHeight: false,
+            collapsible: true
+        });
 
-    /* Layout {{{ */
-    $("#help").accordion({
-        autoHeight: false,
-        collapsible: true
-    });
+        $("#tab-this").tabs();
 
-    $("#tab-this").tabs();
-    $('body').layout({
-        applyDefaultStyles: false,
-        enableCursorHotkey: false,
-        west: {
-            size: "350",
-            fxName: "slide",
-            fxSpeed: "fast",
-            initClosed: true,
+        $('body').layout({
+            applyDefaultStyles: false,
+            enableCursorHotkey: false,
+            west: {
+                size: "350",
+                fxName: "slide",
+                fxSpeed: "fast",
+                initClosed: true,
+                enableCursorHotkey: false,
+                slidable: false,
+                resizable: false,
+                togglerAlign_closed : 'center',
+                togglerAlign_open : 'center',
+                togglerContent_open: '-',
+                togglerContent_closed: '+',
+                spacing_closed: 16,
+                spacing_open: 16,
+                togglerLength_open: -1,
+                togglerLength_closed: -1,
+                showOverflowOnHover: false
+            }
+        });
+        $('#center').layout({
+            applyDefaultStyles: false,
             enableCursorHotkey: false,
             slidable: false,
             resizable: false,
-            togglerAlign_closed : 'center',
-            togglerAlign_open : 'center',
-            togglerContent_open: '-',
-            togglerContent_closed: '+',
-            spacing_closed: 16,
-            spacing_open: 16,
-            togglerLength_open: -1,
-            togglerLength_closed: -1,
-            showOverflowOnHover: false
-        }
-    });
-    $('#center').layout({
-        applyDefaultStyles: false,
-        enableCursorHotkey: false,
-        slidable: false,
-        resizable: false,
-        closable: false,
-    });
-
-    if ($canvas.hasClass('map')) {
-        var myScroll = new iScroll('canvas', { 
-            zoom: true, 
-            wheelAction: 'zoom', 
-            zoomMin: 0.25, 
-            zoomMax: 1, 
-            hideScrollbar: true 
+            closable: false,
         });
-    };
-    /* }}} */
 
-    $("#add").click(function() {
-        $('<section><h1>New section</h1></section>')
-            .addClass('section1')
-            .css('top', 30)
-            .css('left', 30)
-            .data('section', '-1')
-            .prependTo('article')
-            .trigger('refresh')
-            .trigger('edit');
-    });
+        $("#add").click(function() {
+            $('<section><h1>New section</h1></section>')
+                .addClass('section1')
+                .css('top', 30)
+                .css('left', 30)
+                .attr('data-section', -1)
+                .prependTo('article')
+                .trigger('refresh')
+                .trigger('edit');
+        });
 
-    $("#save").click(function() {
-        var message = window.prompt("Summary", "A nice configuration");
-        if (message) {
-            $.get("flag/", {
-                message: "[LAYOUT] " + message
+        $("#save").click(function() {
+            var message = window.prompt("Summary", "A nice configuration");
+            if (message) {
+                $.get("flag/", {
+                    message: "[LAYOUT] " + message
+                });
+            }
+            return false;
+        });
+
+
+        $("#mode").buttonset();
+        $("#playpause, #time").button();
+
+        $("#modeedit, #modeplay").change(function() {
+            var mode = $(this).val();
+            if (mode == "play") {
+                $("article").addClass("play");
+            } else {
+                $("article").removeClass("play");
+            }
+        });
+
+        if ($canvas.hasClass('map')) {
+            var myScroll = new iScroll('canvas', { 
+                zoom: true, 
+                wheelAction: 'zoom', 
+                zoomMin: 0.25, 
+                zoomMax: 1, 
+                hideScrollbar: true 
             });
-        }
-        return false;
-    });
 
+            $canvas.dblclick(function(event) {
+                var x = event.clientX;
+                var y = event.clientY;
+                var value = $('#zoomslider').slider('value');
+                if (event.shiftKey){
+                    var newValue = (value - 0.2 <= myScroll.options.zoomMin) 
+                                   ? myScroll.options.zoomMin : value - 0.2;
+                    myScroll.zoom(x, y, newValue, 300);
+                } else {
+                    var newValue = (value + 0.2 >= myScroll.options.zoomMax) 
+                                   ? myScroll.options.zoomMax : value + 0.2;
+                    myScroll.zoom(x, y, newValue, 300);
+                };
+                $('#zoomslider').slider('value', newValue);
+            });
 
-    $("#mode").buttonset();
-    $("#playpause, #time").button();
-
-    $("#modeedit, #modeplay").change(function() {
-        var mode = $(this).val();
-        if (mode == "play") {
-            $("article").addClass("play");
-        } else {
-            $("article").removeClass("play");
-        }
-    });
-
-    /* Navigation {{{ */
-    $canvas.dblclick(function(event) {
-        var x = event.clientX;
-        var y = event.clientY;
-        var value = $('#zoomslider').slider('value');
-        if (event.shiftKey){
-            var newValue = (value - 0.2 <= myScroll.options.zoomMin) 
-                           ? myScroll.options.zoomMin : value - 0.2;
-            myScroll.zoom(x, y, newValue, 300);
-        } else {
-            var newValue = (value + 0.2 >= myScroll.options.zoomMax) 
-                           ? myScroll.options.zoomMax : value + 0.2;
-            myScroll.zoom(x, y, newValue, 300);
+            $("#zoomin").click(function(event) {
+                //event.stopImmediatePropagation();
+                var value = $('#zoomslider').slider('value');
+                var newValue = (value + 0.1 >= myScroll.options.zoomMax) 
+                               ? myScroll.options.zoomMax : value + 0.1;
+                myScroll.zoom(0, 0, newValue, 300);
+                $('#zoomslider').slider('value', newValue);
+            });
+            $("#zoomout").click(function(event) {
+                //event.stopImmediatePropagation();
+                var value = $('#zoomslider').slider('value');
+                var newValue = (value - 0.1 <= myScroll.options.zoomMin) 
+                               ? myScroll.options.zoomMin : value - 0.1;
+                myScroll.zoom(0, 0, newValue, 300);
+                $('#zoomslider').slider('value', newValue);
+            });
+            $('#zoomslider').slider({
+                orientation: 'vertical',
+                max: 1,
+                min: 0.25,
+                step: 0.01,
+                value: 1,
+                slide: function(event) {
+                    var value = $(this).slider("option", "value");
+                    myScroll.zoom(0, 0, value, 300);
+                }
+            });
         };
-        $('#zoomslider').slider('value', newValue);
-    });
 
-    $("#zoomin").click(function(event) {
-        //event.stopImmediatePropagation();
-        var value = $('#zoomslider').slider('value');
-        var newValue = (value + 0.1 >= myScroll.options.zoomMax) 
-                       ? myScroll.options.zoomMax : value + 0.1;
-        myScroll.zoom(0, 0, newValue, 300);
-        $('#zoomslider').slider('value', newValue);
-    });
-    $("#zoomout").click(function(event) {
-        //event.stopImmediatePropagation();
-        var value = $('#zoomslider').slider('value');
-        var newValue = (value - 0.1 <= myScroll.options.zoomMin) 
-                       ? myScroll.options.zoomMin : value - 0.1;
-        myScroll.zoom(0, 0, newValue, 300);
-        $('#zoomslider').slider('value', newValue);
-    });
-    $('#zoomslider').slider({
-        orientation: 'vertical',
-        max: 1,
-        min: 0.25,
-        step: 0.01,
-        value: 1,
-        slide: function(event) {
-            var value = $(this).slider("option", "value");
-            myScroll.zoom(0, 0, value, 300);
-        }
-    });
-    /* }}} */
-
-    /* Timeline {{{ */
-    $("body").bind("timeupdate", function () {
-        var currentTime, minTime, maxTime, nextTime, $body;
-
-        $body = $('body');
-        currentTime = $body.data("currentTime");
-        minTime = $body.timeline("minTime");
-        maxTime = $body.timeline("maxTime");
-        nextTime =  (currentTime / (maxTime - minTime)) * 100000;
-
-        $('#timeslider').slider("option", "value", nextTime);
-    });
-
-    $('#timelineslider').slider({
-        max: 100000,
-        slide: function(event) {
-            var value, currentTime, minTime, maxTime, nextTime, $body;
-
-            value = $(this).slider("option", "value");
+        $("body").bind("timeupdate", function () {
+            var currentTime, minTime, maxTime, nextTime, $body;
 
             $body = $('body');
             currentTime = $body.data("currentTime");
             minTime = $body.timeline("minTime");
             maxTime = $body.timeline("maxTime");
+            nextTime =  (currentTime / (maxTime - minTime)) * 100000;
 
-            nextTime = minTime.getTime() + ((maxTime - minTime) * (value/100000));
+            $('#timeslider').slider("option", "value", nextTime);
+        });
 
-            if (! currentTime) {
-                currentTime = new Date();
-                $body.data("currentTime", currentTime);
+        $('#timelineslider').slider({
+            max: 100000,
+            slide: function(event) {
+                var value, currentTime, minTime, maxTime, nextTime, $body;
+
+                value = $(this).slider("option", "value");
+
+                $body = $('body');
+                currentTime = $body.data("currentTime");
+                minTime = $body.timeline("minTime");
+                maxTime = $body.timeline("maxTime");
+
+                nextTime = minTime.getTime() + ((maxTime - minTime) * (value/100000));
+
+                if (! currentTime) {
+                    currentTime = new Date();
+                    $body.data("currentTime", currentTime);
+                }
+                currentTime.setTime(nextTime);
+
+                $body.timeline("currentTime", currentTime);
             }
-            currentTime.setTime(nextTime);
-
-            $body.timeline("currentTime", currentTime);
-        }
-    });
-
-    /* }}} */
+        });
         
-        /* Smooth scrolling to and uncollapsing of anchors {{{ */
         $('a[href^="#"]').live('click', function() {
-        //$('div#center a[href^="#"]').live('click', function() {
-        //$('div#center').delegate('a[href^="#"]', 'click', function() {
-            
             var $target = $($(this).attr('href'));
             var offset = $target.offset();
             //var container_offset = $('div#center').offset();
@@ -804,9 +778,7 @@
             $target.trigger("geometrychange");
             return false;
         });
-        /* }}} */
     });
-    /* }}} */
 })(jQuery);
 
-/* vim: set foldmethod=marker: */
+/* vim: set foldmethod=indent: */
