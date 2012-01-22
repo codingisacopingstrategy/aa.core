@@ -11,23 +11,36 @@
     <h3><a href="#">Links</a></h3>
     <div>
 
-        <p>Inline:</p>
 
-        <pre><code>An [example](http://url.com/ "Title")
-        </code></pre>
 
-        <p>Reference-style labels (titles are optional):</p>
+        <p>Internal link</p>
+        <pre><code>[[ Name of the page ]]
+[[ Name of the page | Title ]]</code></pre>
+        <p>External link</p>
+        <pre><code>[[ URL of the link ]]
+[[ URL of the link | Title ]]</code></pre>
+        <p>Link inside the page</p>
+        <pre><code>[[ #ID-OF-THE-ELEMENT ]]</code></pre>
+        <p>Landmarks</p>
+        <pre><code>[[ landmark::#|Title of the landmark ]]</code></pre>
 
-        <pre><code>An [example][id]. Then, anywhere
-        else in the doc, define the link:
+        <!--<p>Inline:</p>-->
 
-          [id]: http://example.com/  "Title"
-        </code></pre>
+        <!--<pre><code>An [example](http://url.com/ "Title")-->
+        <!--</code></pre>-->
 
-        <p>Open the link in a new window</p>
+        <!--<p>Reference-style labels (titles are optional):</p>-->
 
-        <pre><code>An [example](http://url.com/ "Title"){: target='_blank' }
-        </code></pre>
+        <!--<pre><code>An [example][id]. Then, anywhere-->
+        <!--else in the doc, define the link:-->
+
+          <!--[id]: http://example.com/  "Title"-->
+        <!--</code></pre>-->
+
+        <!--<p>Open the link in a new window</p>-->
+
+        <!--<pre><code>An [example](http://url.com/ "Title"){: target='_blank' }-->
+        <!--</code></pre>-->
     </div>
 
     <h3><a href="#">Images</a></h3>

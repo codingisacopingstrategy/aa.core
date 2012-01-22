@@ -956,6 +956,7 @@ article.map div#wrapper {
 }
 .ui-tabs .ui-tabs-nav {
     border-top: 2px solid white;
+    margin-left: 0;
 }
 .ui-tabs .ui-tabs-nav li {
     float: left;
@@ -1075,3 +1076,8 @@ article.map div#wrapper {
 .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
 
 
+/* History page {{{ */
+dl#commits ul li {
+    border-bottom: 1px solid black;
+}
+/* }}} */
