@@ -43,6 +43,7 @@ def make_elt (rel, target, label):
     elt.text = label or target
     if rel:
         elt.set('property', rel)
+        elt.set('title', "%s::%s" % (rel, target))
     return elt
 
 
