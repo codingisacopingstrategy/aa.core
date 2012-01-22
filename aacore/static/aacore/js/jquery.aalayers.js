@@ -73,7 +73,7 @@
         $(data.selector).sort_by_zindex({reverse: true})
             .each(function() {
                 var $this = $(this);
-                var $h1 = $this.find('h1:first').clone();
+                var $h1 = $this.find('h1').clone();
                 var $li = $('<li></li>');
 
                 var $input = $('<input type="checkbox" name="some_name" value="bla"/>')
@@ -82,7 +82,7 @@
                         data.post_toggle.apply(data.container, [event, data, $this]);
                     });
 
-                var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.find('span').remove().end().text() + '</a></label>');
+                var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.find('span.edit, span.about').remove().end().text() + '</a></label>');
                 //var $label = $('<label for="name"><a href="#' + $this.attr('id')+ '">' + $h1.text() + '</a></label>');
                 //var $label = $('<label>').attr('for', 'name').append(
                         //$('a').attr('href', '#' + $this.attr('id')).text($h1.text())
