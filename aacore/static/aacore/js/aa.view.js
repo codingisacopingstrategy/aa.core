@@ -561,6 +561,10 @@
                     var ct = $.timecode_fromsecs(player.currentTime, true);
                     $.insertAtCaret(currentTextArea, ct + " -->", true);
                 }
+                //var d = new Date();
+                //var ct = [$.zeropad(d.getHours(), 2), $.zeropad(d.getMinutes(), 2), $.zeropad(d.getSeconds(), 2)].join(':');
+                //$.insertAtCaret(currentTextArea, ct + " -->", true);
+
             }
         });
         shortcut.add("Ctrl+Shift+Left", function () {

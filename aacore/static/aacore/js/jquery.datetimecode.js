@@ -235,6 +235,9 @@ $.timecode_unparse = timecode_fromsecs;
 $.secs2date = secs2date;
 
 $.date2secs = date2secs;
+
+$.zeropad = zeropad;
+$.zeropostpad = zeropostpad;
 })(jQuery);
 
 
