@@ -385,7 +385,7 @@
                 hoverClass: "drophover",
                 drop: function (event, ui) {
                     var $select = $(ui.helper).find('select');
-                    var key = $select.attr("name");
+                    var key = $select.attr("id");
                     var value = $select.find('option:selected').val();
                     var section = $(this).closest(".section1, .section2");
                     section.css(key, value);
