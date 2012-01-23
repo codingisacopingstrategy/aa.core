@@ -229,7 +229,10 @@ def direct_get_response (url, request=None):
 def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=None, request=None):
 
     content = direct_get_response(uri, request).content
-    content = html5tidy.tidy(content)
+    # FIXME: html5tidy breaks the browse/sniff code.
+    # When it is there, cliking on the browse button of the embeds does not
+    # show anyting, even on reload...
+    #content = html5tidy.tidy(content)
     uri = prep_uri(uri)
 
     if format:
