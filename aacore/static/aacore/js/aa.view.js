@@ -228,7 +228,7 @@
                         show: function (elt) {
                             $(elt).addClass("active")
                                 .closest('section.section1')
-                                   .find('div.wrapper')
+                                   .find('div.wrapper:first')
                                         .autoscrollable("scrollto", elt);
                         },
                         hide: function (elt) {
@@ -467,17 +467,11 @@
                                 // - extra_css: loads extra link rel="stylesheet"
                                 // - extra_js: load extra script
                                 // - script: extra javascript code to execute
-
                                 var toGo = data.extra_css.length + data.extra_js.length;
+                                var html = $(data.content);
 
-                                function doit () {
-                                    if (toGo == 0) {
-                                        var html = data.content + '<script>' + data.script + '</script>';
-                                        $(that).replaceWith($(html)).trigger("refresh");
-                                    } else {
-                                        toGo -= 1;
-                                    }
-                                }
+                                $(that).replaceWith(html);
+                                html.trigger("refresh");
 
                                 $.each(data.extra_css, function(index, value) { 
                                     $.getCSS(value, function() {
@@ -494,6 +488,14 @@
                                         doit();
                                     });
                                 });
+
+                                function doit () {
+                                    if (toGo == 0) {
+                                        $.globalEval(data.script);
+                                    } else {
+                                        toGo -= 1;
+                                    }
+                                }
 
                                 doit();
                             } else {
