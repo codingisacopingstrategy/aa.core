@@ -102,28 +102,28 @@ function timecode_fromsecs (rawsecs, fract, alwaysfract) {
         if ((rawsecs > 0) || alwaysfract) {
             fract = zeropostpad((""+rawsecs).substr(2, 3), 3);
             // return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2)+","+fract;
-            if (hours) {
+            //if (hours) {
                 return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2)+","+fract;
-            } else {
-                return zeropad(mins, 2)+":"+zeropad(secs, 2)+","+fract;
-            }
+            //} else {
+                //return zeropad(mins, 2)+":"+zeropad(secs, 2)+","+fract;
+            //}
         } else {
-            if (hours) {
+            //if (hours) {
                 // return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2);
                 return zeropad(hours, 2)+":"+ zeropad(mins, 2)+":"+zeropad(secs, 2);
-            } else {
-                // return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2);
-                return zeropad(mins, 2)+":"+zeropad(secs, 2);
-            }
+            //} else {
+                //// return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2);
+                //return zeropad(mins, 2)+":"+zeropad(secs, 2);
+            //}
         }
     } else {
         secs = Math.floor(rawsecs);
         // return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2);
-        if (hours) {
+        //if (hours) {
             return zeropad(hours, 2)+":"+zeropad(mins, 2)+":"+zeropad(secs, 2);
-        } else {
-            return zeropad(mins, 2)+":"+zeropad(secs, 2);
-        }
+        //} else {
+            //return zeropad(mins, 2)+":"+zeropad(secs, 2);
+        //}
     }
 }
 
