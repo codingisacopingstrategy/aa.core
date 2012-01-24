@@ -20,6 +20,7 @@ import mdx_sectionedit
 import mdx_addsections
 import mdx_timecodes
 import mdx_del_ins
+import mdx_cite
 #import mdx_cut
 
 from aacore.utils import url_for_pagename
@@ -40,6 +41,7 @@ def make_link(rel, target, label, default_link_rel=None, filter_=None):
         href = "#%s" % parts.fragment
     elif parts.scheme:
         href = target
+        a.set('target', '_blank')
     else:
         href = url_for_pagename(target)
     a.set('href', href)
@@ -122,6 +124,7 @@ def get_markdown(default_link_rel="aa:link"):
             mdx_semanticdata.makeExtension(),
             mdx_timecodes.makeExtension(),
             mdx_del_ins.makeExtension(),
+            mdx_cite.makeExtension(),
             mdx_addsections.makeExtension(configs=[('class', 'section%(LEVEL)d')]),
             ],
         )
@@ -147,6 +150,7 @@ def get_simple_markdown(default_link_rel="aa:link"):
             mdx_semanticdata.makeExtension(),
             #mdx_timecodes.makeExtension(),
             mdx_del_ins.makeExtension(),
+            mdx_cite.makeExtension(),
             #mdx_addsections.makeExtension(configs=[('class', 'section%(LEVEL)d')]),
             ],
         )
