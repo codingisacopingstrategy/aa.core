@@ -228,7 +228,7 @@
                         show: function (elt) {
                             $(elt).addClass("active")
                                 .closest('section.section1')
-                                   .find('div.wrapper:first')
+                                   .find('div.wrapper')
                                         .autoscrollable("scrollto", elt);
                         },
                         hide: function (elt) {
@@ -467,33 +467,35 @@
                                 // - extra_css: loads extra link rel="stylesheet"
                                 // - extra_js: load extra script
                                 // - script: extra javascript code to execute
-                                for (var i = 0; i < data.extra_css.length; i++) {
-                                    var href = data.extra_css[i];
-                                    //if (!$('link[href="' + href + '"]').length) {
-                                    $('<link rel="stylesheet" type="text/css" media="screen">')
-                                        .attr("href", href)
-                                        .appendTo($('head'));
-                                    //};
-                                };
-                                for (var i = 0; i < data.extra_js.length; i++) {
-                                    var src = data.extra_js[i];
-                                    $('<script>').attr("src", src).appendTo($('head'));
-                                };
 
-                                var new_content = $(data.content);
-                                $(that).replaceWith(new_content);
+                                var toGo = data.extra_css.length + data.extra_js.length;
 
-                                // FIXME: This is a hack to make sure the html is load before executing the script.
-                                //new_content.ready(function() {
-                                setTimeout(function() {
-                                    var script_elt = document.createElement('script');
-                                    script_elt.text = data.script
-                                    var head = document.getElementsByTagName('body')[0].appendChild(script_elt);
-                                    //$(script_elt).appendTo($('head'));
-                                }, 1000);
-                                //});
+                                function doit () {
+                                    if (toGo == 0) {
+                                        var html = data.content + '<script>' + data.script + '</script>';
+                                        $(that).replaceWith($(html)).trigger("refresh");
+                                    } else {
+                                        toGo -= 1;
+                                    }
+                                }
 
-                                $(new_content).trigger("refresh");
+                                $.each(data.extra_css, function(index, value) { 
+                                    $.getCSS(value, function() {
+                                        //console.log('loaded css: ' + value);   
+                                        toGo -= 0;
+                                        doit();
+                                    });
+                                });
+
+                                $.each(data.extra_js, function(index, value) { 
+                                    $.getScript(value, function() {
+                                        //console.log('loaded js: ' + value);   
+                                        toGo -= 0;
+                                        doit();
+                                    });
+                                });
+
+                                doit();
                             } else {
                                 if (data.content) {
                                     $(that).html(data.content);
