@@ -6,10 +6,8 @@
     - Give a location to the first annotation
     - more meaningful default text for new pages
     - add annotation button: predefined location + meaningful text too.
-- add more available styles
 * Improve history 
     * Be able to revert a page
-* rev doesn't work
 - layer palette doesn't refresh
 - list pages filter ?
 
@@ -24,30 +22,29 @@
 - button to remove the about attribute/ drag the @ to remove the about attribute + confirmation
 - "attach" boxes
     - with data-anchor, data-position (north, south, east, west etc.)
-
-html5 audio/video: preload="auto"?
-configure serve to serve best html5 video/audio
-
-- How can RDF be useful for collective commenting and annotating?
+- configure serve to serve best html5 video/audio
 - RSS feeds
+- Still a problem with non consecutive header levels...
+
+Ideas
+=====
+
+- html5 audio/video: preload="auto"?
+- How can RDF be useful for collective commenting and annotating?
 - rdf metadata to create relation between pages. EG. translation.
 - move page
 - How to preserve the title attribute with the new syntax ([[embed::ressource]])?
-- bug embed ???
 - manual sectioning "8<---"? What about the <br /> tag which is semantically correct for this?
-
 - Notion of focus for media, to know which one is being controlled
-- support for RSS embeding
 
 # Oralsite workshop remarks:
 
 - URL and BROWSE buttons are too present.
 - "Browse" term leads to other expectations than getting metadata. (but is there something better?)
 - video leads text/text leads video
-- Still a problem with non consecutive header levels...
 - embed webpages = iframe?
 
-A nice sniffer: `file`:
+- A nice sniffer: `file`:
 
     ➜  ~  file /tmp/marqueurs.txt    
     /tmp/marqueurs.txt: ASCII English text, with very long lines
@@ -68,22 +65,15 @@ Meeting 01/2012
 Navigation
 ----------
 
-- left bar: mode more explicit
 - how to come back to TOC when sidebar is closed
-- Previsualisation visuelle de la page
 - TOC links weird
 - Bug when resizing a box it goes up
-- collapsed section : tooltip
-- disappearing scrollbars ?
 - home page different than publication homepage
-- not enough margin in left bar
 - cinematic mode shows hidden boxes in edit mode
 - drag and drop classes
 - more explicit class names
-- timeline: avoir une butée à la fin de la timeline
 - different types of landmarks... what syntax?
 - show sound files in the timeline
-- in dissapearance: red is aggressive
 - background appears in cinematic mode?
 - remove decorations with classes
 - play/read mode: choose to put a border or not on the boxes
@@ -95,15 +85,9 @@ Navigation
 Bug
 ---
 
-- when editing a box, sometimes the content of another box appears.
-- when add a new box, save it first
-- when editing a box, sometimes it dissapears (content + begining of the next box)
-
-
 - carriage return on titles
 - history: date sections not accurate
-- url link in _blank (by default on external links?)
 - Jonathan Burrows on Scores: play mode: sidebar opened the images overflow
 - lightbox: missing navigation buttons
 - Log out, go back to the current page
-- wrong timecodes on paste + check audacity timecodes
+- renumber section when one gets deleted
