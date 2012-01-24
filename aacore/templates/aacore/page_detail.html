@@ -1,6 +1,6 @@
 {% extends "aacore/base_wiki.html" %}
 
-{% load aacoretags %}
+{% load aacoretags typogrify_tags %}
 
 {% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
 
@@ -41,7 +41,7 @@
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}
                             {% if meta.type %}{{ meta.type|first }}{% endif %}">
     <div id="wrapper">
-    {{ md|safe }}
+    {{ md|safe|typogrify }}
     </div>
 
     <nav id="zoom">
