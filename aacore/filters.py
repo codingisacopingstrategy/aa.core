@@ -1,3 +1,21 @@
+# This file is part of Active Archives.
+# Copyright 2006-2012 the Active Archives contributors (see AUTHORS)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Also add information on how to contact you by electronic and paper mail.
+
+
 import re
 import rdfutils
 import subprocess
@@ -165,11 +183,11 @@ class AAFilterCrop(AAFilter):
     def run(self):
         if not os.path.exists(self.stdout['local_path']):
             cmd = 'convert -crop %sx%s+%s+%s %s %s' % (self.parsed_arguments['width'],
-                                                self.parsed_arguments['height'], 
-                                                self.parsed_arguments['top'], 
-                                                self.parsed_arguments['left'], 
-                                                self.stdin['local_path'], 
-                                                self.stdout['local_path'])
+                                                       self.parsed_arguments['height'], 
+                                                       self.parsed_arguments['top'], 
+                                                       self.parsed_arguments['left'], 
+                                                       self.stdin['local_path'], 
+                                                       self.stdout['local_path'])
             p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
                                   stdin=subprocess.PIPE)
             #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
@@ -206,7 +224,6 @@ class AAFilterZoomable(AAFilter):
         self.stdout['script'] += """$.panzoom();"""
 
 
-
 class AAFilterLightBox(AAFilter):
     """
     [[ embed::http://example.org/image-small.jpg||lightbox:200px ]]
@@ -235,6 +252,7 @@ class AAFilterLightBox(AAFilter):
         self.stdout['extra_css'].append("http://leandrovieira.com/projects/jquery/lightbox/css/jquery.lightbox-0.5.css")
         self.stdout['extra_js'].append("http://leandrovieira.com/projects/jquery/lightbox/js/jquery.lightbox-0.5.pack.js")
         self.stdout['script'] += """$('a[rel="lightbox"]').lightBox();"""
+
 
 if __name__ == '__main__':
     filters = {}
