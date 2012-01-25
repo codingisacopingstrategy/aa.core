@@ -701,7 +701,7 @@
         if ($canvas.hasClass('map')) {
             var myScroll = new iScroll('canvas', { 
                 zoom: true, 
-                wheelAction: 'zoom', 
+                //wheelAction: 'zoom', 
                 zoomMin: 0.25, 
                 zoomMax: 1, 
                 hideScrollbar: true 
