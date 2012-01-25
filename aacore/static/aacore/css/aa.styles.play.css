@@ -60,21 +60,21 @@ article.play section.section1 h1 {
 }
 article.play section.section1 {
     border: none;
-    border: 1px solid red;
-    box-sizing: border-box;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    outline: 0px none transparent;
+    /*border: 1px solid red;*/
+    /*box-sizing: border-box;*/
+    /*-webkit-box-sizing:border-box;*/
+    /*-moz-box-sizing: border-box;*/
+    /*-ms-box-sizing: border-box;*/
+    /*outline: 0px none transparent;*/
 }
 article.play section.section2 {
     border: none;
-    border: 1px solid blue;
-    box-sizing: border-box;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    outline: 0px none transparent;
+    /*border: 1px solid blue;*/
+    /*box-sizing: border-box;*/
+    /*-webkit-box-sizing:border-box;*/
+    /*-moz-box-sizing: border-box;*/
+    /*-ms-box-sizing: border-box;*/
+    /*outline: 0px none transparent;*/
 }
 article.play section.section2 h2 {
     display: none;
@@ -107,10 +107,10 @@ article.play section.section2 {
     display: none;
 }
 article.play .active div.wrapper {
-      /*-moz-animation-duration: 2s;*/
-      /*-webkit-animation-duration: 2s;*/
-      /*-moz-animation-name: slidein;*/
-      /*-webkit-animation-name: slidein;*/
+      -moz-animation-duration: 2s;
+      -webkit-animation-duration: 2s;
+      -moz-animation-name: slidein;
+      -webkit-animation-name: slidein;
 }
     
 @-moz-keyframes slidein {
