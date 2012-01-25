@@ -55,6 +55,7 @@ TIMECODE_RE = re.compile(
     $""",
     re.X | re.M
 )
+ATTR_RE = re.compile(r'(?P<otherstuff>.*){:(?P<attributes>.*)}')
 
 
 def replace_timecodes(lines):
@@ -66,10 +67,16 @@ def replace_timecodes(lines):
             end = m.group('end')
             otherstuff = m.group('otherstuff') or ''
 
+            mm = ATTR_RE.search(otherstuff)
+            attr = ''
+            if mm:
+                otherstuff = mm.group('otherstuff') or ''
+                attr = mm.group('attributes')
+
             if end:
-                line = '## %%%%aa:start::%(start)s%%%% &rarr; %%%%aa:end::%(end)s%%%% %(otherstuff)s{: data-start="%(start)s" data-end="%(end)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% &rarr; %%%%aa:end::%(end)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" data-end="%(end)s" }' % locals()
             else:
-                line = '## %%%%aa:start::%(start)s%%%% &rarr; %(otherstuff)s{: data-start="%(start)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% &rarr; %(otherstuff)s{: %(attr)s data-start="%(start)s" }' % locals()
         newlines.append(line)
     return newlines
 
@@ -85,7 +92,6 @@ class TimeCodesTreeprocessor(markdown.treeprocessors.Treeprocessor):
     """
     def run(self, doc):
         fill_missing_ends(doc)
-        # print doc.find("*[@data-start]")
 
 
 def fill_missing_ends(node):
