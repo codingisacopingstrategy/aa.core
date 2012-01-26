@@ -45,11 +45,6 @@ from timecode import timecode_tosecs
 import lxml.cssselect
 
 
-def index (request):
-    """ The 'index' view redirects to the Index page view """
-    url = reverse("aa-page-detail", args=["Index"])
-    return HttpResponseRedirect(url)
-
 #### RDFSource
 def rdf_delegate(request, id):
     """
@@ -137,7 +132,7 @@ def embed (request):
 def browse (request):
     """ Main "browser" view """
 
-    model = get_rdf_model()  # Open the RDF Store (the 4 redland databases)
+    model = get_rdf_model()  # Opens the RDF Store (the 4 redland databases)
     uri = request.REQUEST.get("uri", "")
 
     # Avoids browsing an internal URL
@@ -165,9 +160,9 @@ def browse (request):
     context['literal'] = literal
 
     if literal:
-        node_stats, links_out, links_in, as_rel = rdfutils.load_links(model, context, literal=uri)
+        (node_stats, links_out, links_in, as_rel) = rdfutils.load_links(model, context, literal=uri)
     else:
-        node_stats, links_out, links_in, as_rel = rdfutils.load_links(model, context, uri=uri)
+        (node_stats, links_out, links_in, as_rel) = rdfutils.load_links(model, context, uri=uri)
 
     context['node_stats'] = node_stats
     context['links_out'] = links_out
@@ -181,7 +176,8 @@ def browse (request):
         except Resource.DoesNotExist:
             pass
 
-    return render_to_response("aacore/browse.html", context, context_instance = RequestContext(request))
+    return render_to_response("aacore/browse.html", context, 
+                              context_instance=RequestContext(request))
 
 ####################################
 ### Resource Main Sniff Page (http)
@@ -194,11 +190,17 @@ def resource_sniff (request, id):
     context = {}
     context['namespaces'] = Namespace.objects.all()
     context['resource'] = get_object_or_404(Resource, pk=id)
-    return render_to_response("aacore/resource_sniff.html", context, context_instance = RequestContext(request))
+    return render_to_response("aacore/resource_sniff.html", context, 
+                              context_instance=RequestContext(request))
 
 
 ############################################################
 # WIKI
+def index (request):
+    """ The 'index' view redirects to the Index page view """
+    url = reverse("aa-page-detail", args=["Index"])
+    return HttpResponseRedirect(url)
+
 
 @login_required
 def annotation_import(request, slug, section):
@@ -545,38 +547,3 @@ def sandbox(request):
     context = {}
     context['content'] = request.REQUEST.get("content", "")
     return render_to_response("aacore/sandbox.html", context, context_instance=RequestContext(request))
-
-
-############################################################
-# UNSTABLE
-############################################################
-
-# map filter args to template context...
-
-
-def path_to_url (p):
-    if p.startswith(projsettings.MEDIA_ROOT):
-        return full_site_url(projsettings.MEDIA_URL + p[len(projsettings.MEDIA_ROOT):])
-    return p
-
-def xpath_filter (fargs, url, cur, rdfmodel=None):
-    """ Takes a url as input value and an xpath as argument.
-    Returns a collection of html elements
-    usage:
-        {{ "http://fr.wikipedia.org/wiki/Antonio_Ferrara"|xpath:"//h2" }}
-    """
-    def absolutize_refs (baseurl, lxmlnode):
-        for elt in lxml.cssselect.CSSSelector("*[src]")(lxmlnode):
-            elt.set('src', urlparse.urljoin(baseurl, elt.get("src")))
-        return lxmlnode
-    request = urllib2.Request(url)
-    request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.1.5) Gecko/20091109 Ubuntu/9.10 (karmic) Firefox/3.5.5")
-    stdin = urllib2.urlopen(request)
-    htmlparser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), namespaceHTMLElements=False)
-    page = htmlparser.parse(stdin)
-    p = page.xpath(fargs)
-    if p:
-        return "\n".join([lxml.etree.tostring(absolutize_refs(url, item), encoding='utf-8') for item in p])
-    else:
-        return None
-

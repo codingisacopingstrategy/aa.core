@@ -1,3 +1,21 @@
+# This file is part of Active Archives.
+# Copyright 2006-2011 the Active Archives contributors (see AUTHORS)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Also add information on how to contact you by electronic and paper mail.
+
+
 """
 Utilities specific to the core application
 """
@@ -7,16 +25,15 @@ import RDF
 
 import django
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import (reverse, resolve)
 from django.conf import settings as projectsettings
+from django.http import HttpRequest
 
-from settings import RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS
-from rdfutils import get_model, rdf_parse_into_model, prep_uri
+from settings import (RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS)
+from rdfutils import (get_model, rdf_parse_into_model, prep_uri)
 import aacore.models
 import html5tidy
 
-
-#####################
 
 def url_for_pagename(name):
     """ Convenience function to map a name to a page (partial) URL """
@@ -27,8 +44,6 @@ def pagename_for_url(url):
     url = url.rstrip("/")
     name = dewikify(url[url.rindex("/")+1:])
     return name
-
-######################
 
 def get_rdf_model ():
     """
@@ -58,7 +73,7 @@ def is_local_url(url):
         base = projectsettings.SITE_URL
     except AttributeError:
         base = None
-    base = base or "http://"+Site.objects.get_current().domain
+    base = base or "http://" + Site.objects.get_current().domain
     return url.startswith(base)
 
 def relative_site_url(url):
@@ -138,8 +153,6 @@ def reindex (item, rdfmodel=None):
 # "Sniff" / "Add"
 # Main Resource View -- allow "preview" of non-added resources
 
-import aacore.models
-
 def add_resource (url, rdfmodel=None, request=None, reload=False):
     """
     This is what gets called when in the aa browser you type a URL.
@@ -197,9 +210,6 @@ def get_indexed_models():
             print "ERROR IMPORTING", modelname
     return ret
 
-from django.core.urlresolvers import resolve
-from django.http import HttpRequest
-
 def direct_get_response (url, request=None):
     """ 
     Hack to load a view contents without going through the (local) server,
@@ -253,7 +263,3 @@ def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=No
     stream = parser.parse_string_as_stream(content, baseuri)
     model.context_remove_statements(context=context)
     model.add_statements(stream, context=context)
-
-#if __name__ == '__main__':
-#    import doctest
-#    doctest.testmod()
