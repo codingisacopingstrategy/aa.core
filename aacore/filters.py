@@ -16,12 +16,15 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
+import urlparse
+import urllib2
+import html5lib
+import lxml
 import re
 import rdfutils
 import subprocess
 import os.path
 import feedparser
-from urlparse import urlparse
 from utils import get_rdf_model
 from aacore.models import Resource
 from textwrap import dedent
@@ -44,7 +47,7 @@ class AAFilter(object):
 
     @staticmethod
     def uri_to_path(uri):
-        return urlparse(uri).path
+        return urlparse.urlparse(uri).path
 
     def get_next_path(self):
         extension = os.path.splitext(self.stdin['local_path'])[1]
@@ -126,6 +129,41 @@ class AAFilterEmbed(AAFilter):
                 self.stdout['output'] += u'</div>'
         else:
             self.stdout['output'] = "<p>Unable to detect embed type</p>"
+
+
+class AAFilterXPath(AAFilter):
+    """ Takes a url as input value and an xpath as argument.
+    Returns a collection of html elements
+    usage:
+        {{ "http://fr.wikipedia.org/wiki/Antonio_Ferrara"|xpath:"//h2" }}
+    """
+    name = "xpath"
+
+    #def validate(self):
+        #sizepat = re.compile(r"(?P<width>\d+)px", re.I)
+        #match = sizepat.match(self.arguments)
+        #if match:
+            #self.parsed_arguments['width'] = match.groupdict()['width']
+            #return True
+
+    def absolutize_refs (self, baseurl, lxmlnode):
+        for elt in lxml.cssselect.CSSSelector("*[src]")(lxmlnode):
+            elt.set('src', urlparse.urljoin(baseurl, elt.get("src")))
+        return lxmlnode
+
+    def run(self):
+        request = urllib2.Request(self.stdin['original_url'])
+        request.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.1.5) Gecko/20091109 Ubuntu/9.10 (karmic) Firefox/3.5.5")
+        stdin = urllib2.urlopen(request)
+        htmlparser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), 
+                                         namespaceHTMLElements=False)
+        page = htmlparser.parse(stdin)
+        p = page.xpath(self.arguments)
+        if p:
+            self.stdout['output'] = "\n".join([lxml.etree.tostring(self.absolutize_refs(self.stdin['original_url'], item)) for item in p])
+            #self.stdout['output'] = "\n".join([lxml.etree.tostring(self.absolutize_refs(self.stdin['original_url'], item), encoding='utf-8') for item in p])
+        else:
+            self.stdout['output'] = "<p>Your query for %s did not return any elements</p>" % self.arguments
 
 
 class AAFilterBW(AAFilter):
