@@ -960,6 +960,7 @@ article.map div#wrapper {
 }
 .ui-tabs .ui-tabs-nav li {
     float: left;
+    padding: 0 9px;
 }
 .ui-tabs .ui-tabs-nav li a {
     /*float: left;*/
@@ -1017,11 +1018,16 @@ article.map div#wrapper {
 
 /* Accordion
 ----------------------------------*/
+.ui-accordion .ui-accordion-header.ui-state-default:before {
+    content: "\25B8 ";
+}
 .ui-accordion .ui-accordion-header {
   cursor: pointer;
   position: relative;
   margin-top: 1px;
   zoom: 1;
+  font-size: 13px;
+  line-height: 18px;
 }
 .ui-accordion .ui-accordion-li-fix {
   display: inline;
