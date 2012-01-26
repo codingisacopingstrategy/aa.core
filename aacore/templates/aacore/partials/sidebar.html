@@ -4,12 +4,12 @@
 {% get_markdown_for content as md meta %}
 
 
-<nav id="sidebar" class="ui-layout-west" style="display: none; text-align: left;"> 
+<nav id="sidebar" class="ui-layout-west"> 
     <div id="login">
         {% if user.is_authenticated %}
-            <a title="Logout" href="{% url aa-logout %}">Logout</a>
+            <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>
         {% else %}
-            <a title="Login" href="{% url aa-login %}">Login</a>
+            <a title="Login" href="{% url aa-login %}?next={{ page.get_absolute_url }}">Login</a>
         {% endif %}
     </div>
     <div>
@@ -48,6 +48,10 @@
             {% if meta.ispartof %}
             <p>This page is part of the publication{{ meta.ispartof|pluralize }} {{ meta.ispartof|join:"," }}.</p>
             {% endif %}
+
+            {% if meta.authors %}
+                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
+            {% endif %}
         </header>
     </div>
 
@@ -64,9 +68,6 @@
 
 
         <div id="tab-about" class="aa-tab">
-            {% if meta.authors %}
-                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
-            {% endif %}
             {% for summary in meta.summary %}
                 {% get_markdown_for summary as md meta %}
                 {{ md|safe }}
