@@ -28,6 +28,7 @@
     var $canvas;
     var $sidebar;
     var embedUrl;
+    //var actionStack = [];  // Not Implemented
 
 
     function commit_attributes (elt) {
@@ -37,11 +38,13 @@
          */
         // TODO: update the regex to match timecodes as well
         // RegExp
+        // FIXME: find how \s can not match newlines
+        var TIMECODE_RE =    /(^|\n)(\d{2}:\d{2}:\d{2}([.,]\d{1,3})?\s*-->\s*(\d{2}:\d{2}:\d{2}([.,]\d{1,3})?)?.*?)(\n|$)/;
         var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
         var ATTR_RE = /{:[^}]*}/;
         var NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
                 'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
-                'highlight', 'drophover'].join(' ');
+                'highlight', 'drophover', 'active'].join(' ');
 
         // As we don't want all attributes/values to be persistent we need to
         // perform some cleaning first. In order not to alter the original element
@@ -78,6 +81,7 @@
             section: section
         }, function(data) {
             // Searches for Header
+            //var header_match = HASH_HEADER_RE.exec(data) ? HASH_HEADER_RE.exec(data) : TIMECODE_RE.exec(data);
             var header_match = HASH_HEADER_RE.exec(data);
             if (header_match) {
                 var start, end;
@@ -87,7 +91,7 @@
                     start = header_match.index + attr_match.index;
                     end = start + attr_match[0].length;
                 } else {
-                    start = header_match.slice(1,3).join('').length;
+                    start = header_match.slice(1, 3).join('').length;
                     end = start;
                 }
                 var before = data.substring(0, start);
