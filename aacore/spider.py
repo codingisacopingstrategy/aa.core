@@ -14,14 +14,15 @@ from settings import USER_AGENT
 def spider(url, levels=1):
     """
     Spiders the given url and returns a dictionnary containing all its links
-    and images. Takes an optional depth as sucond argument (not implemented yet).
+    and images. Takes an optional depth as second argument (not implemented yet).
     """
     ret = {}
 
     request = urllib2.Request(url)
     request.add_header("User-Agent", USER_AGENT)
     f = urllib2.urlopen(request)
-    parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), namespaceHTMLElements=False)
+    parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("lxml"), 
+                                 namespaceHTMLElements=False)
     page = parser.parse(f)
 
     seen = {}

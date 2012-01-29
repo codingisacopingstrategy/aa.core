@@ -66,6 +66,7 @@ def audacity_to_srt(data, explicit=False):
     second section
     """
     stack = []
+
     for line in data.splitlines():
         try:
             (start, end, body) = tuple(line.split(None, 2))
@@ -101,6 +102,7 @@ def audacity_to_srt(data, explicit=False):
 
     template = "{e[start]} --> {e[end]}\n\n{e[body]}\n\n"
     return "".join([template.format(e=e) for e in stack])
+
 
 def srt_to_audacity(data, force_endtime=False):
     """docstring for srt_to_audacity"""
