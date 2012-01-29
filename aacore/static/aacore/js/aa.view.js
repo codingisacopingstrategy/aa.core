@@ -645,7 +645,7 @@
                 size: "350",
                 fxName: "slide",
                 fxSpeed: "fast",
-                initClosed: true,
+                initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
                 resizable: false,
