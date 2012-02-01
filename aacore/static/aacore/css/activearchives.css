@@ -634,6 +634,18 @@ span[property="aa:end"]:hover {
     cursor: pointer;
     color: blue;
 }
+span[property="aa:start"]:after {
+    content: "\00A0\2192\00A0";
+}
+span[property="aa:start"]:last-child:after {
+    content: "\00A0\2192\00A0 ?";
+}
+span[property="aa:end"].deduced:after {
+    content: ")";
+}
+span[property="aa:end"].deduced:before {
+    content: "(";
+}
 /* }}} */
 
 

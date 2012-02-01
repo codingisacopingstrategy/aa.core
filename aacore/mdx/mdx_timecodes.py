@@ -41,8 +41,9 @@ subsequent siblings data-start values. NB: only data-end attributes get set
 """
 
 
-import markdown
 import re
+import markdown
+from markdown.util import etree
 
 
 TIMECODE_RE = re.compile(
@@ -74,9 +75,9 @@ def replace_timecodes(lines):
                 attr = mm.group('attributes')
 
             if end:
-                line = '## %%%%aa:start::%(start)s%%%% &rarr; %%%%aa:end::%(end)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" data-end="%(end)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% %%%%aa:end::%(end)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" data-end="%(end)s" }' % locals()
             else:
-                line = '## %%%%aa:start::%(start)s%%%% &rarr; %(otherstuff)s{: %(attr)s data-start="%(start)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" }' % locals()
         newlines.append(line)
     return newlines
 
@@ -104,7 +105,15 @@ def fill_missing_ends(node):
             for sibling in children[i + 1:]:
                 if sibling.get("data-start"):
                     # print "found matching end", sibling.get("data-start")
-                    child.set("data-end", sibling.get("data-start"))
+                    data_end = sibling.get("data-start")
+                    child.set("data-end", data_end) 
+                    #<span content="00:38:10" property="aa:start" title="aa:start::00:38:10" class="deduced">00:38:10</span>
+                    end = etree.SubElement(child, 'span')
+                    end.set('content', data_end)
+                    end.set('property', "aa:end")
+                    end.set('title', "aa:end::%s" % data_end)
+                    end.set('class', "deduced")
+                    end.text = data_end
                     break
 
 
