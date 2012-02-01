@@ -17,26 +17,30 @@
 
     <title>{% block title %}active archives{% endblock %}</title>
 
+    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/jquery.layout.css" type="text/css" />
+    <link rel="stylesheet" href="https://raw.github.com/vitch/jScrollPane/master/style/jquery.jscrollpane.css" type="text/css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/activearchives.css" type="text/css" />
     <link rel="aa-embed" href="{% url aa-embed %}" type="text/css" />
 
     {% block jquery %}
-    <!--<script src="{{ STATIC_URL }}lib/jquery/jquery.js"></script>-->
-    <!--<script src="{{ STATIC_URL }}lib/jquery/jquery-ui.js"></script>    -->
-    <!--<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery/jquery-ui.css" type="text/css" />-->
     <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.1.min.js"></script>
     <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.17.custom.min.js"></script>    
-    <!--<link rel="stylesheet" href="{{ STATIC_URL }}lib/jquery-ui/css/south-street/jquery-ui-1.8.17.custom.css" type="text/css" />-->
+    <script src="https://raw.github.com/vitch/jScrollPane/master/script/jquery.mousewheel.js"></script>    
+    <script src="https://raw.github.com/vitch/jScrollPane/master/script/jquery.jscrollpane.min.js"></script>    
 
     <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
     <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
     <link rel="stylesheet" href="{% url aa-colors-css %}" media="screen" />
     {% endblock jquery %}
 
-    <!--<link rel="stylesheet" href="{{ STATIC_URL }}aacore/css/aa.styles.css" media="screen" />-->
-
     {% block extrahead %}{% endblock %}
+    <!--<script>-->
+    <!--$(document).ready(function() {-->
+        <!--$('#canvas').jScrollPane();-->
+    <!--});-->
+    <!--</script>-->
+
     {% endblock head %}
 </head>
 

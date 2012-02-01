@@ -120,11 +120,7 @@
         $('section.section1').each(function(i) {
             var section2 = $('section.section2', this);
             if (section2.length) {
-                var line = $("<div>").addClass('line').css({
-                    'position': 'absolute',
-                    'top': 26 + (5 * j),
-                    'height': 5
-                })
+                var line = $("<div>").addClass('line');
                 section2.each(function() {
                     var extraClass = $(this).has('audio').length ? 'audio ' : 'normal'; 
                     //var extraClass = $(this).has('audio').length ? '' : ''; 
@@ -273,6 +269,7 @@
         // then on any <section> or other dynamically loaded/created element to "activate" it
         $canvas.bind("refresh", function (evt) {
             var context = evt.target;
+            console.log('refresh');
 
             $("section.section1 > div.wrapper", $canvas).autoscrollable();
 
@@ -642,12 +639,13 @@
             applyDefaultStyles: false,
             enableCursorHotkey: false,
             west: {
-                size: "350",
+                size: "250",
                 fxName: "slide",
                 fxSpeed: "fast",
                 initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
+                closable: false,
                 resizable: false,
                 togglerAlign_closed : 'center',
                 togglerAlign_open : 'center',
@@ -716,8 +714,10 @@
             var mode = $(this).val();
             if (mode == "play") {
                 $("article").addClass("play");
+                $("body").layout().close("east");
             } else {
                 $("article").removeClass("play");
+                $("body").layout().open("east");
             }
         });
 
@@ -825,6 +825,8 @@
             $target.trigger("geometrychange");
             return false;
         });
+
+        $("section.section1 > div.wrapper", $canvas).autoscrollable();  // FIXME: quick fix to make autoscrollable work on load
     });
 })(jQuery);
 

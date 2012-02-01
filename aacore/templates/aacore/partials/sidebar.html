@@ -4,25 +4,19 @@
 {% get_markdown_for content as md meta %}
 
 
-<nav id="sidebar" class="ui-layout-west"> 
+<nav id="sidebar" class="ui-layout-east"> 
     <div id="login">
         {% if user.is_authenticated %}
-            <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>
+        Welcome {{ user }} | <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>
         {% else %}
             <a title="Login" href="{% url aa-login %}?next={{ page.get_absolute_url }}">Login</a>
         {% endif %}
     </div>
-    <div>
-    <!--<h1 class="logo">-->
-        <!--[><a title="Back to main page" href="{% url aa-index %}"><]-->
-            <!--[><span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span><]-->
-        <!--[></a><]-->
-        <!--<a title="Back to main page" href="{% url aa-index %}">-->
-            <!--Oralsite-->
-        <!--</a>-->
-    <!--</h1>-->
-    <!--<p><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></p>-->
-    <!--<hr>-->
+    <div id="logo">
+        <a title="Back to main page" href="{% url aa-index %}">Oralsite</a>
+        (<a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">about</a>)
+    </div>
+
         {% if page %}
             {% if user.is_authenticated %}
                 <ul id="toolbar">
