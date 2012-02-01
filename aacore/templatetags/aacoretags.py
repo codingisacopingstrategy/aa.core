@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site
 
 from aacore.utils import pagename_for_url
+from aacore import utils
 from aacore.mdx import get_markdown, get_simple_markdown
 from aacore.html5tidy import tidy
 from aacore.models import *
@@ -31,6 +32,15 @@ def escape_newlines(value):
     """
     #return value.encode('unicode-escape')
     return value.replace('\n', r'\n')
+
+
+@register.filter
+@stringfilter
+def wikify(value):
+    """
+    Wikifies the given string
+    """
+    return utils.wikify(value)
 
 
 

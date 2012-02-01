@@ -46,7 +46,11 @@
             </hgroup>
 
             {% if meta.ispartof %}
-            <p>This page is part of the publication{{ meta.ispartof|pluralize }} {{ meta.ispartof|join:"," }}.</p>
+            <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
+             {% for publication in meta.ispartof %}
+             “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
+             {% endfor %}
+            
             {% endif %}
 
             {% if meta.authors %}
