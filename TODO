@@ -1,6 +1,7 @@
 High priority
 =============
 
+- Skip tag
 - Create new page: default content that give clues
     - First page directly created?
     - Give a location to the first annotation
@@ -105,4 +106,6 @@ LGRU
 
 - sidebar opened by default.
 - editable stylesheets
--  
+
+
+- 
