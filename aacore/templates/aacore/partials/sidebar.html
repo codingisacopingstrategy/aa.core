@@ -34,22 +34,11 @@
                 {% else %}
                     <h1>{{ page.name }}</h1>
                 {% endif %}
+
                 {% if meta.subtitle %}
                     <h2>{{ meta.subtitle|first }}</h2>
                 {% endif %}
             </hgroup>
-
-            {% if meta.ispartof %}
-            <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
-             {% for publication in meta.ispartof %}
-             “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
-             {% endfor %}
-            
-            {% endif %}
-
-            {% if meta.authors %}
-                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
-            {% endif %}
         </header>
     </div>
 
@@ -66,6 +55,22 @@
 
 
         <div id="tab-about" class="aa-tab">
+            {% if meta.ispartof %}
+            <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
+            {% for publication in meta.ispartof %}
+            “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
+            {% endfor %}
+            
+            {% endif %}
+
+            {% if meta.with %}<p>With {{ meta.with|join:', ' }}.</p>{% endif %}
+
+            {% if meta.editedby %}<p>Edited by {{ meta.editedby|join:', ' }}.</p>{% endif %}
+
+            {% if meta.authors %}
+                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
+            {% endif %}
+
             {% for summary in meta.summary %}
                 {% get_markdown_for summary as md meta %}
                 {{ md|safe }}
