@@ -37,6 +37,8 @@
 <div id="timelineslider"></div>
 </nav>
 
+<iframe id="browser-panel" class="ui-layout-south"></iframe>
+
 {% get_markdown_for content as md meta %}
 <article id="canvas" class="ui-layout-center
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}

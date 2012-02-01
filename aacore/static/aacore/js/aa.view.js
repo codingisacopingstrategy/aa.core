@@ -666,6 +666,25 @@
             slidable: false,
             resizable: false,
             closable: false,
+            south: {
+                size: "250",
+                fxName: "slide",
+                fxSpeed: "fast",
+                initClosed: true,
+                enableCursorHotkey: false,
+                slidable: true,
+                closable: true,
+                resizable: true,
+                togglerAlign_closed : 'center',
+                togglerAlign_open : 'center',
+                togglerContent_open: '-',
+                togglerContent_closed: '+',
+                spacing_closed: 0,
+                spacing_open: 16,
+                togglerLength_open: -1,
+                togglerLength_closed: -1,
+                showOverflowOnHover: false
+            }
         });
 
         $("#add").click(function() {
