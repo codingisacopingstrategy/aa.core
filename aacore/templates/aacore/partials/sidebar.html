@@ -4,7 +4,7 @@
 {% get_markdown_for content as md meta %}
 
 
-<nav id="sidebar" class="ui-layout-east"> 
+<nav id="sidebar" class="ui-layout-west"> 
     <div id="login">
         {% if user.is_authenticated %}
         Welcome {{ user }} | <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>

@@ -381,14 +381,12 @@ nav#sidebar {
     padding: 1em;
     overflow: hidden;
 }
-/*nav#sidebar p {*/
-    /*-webkit-hyphens: auto;*/
-    /*-moz-hyphens: auto;*/
-    /*hyphens: auto;*/
-/*}*/
-/*nav#sidebar:hover {*/
-    /*overflow: auto;*/
-/*}*/
+#tab-about p + p {
+    text-indent: 1.5em;
+}
+nav#sidebar:hover {
+    overflow: auto;
+}
 nav#sidebar header {
     border-top: 2px solid black;
     border-bottom: 2px solid black;

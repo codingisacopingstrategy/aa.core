@@ -639,7 +639,7 @@
             applyDefaultStyles: false,
             enableCursorHotkey: false,
             west: {
-                size: "250",
+                size: "225",
                 fxName: "slide",
                 fxSpeed: "fast",
                 initClosed: false,
@@ -714,10 +714,10 @@
             var mode = $(this).val();
             if (mode == "play") {
                 $("article").addClass("play");
-                $("body").layout().close("east");
+                $("body").layout().close("west");
             } else {
                 $("article").removeClass("play");
-                $("body").layout().open("east");
+                $("body").layout().open("west");
             }
         });
 
