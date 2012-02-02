@@ -118,7 +118,7 @@ def embed (request):
 <div class="aa_embed">
     <div class="links">
         <a class="directlink" href="%(url)s">URL</a>
-        <a class="browselink" target="browser" href="%(browseurl)s">browse</a>
+        <a class="browselink" target="browser" href="%(browseurl)s">metadata</a>
     </div>
     <div class="body">%(embed)s</div>
 </div>""".strip()
