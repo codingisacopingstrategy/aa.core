@@ -1,33 +1,42 @@
-<h2>Filters Cheatsheet</h2>
+<h2>Filters</h2>
 
 <div>
-<dl id="filters-help">
-    <dt>Embed audio</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||embed:html5audio]]</code></dd>
+<p>Embed audio</p>
+<pre><code>[[ embed::URL_OF_MEDIA
+||embed:html5audio ]]</code></pre>
 
-    <dt>Embed video</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||embed:html5video]]</code></dd>
+<p>Embed video</p>
+<pre><code>[[ embed::URL_OF_MEDIA
+||embed:html5video ]]</code></pre>
 
-    <dt>Embed image</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||embed:img]]</code></dd>
+<p>Embed image</p>
+<pre><code>[[ embed::URL_OF_MEDIA
+||embed:img ]]</code></pre>
 
-    <dt>Black and white image</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||bw|embed:img]]</code></dd>
+<p>Black and white image</p>
+<pre><code>[[ embed::URL_OF_MEDIA
+||bw
+|embed:img ]]</code></pre>
 
-    <dt>Resize image</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||resize:_WIDTH-IN-PIXELS_|embed:img]]</code></dd>
-    <dd>ex. <code>[[ embed::URL_OF_MEDIA||resize:300px|embed:img]]</code></dd>
+<p>Resize image</p>
+<!--<pre><code>[[ embed::URL_OF_MEDIA||resize:_WIDTH-IN-PIXELS_|embed:img]]</code></pre>-->
+<pre><code>[[ embed::URL_OF_MEDIA
+||resize:300px
+|embed:img ]]</code></pre>
 
-    <dt>Crop image</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||crop:_WIDTH_x_HEIGHT_+_X_+_Y_|embed:img]]</code></dd>
-    <dd>ex. <code>[[ embed::URL_OF_MEDIA||crop:400x300+0+0|embed:img]]</code></dd>
+<p>Crop image</p>
+<!--<pre><code>[[ embed::URL_OF_MEDIA||crop:_WIDTH_x_HEIGHT_+_X_+_Y_|embed:img]]</code></pre>-->
+<pre><code>[[ embed::URL_OF_MEDIA
+||crop:400x300+0+0
+|embed:img ]]</code></pre>
 
-    <dt>Zoomable image (¡ do not add "embed:img" at the end !)</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||zoomable:_DISPLAY-SIZE_]]</code></dd>
-    <dd><code>[[ embed::URL_OF_MEDIA||zoomable:300px]]</code></dd>
+<p>Zoomable image (<mark>do not add "embed:img" at the end !</mark>)</p>
+<!--<pre><code>[[ embed::URL_OF_MEDIA||zoomable:_DISPLAY-SIZE_]]</code></pre>-->
+<pre><code>[[ embed::URL_OF_MEDIA
+||zoomable:300px ]]</code></pre>
 
-    <dt>Lightbox (open image in fullscreen) (¡ do not add "embed:img" at the end !)</dt>
-    <dd><code>[[ embed::URL_OF_MEDIA||lightbox:_THUMBNAIL-SIZE_]]</code></dd>
-    <dd>ex. <code>[[ embed::URL_OF_MEDIA||lightbox:300px]]</code></dd>
-</dl>
+<p>Lightbox (open image in fullscreen) (<mark>do not add "embed:img" at the end</mark>)</p>
+<!--<pre><code>[[ embed::URL_OF_MEDIA||lightbox:_THUMBNAIL-SIZE_]]</code></pre>-->
+<pre><code>[[ embed::URL_OF_MEDIA
+||lightbox:300px ]]</code></pre>
 </div>

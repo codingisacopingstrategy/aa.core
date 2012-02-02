@@ -81,22 +81,17 @@
 
         {% if user.is_authenticated %}
             <div id="tab-styles" class="aa-tab">
-                {% include "aacore/partials/swatches.html" %}
+            {% include "aacore/partials/swatches.html" %}
             </div>
 
             <div id="tab-help" class="aa-tab">
-                <div id="help">
-                {% include "aacore/partials/playmode_classes_help.html" %}
-                {% include "aacore/partials/metadata_help.html" %}
-                {% include "aacore/partials/timecode_help.html" %}
-                {% include "aacore/partials/filters_help.html" %}
-                {% include "aacore/partials/markdown_help.html" %}
-                </div>
+            <div id="help">
+            {% include "aacore/partials/metadata_help.html" %}
+            {% include "aacore/partials/timecode_help.html" %}
+            {% include "aacore/partials/filters_help.html" %}
+            {% include "aacore/partials/markdown_help.html" %}
+            </div>
             </div>
         {% endif %}
-
-        <!--<div id="tab-browse">-->
-            <!--<iframe id="browser-panel"></iframe>-->
-        <!--</div>-->
     </div>
 </nav>
