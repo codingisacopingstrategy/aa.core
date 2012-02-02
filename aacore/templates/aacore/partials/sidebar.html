@@ -5,75 +5,76 @@
 
 
 <nav id="sidebar" class="ui-layout-west"> 
+    <div id="logo">
+        <p>
+        <a title="Back to main page" href="{% url aa-index %}">Oralsite</a>
+        (<a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">about</a>)
+        </p>
+    </div>
     <div id="login">
+        <p>
         {% if user.is_authenticated %}
         Welcome {{ user }} | <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>
         {% else %}
             <a title="Login" href="{% url aa-login %}?next={{ page.get_absolute_url }}">Login</a>
         {% endif %}
-    </div>
-    <div id="logo">
-        <a title="Back to main page" href="{% url aa-index %}">Oralsite</a>
-        (<a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">about</a>)
+        </p>
     </div>
 
-        {% if page %}
-            {% if user.is_authenticated %}
-                <ul id="toolbar">
-                    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
-                    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
-                    <li><a id="add" title="Add an annotation" href="#">Add</a></li>
-                    <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
-                </ul>
-            {% endif %}
-        {% endif %}
-        <header>
-            <hgroup>
-                {% if meta.title %}
-                    <h1>{{ meta.title|first }}</h1>
-                {% else %}
-                    <h1>{{ page.name }}</h1>
-                {% endif %}
 
-                {% if meta.subtitle %}
-                    <h2>{{ meta.subtitle|first }}</h2>
-                {% endif %}
-            </hgroup>
-        </header>
-    </div>
+    {% if page %}
+    {% if user.is_authenticated %}
+    <ul id="toolbar">
+        <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+        <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+        <li><a id="add" title="Add an annotation" href="#">Add</a></li>
+        <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
+    </ul>
+    {% endif %}
+    {% endif %}
+
+    <hgroup>
+    {% if meta.title %}
+        <h1>{{ meta.title|first }}</h1>
+    {% else %}
+        <h1>{{ page.name }}</h1>
+    {% endif %}
+
+    {% if meta.subtitle %}
+        <h2>{{ meta.subtitle|first }}</h2>
+    {% endif %}
+    </hgroup>
 
     <div id="tab-this">
         <ul id="aa-tabs">
             <li><a title="About" href="#tab-about">Introduction</a></li>
             <li><a title="Layers" href="#tab-layers">Table of Contents</a></li>
             {% if user.is_authenticated %}
-                <li><a title="Styles" href="#tab-styles">Styles</a></li>
-                <li><a title="Help" href="#tab-help">Help</a></li>
+            <li><a title="Styles" href="#tab-styles">Styles</a></li>
+            <li><a title="Help" href="#tab-help">Help</a></li>
             {% endif %}
-            <!--<li><a title="Browser" href="#tab-browse">Browse</a></li>-->
         </ul>
 
 
         <div id="tab-about" class="aa-tab">
+            <div>
             {% if meta.ispartof %}
             <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
             {% for publication in meta.ispartof %}
             “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
             {% endfor %}
-            
             {% endif %}
 
             {% if meta.with %}<p>With {{ meta.with|join:', ' }}.</p>{% endif %}
-
             {% if meta.editedby %}<p>Edited by {{ meta.editedby|join:', ' }}.</p>{% endif %}
-
             {% if meta.authors %}
-                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
+            <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
             {% endif %}
+            </div>
 
             {% for summary in meta.summary %}
-                {% get_markdown_for summary as md meta %}
-                {{ md|safe }}
+            {% get_markdown_for summary as md meta %}
+            {{ md|safe }}
             {% endfor %}
         </div>
 

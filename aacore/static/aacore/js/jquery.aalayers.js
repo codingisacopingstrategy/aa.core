@@ -61,6 +61,7 @@
             + "    </fieldset>"
             + "</form>"
         ).find('ul').sortable({
+            axis: 'y',
             stop : function(event, ui) {
                 data.post_reorder.apply(data.$container, [event, ui, data]);
             },
