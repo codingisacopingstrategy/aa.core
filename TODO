@@ -45,8 +45,6 @@ Ideas
 Oralsite workshop remarks
 =========================
 
-- URL and BROWSE buttons are too present.
-- "Browse" term leads to other expectations than getting metadata. (but is there something better?)
 - video leads text/text leads video
 - embed webpages = iframe?
 
@@ -92,7 +90,9 @@ Bug
 - Jonathan Burrows on Scores: play mode: sidebar opened the images overflow
 - lightbox: missing navigation buttons
 - renumber section when one gets deleted
-
+- Question marks in wiki links are mistakenly decoded
+    [[What's the Score Now?]] --> http://localhost:8000/pages/What%27s_the_Score_Now/?/edit/
+- Pages names must not contain non-sacci characters
 
 
 Meeting 27/01/2012
@@ -106,6 +106,7 @@ LGRU
 
 - sidebar opened by default.
 - editable stylesheets
+- file upload
+- Rester en contact avec Bachir pour l'hébergement + donner accès à Active Archives. Serveur des laboratoires.
 
 
-- 
