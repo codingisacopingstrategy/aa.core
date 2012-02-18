@@ -43,6 +43,16 @@ def wikify(value):
     return utils.wikify(value)
 
 
+@register.filter
+@stringfilter
+def render_aatags(value):
+    """
+    Wikifies the given string
+    """
+    from aacore import tags
+    return "".join(tags.render_tpl(value))
+
+
 
 class MarkdownConvertor(template.Node):
     def __init__(self, value, var_name, meta_name):

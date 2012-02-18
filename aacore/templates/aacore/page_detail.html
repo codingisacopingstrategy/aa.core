@@ -55,7 +55,7 @@
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}
                             {% if meta.type %}{{ meta.type|first }}{% endif %}">
     <div id="wrapper">
-    {{ md|safe|typogrify }}
+    {{ md|render_aatags|safe|typogrify }}
     </div>
 
     <nav id="zoom">
