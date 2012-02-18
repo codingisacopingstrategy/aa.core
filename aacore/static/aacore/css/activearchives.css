@@ -205,6 +205,7 @@ small                               { font-size: 11px; }
 abbr, code, kbd,
 samp, small, var                    { line-height: 15px; }
 ul, ol, dl, dialog                  { position: relative; top: 5px; margin-top: 1.385em; margin-bottom: 1.385em; }
+dd + dt                             { margin-top: 18px; }
 li ul, li ol, ul ul, ol ol          { top: 0; margin-top: 0; margin-bottom: 0; }
 li h1, li h2, li h3,
 li h4, li h5, li h6,

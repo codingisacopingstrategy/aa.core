@@ -132,7 +132,7 @@ article.play .active div.wrapper {
     opacity: 1;
   }
 }
-article.play section {
+article.play section.section2 {
     border-top: none!important;
 }
 article.play .ui-resizable-handle {
