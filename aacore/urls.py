@@ -36,7 +36,7 @@ urlpatterns = patterns('aacore.views',
 )
 
 ### LOGIN ###
-urlpatterns += patterns('',
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'aacore/login.html'}, name='aa-login'),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'template_name': 'aacore/logout.html'}, name='aa-logout'),
+urlpatterns += patterns('django.contrib.auth.views',
+    url(r'^accounts/login/$', 'login', {'template_name': 'aacore/login.html'}, name='aa-login'),
+    url(r'^accounts/logout/$', 'logout', {'template_name': 'aacore/logout.html'}, name='aa-logout'),
 )
