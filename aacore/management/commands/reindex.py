@@ -1,7 +1,6 @@
-from optparse import make_option
 import RDF
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 import aacore.models
 import aacore.utils
 
@@ -30,6 +29,7 @@ class Command(BaseCommand):
             models = aacore.utils.get_indexed_models()
 
         for model in models:
+            print(model)
             for item in model.objects.all():
                 print item.get_absolute_url()
                 try:

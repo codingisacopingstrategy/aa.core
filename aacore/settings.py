@@ -35,9 +35,8 @@ RDF_STORAGE_NAME = getattr(settings, 'AA_RDF_STORAGE_NAME', "aa")
 RDF_STORAGE_DIR = getattr(settings, 'AA_RDF_STORAGE_DIR', ".")
 
 # List of models that are indexed by the RDF Store
-INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Resource", "aacore.models.Page",))
+INDEXED_MODELS = getattr(settings, 'AA_INDEXED_MODELS', ("aacore.models.Resource",))
 RESOURCE_DELEGATES = getattr(settings, 'AA_RESOURCE_DELEGATES', ())
 
 CACHE_DIR = getattr(settings, 'AA_CACHE_DIR', os.path.join(settings.MEDIA_ROOT, "cache"))
 CACHE_URL = getattr(settings, 'AA_CACHE_URL', os.path.join(settings.MEDIA_URL, "cache"))
-GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "repositories"))

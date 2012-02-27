@@ -1,7 +1,5 @@
 from django.contrib import admin
-from django.contrib.contenttypes import generic
-
-from models import *
+from aacore.models import (Resource, ResourceDelegate, Namespace, RDFDelegate)
 
 
 admin.site.register(ResourceDelegate)
@@ -22,11 +20,6 @@ class NamespaceAdmin(admin.ModelAdmin):
     search_fields = ("name", "url")
     list_editable = ("color", )
 admin.site.register(Namespace, NamespaceAdmin)
-
-class PageAdmin(admin.ModelAdmin):
-    list_display = ("name", "content", )
-    search_fields = ("name", "content")
-admin.site.register(Page, PageAdmin)
 
 class RDFDelegateAdmin(admin.ModelAdmin):
     list_display = ("url", "format")

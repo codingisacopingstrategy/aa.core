@@ -1,5 +1,4 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import (redirect_to, direct_to_template)
 
 
 urlpatterns = patterns('aacore.views',
@@ -9,34 +8,4 @@ urlpatterns = patterns('aacore.views',
     url(r'^resources/$', 'resources', {}, name='aa-resources'),
     url(r'^resources/(?P<id>\d+)/$', 'resource_sniff', {}, 'aa-resource-sniff'),
     url(r'^rdfdelegate/(?P<id>\d+)/$', 'rdf_delegate', {}, name='aa-rdf-source'),
-
-    ### WIKI
-    url(r'^$', 'index', {}, 'aa-index'),
-    url(r'^pages/$', 'index'),
-    url(r'^pages/(?P<slug>[^/]+)/$', 'page_detail', {}, name='aa-page-detail'),
-    url(r'^pages/(?P<slug>[^/]+)/edit/$', 'page_edit', {}, name='aa-page-edit'),
-    url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),
-    url(r'^pages/(?P<slug>[-\w]+)/diff/$', 'page_diff', {}, name='aa-page-diff'),
-    url(r'^pages/(?P<slug>[-\w]+)/flag/$', 'page_flag', {}, name='aa-page-flag'),
-
-    ### Export
-    url(r'^pages/(?P<slug>[^/]+)/annotations/(?P<section>\d+)/$', 'annotation_export', 
-        {}, name='aa-annotation-export'),
-    url(r'^pages/(?P<slug>[^/]+)/annotations/(?P<section>\d+)/import$', 'annotation_import', 
-        {}, name='aa-annotation-import'),
-
-    ### EMBED
-    url(r'^embed/$', 'embed', {}, name='aa-embed'),
-
-    ### SANDBOX
-    url(r'^sandbox/$', 'sandbox', {}, name='aa-sandbox'),
-
-    ### RDF ###
-    (r'^rdf/', include('aacore.rdfviews')),
-)
-
-### LOGIN ###
-urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^accounts/login/$', 'login', {'template_name': 'aacore/login.html'}, name='aa-login'),
-    url(r'^accounts/logout/$', 'logout', {'template_name': 'aacore/logout.html'}, name='aa-logout'),
 )

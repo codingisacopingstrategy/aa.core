@@ -5,30 +5,20 @@ Implements active archives models
 
 import re
 import RDF
-import codecs
 import os
 import os.path
 import urllib2
-from git import Repo, NoSuchPathError
-import cStringIO
-from ConfigParser import ConfigParser
-
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from django.contrib.auth.models import User
-
-import aacore.utils
-from rdfutils import rdfnode, prep_uri
-from settings import (CACHE_DIR, CACHE_URL)
-import resource_opener
-from settings import GIT_DIR
-from django.conf import settings
-from diff_match_patch import diff_match_patch
-
-from django.db.models.signals import post_save, post_delete, m2m_changed
-import rdfutils
 import django.dispatch
+from django.conf import settings
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.db.models.signals import post_delete
+from aacore.rdfutils import (rdfnode, prep_uri)
+from aacore.settings import (CACHE_DIR, CACHE_URL)
+import aacore.utils
+import rdfutils
+import resource_opener
 
 
 
@@ -122,7 +112,7 @@ class Resource (models.Model):
 
     @staticmethod
     def get_local_path_from_url(url):
-        return os.path.join(MEDIA_ROOT, url)
+        return os.path.join(settings.MEDIA_ROOT, url)
 
     def foo(self):
         return "%06d" % self.id
@@ -159,7 +149,7 @@ class Resource (models.Model):
         Throws: AAWait when not yet available.
         """
         if rdfmodel == None:
-            rdfmodel = get_rdf_model()
+            rdfmodel = aacore.utils.get_rdf_model()
         if rel:
             query = """SELECT DISTINCT ?obj 
                     WHERE {{ <%s> <%s> ?obj. }} 
@@ -184,132 +174,6 @@ class ResourceDelegate (models.Model):
     delegate_type = models.ForeignKey(ContentType)
     delegate_id = models.PositiveIntegerField()
     delegate = generic.GenericForeignKey('delegate_type', 'delegate_id')
-
-
-class Page(models.Model):
-    """ Represents a wiki page. 
-    
-    Acts like a proxy to access to the associated GIT repository but caches the
-    last revision of a page for convenience.
-    
-    """
-    name = models.CharField(max_length=255)
-    content = models.TextField(blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    @models.permalink
-    def get_diff_url(self):
-        return ("aa-page-diff", (), {'slug': aacore.utils.wikify(self.name)})
-
-    @models.permalink
-    def get_history_url(self):
-        return ("aa-page-history", (), {'slug': aacore.utils.wikify(self.name)})
-
-    @models.permalink
-    def get_edit_url(self):
-        return ("aa-page-edit", (), {'slug': aacore.utils.wikify(self.name)})
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ("aa-page-detail", (), {'slug': aacore.utils.wikify(self.name)})
-
-    @property
-    def slug(self):
-        """
-        Returns the wikified name of the page.
-        """
-        return aacore.utils.wikify(self.name)
-
-    def get_repository(self):
-        try:
-            repo = Repo(GIT_DIR)
-        except NoSuchPathError:
-            repo = Repo.init(GIT_DIR)
-            #repo = Repo.init(GIT_DIR, bare="True")
-        return repo
-
-    def iter_commits(self):
-        repo = self.get_repository()
-        return repo.iter_commits(paths=self.slug)
-
-    def commit(self, amend=False, message="No message", author="Anonymous <anonymous@127.0.0.1>", is_minor=False):
-        """
-        Commits page content and saves it it in the database.
-        """
-        # Makes sure the content ends with a newline
-        if self.content[-1] != "\n":
-            self.content += "\n"
-
-        repo = self.get_repository()
-
-        # Writes content to the CONTENT file
-        path = os.path.join(GIT_DIR, self.slug)
-        f = codecs.open(path, "w", "utf-8")
-        f.write(self.content)
-        f.close()
-
-        # Adds the newly creates files and commits
-        repo.index.add([self.slug,])
-        repo.git.commit(amend=amend, message=message, author=author)
-
-        # Add the commit metadata in a git note, formatted as
-        # a .ini config file
-    # THIS SEEMS TO CAUSE AN ERROR:  git: 'notes' is not a git-command. See 'git --help' in git 1.5.6.5 on debian at least
-#        config = ConfigParser()
-#        config.add_section('metadata')
-#        config.set('metadata', 'is_minor', is_minor)
-
-#        output = cStringIO.StringIO()
-#        config.write(output)
-#        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
-
-        self.save()
-
-    def read(self, rev="HEAD"):
-        """
-        Returns the page content at a given revision
-        """
-        repo = self.get_repository()
-        commit = repo.commit(rev)
-        return u"%s" % commit.tree[self.slug].data_stream.read().decode('utf-8')
-
-    def diff(self, c1, c2):
-        """
-        Compares two revisions
-        """
-        def diff_prettyXhtml(self, diffs):
-            """
-            Extends google's diff_patch_match
-            Similar to diff_prettyHtml but returns an XHTML valid code
-            """
-            html = []
-            i = 0
-            for (op, data) in diffs:
-                text = (data.replace("&", "&amp;").replace("<", "&lt;")
-                         .replace(">", "&gt;").replace("\n", "<br />"))
-                if op == self.DIFF_INSERT:
-                    html.append('<ins class="added" title="i=%i">%s</ins>' % (i, text))
-                elif op == self.DIFF_DELETE:
-                    html.append('<del class="deleted" title="i=%i">%s</del>' % (i, text))
-                elif op == self.DIFF_EQUAL:
-                    html.append('<span class="equal" title="i=%i">%s</span>' % (i, text))
-                if op != self.DIFF_DELETE:
-                    i += len(data)
-            return "".join(html)
-
-        repo = self.get_repository()
-        commit_1 = repo.commit(c1)
-        commit_2 = repo.commit(c2)
-        f1 = u"%s" % commit_1.tree[self.slug].data_stream.read().decode('utf-8')
-        f2 = u"%s" % commit_2.tree[self.slug].data_stream.read().decode('utf-8')
-        f1 = f1.encode('utf-8')
-        f2 = f2.encode('utf-8')
-        ui = diff_match_patch()
-        diff = ui.diff_main(f1, f2)
-        ui.diff_cleanupSemantic(diff)
-        return diff_prettyXhtml(ui, diff)
 
 
 class Namespace (models.Model):
