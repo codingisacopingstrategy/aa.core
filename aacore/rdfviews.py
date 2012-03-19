@@ -25,16 +25,11 @@ from django.shortcuts import (render_to_response)
 from django.http import (HttpResponse, HttpResponseRedirect)
 from django.template import RequestContext
 from aacore.models import *
-from aacore.utils import (get_rdf_model, full_site_url)
+from aacore.utils import full_site_url
 import rdfutils
+from aacore import RDF_MODEL
 
 
-urlpatterns = patterns('aacore.rdfviews',
-    url(r'^reindex/$', 'reindex', {}, name='aa-rdf-reindex'),
-    url(r'^dump/$', 'dump', {}, name='aa-rdf-dump'),
-    url(r'^query/$', 'query', {}, name='aa-rdf-query'),
-    url(r'^browse/$', 'browse', {}, name='aa-rdf-browse'),
-)
 
 FORMAT_MIMETYPES = {
     "rdfxml":       "application/rdf+xml",
@@ -46,8 +41,7 @@ def reindex (request):
     url = request.REQUEST.get("url")
     url = full_site_url(url)
     format = request.REQUEST.get("format")
-    model = get_rdf_model()
-    rdfutils.rdf_parse_into_model(model, url, format)
+    rdfutils.rdf_parse_into_model(RDF_MODEL, url, format)
     return HttpResponseRedirect(url)
 
 def dump (request):
@@ -58,7 +52,7 @@ def dump (request):
     """
     url = request.REQUEST.get("url", "")
     if not url:
-        model = get_rdf_model()
+        model = RDF_MODEL
     else:
         inputformat = request.REQUEST.get("input", "")
         # parser = RDF.Parser(name="rdfa")
@@ -88,8 +82,7 @@ def query (request):
     context['namespaces'] = Namespace.objects.all()
     if q and request.method == "POST":
         thequery = RDF.Query(q.encode("utf-8"), query_language="sparql")
-        model = get_rdf_model()
-        results = thequery.execute(model)
+        results = thequery.execute(RDF_MODEL)
         context['results'] = results.get_bindings_count()
         bindings = []
         for i in range(results.get_bindings_count()):
@@ -104,7 +97,8 @@ def query (request):
             rows.append(row)
         context['rows'] = rows
 
-    return render_to_response("rdfviews/query.html", context, context_instance = RequestContext(request))
+    return render_to_response("rdfviews/query.html", context, 
+                              context_instance=RequestContext(request))
 
 def browse (request):
     uri = request.REQUEST.get("uri", "")
@@ -126,16 +120,16 @@ def browse (request):
     context['uri'] = uri
     context['literal'] = literal
 
-    model = get_rdf_model()
     q = "SELECT DISTINCT ?relation ?object WHERE {{ {0} ?relation ?object . }} ORDER BY ?relation".format(s)
-    context['results_as_subject'] = rdfutils.query(q, model)
+    context['results_as_subject'] = rdfutils.query(q, RDF_MODEL)
     if not literal:
         q = "SELECT DISTINCT ?subject ?object WHERE {{ ?subject {0} ?object . }} ORDER BY ?subject".format(s)
-        context['results_as_relation'] = rdfutils.query(q, model)
+        context['results_as_relation'] = rdfutils.query(q, RDF_MODEL)
     else:
         context['results_as_relation'] = ()
     q = "SELECT DISTINCT ?subject ?relation WHERE {{ ?subject ?relation {0} . }} ORDER BY ?relation".format(s)
-    context['results_as_object'] = rdfutils.query(q, model)
+    context['results_as_object'] = rdfutils.query(q, RDF_MODEL)
 
-    return render_to_response("rdfviews/browse.html", context, context_instance = RequestContext(request))
+    return render_to_response("rdfviews/browse.html", context, 
+                              context_instance=RequestContext(request))
 

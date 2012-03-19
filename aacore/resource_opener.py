@@ -22,40 +22,88 @@
 
 # TODO: Rename HttpUtils ?
 
-import re, urllib2, datetime, email.utils, urlparse, os
+import re
+import urllib2
+import datetime
+import email.utils
+import urlparse
+import os
 
-from aacore.settings import USER_AGENT
+USER_AGENT = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1) Gecko/20090624 Firefox/3.5"
 
 
-# http://code.activestate.com/recipes/577015-parse-http-date-time-string/
-def parse_http_datetime(s):
-    return datetime.datetime(*email.utils.parsedate(s)[:6])
+def parse_http_datetime(string):
+    """
+    Parses datetime strings returned by HTTP servers following the RFC 2616
+    standard (which supports three datetime formats) and returns a datetime instance.
+
+    >>> rcf_822 = "Sun, 06 Nov 1994 08:49:37 GMT"
+    >>> print(parse_http_datetime(rcf_822))
+    1994-11-06 08:49:37
+
+    >>> rcf_850 = "Sunday, 06-Nov-94 08:49:37 GMT"
+    >>> print(parse_http_datetime(rcf_850))
+    1994-11-06 08:49:37
+
+    >>> asctime = "Sun Nov  6 08:49:37 1994"
+    >>> print(parse_http_datetime(asctime))
+    1994-11-06 08:49:37
+
+    Taken from http://code.activestate.com/recipes/577015-parse-http-date-time-string/
+    """
+    return datetime.datetime(*email.utils.parsedate(string)[:6])
 
 
-# http://www.artima.com/forums/flat.jsp?forum=122&thread=15024
 class NotModifiedHandler(urllib2.BaseHandler):
+    """
+    Implements an error handler for 304 response code (Not Modified) and Fakes
+    URL-handle so that we can process the result of the open() like it were a
+    usual request.
+
+    Urllib2 only ever returns a response if the code is 200. In other cases,
+    HTTPError exceptions are raised.
+
+    Taken from http://www.artima.com/forums/flat.jsp?forum=122&thread=15024
+    """
     def http_error_304(self, req, fp, code, message, headers):
         addinfourl = urllib2.addinfourl(fp, headers, req.get_full_url())
         addinfourl.code = code
         return addinfourl
 
 
-def splitContentType(t):
-    m = splitContentType.pat.match(t)
+def split_content_type(ct):
+    """
+    >>> ct = "image/jpeg"
+    >>> print(split_content_type(ct))
+    ('image/jpeg', '')
+    >>> ct = "text/html; charset=iso-8859-1"
+    >>> print(split_content_type(ct))
+    ('text/html', 'iso-8859-1')
+    """
+    content_type_re = re.compile(r"""\s*(?P<mimetype>[\w+_-]+/[\w+_-]+)\s*(?:;\s*charset=(?P<charset>[\w-]*)\s*)?""")
+    m = content_type_re.match(ct)
     if m:
         d = m.groupdict()
         (mt, charset) = (d['mimetype'], d['charset'])
         if charset == None:
             charset = ""
         return (mt, charset)
-splitContentType.pat = re.compile(r"""\s*(?P<mimetype>[\w+_-]+/[\w+_-]+)\s*(?:;\s*charset=(?P<charset>[\w-]*)\s*)?""")
 
 
 def conditional_get(url, last_modified=None, etag=None):
     """
-    Uses optional last_modified and/or etag to do a "conditional get" of the given url.
-    (when neither is given, results in a regular get)
-    Returns: file-like object as returned by urllib2.urlopen
+    Does a "conditional get" of the given URL using optional last_modified
+    and/or etag arguments, or a regular get if neither is given. Returns a
+    file-like object as returned by urllib2.urlopen.
+
+    >>> url = "http://ubu.artmob.ca/sound/burroughs_william/Break-Through/Burroughs-William-S_01-K-9.mp3"
+    >>> last_modified = "2007-05-31 21:19:04"
+    >>> etag = "542a57-129bfaf-431caa5f08200"
+    >>> page = conditional_get(url, last_modified, etag)
+    >>> print(page.code)
+    200
+    >>> print(page.msg)
+    OK
     """
     request = urllib2.Request(url)
     request.add_header("User-Agent", USER_AGENT)
@@ -71,6 +119,13 @@ class ResourceOpener():
     """
     ResourceOpener simply deals with Conditional GET, and normalizes common headers
     Interesting attributes: original_url, url, file, info, status, content_type, charset, content_length
+
+    >>> url1 = "http://ubu.artmob.ca/sound/burroughs_william/Break-Through/Burroughs-William-S_01-K-9.mp3"
+    #>>> url2 = "http://www.youtube.com/watch?v=rUJF6ke1SoE"
+    >>> r1 = ResourceOpener(url1)
+    #>>> r2 = ResourceOpener(url2)
+    >>> print(r1.get())
+    #>>> print(r2.get())
     """
     def __init__(self, url):
         self.original_url = url
@@ -88,9 +143,9 @@ class ResourceOpener():
             self.status = None
 
         self.info = f.info()
-        self.original_url = self.original_url
+        #self.original_url = self.original_url
         self.content_type = self.info.get('content-type', '').lower()
-        (self.content_type, self.charset) = splitContentType(self.content_type)
+        (self.content_type, self.charset) = split_content_type(self.content_type)
 
         try:
             self.content_length = long(self.info.get('content-length', 0))
@@ -147,9 +202,5 @@ class ResourceOpener():
 
 
 if __name__ == "__main__":
-    url1 = "http://ubu.artmob.ca/sound/burroughs_william/Break-Through/Burroughs-William-S_01-K-9.mp3"
-    url2 = "http://www.youtube.com/watch?v=rUJF6ke1SoE"
-    r1 = ResourceOpener(url1)
-    r2 = ResourceOpener(url2)
-    print r1.get()
-    print r2.get()
+    import doctest
+    doctest.testmod()

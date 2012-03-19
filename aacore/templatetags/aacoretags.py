@@ -21,7 +21,11 @@ register = template.Library()
 
 @register.filter
 def browseurl(uri):
+    """
+    Reverses the browse url of a resource or a litteral.
+    """
     return reverse('aa-browse') + "?" + urllib.urlencode({'uri': uri})
+
 
 @register.filter
 def rdfbrowselink (node):
@@ -40,6 +44,7 @@ def rdfbrowselink (node):
         return mark_safe('<a href="%s">%s</a>' % (link, "blank"+node.blank_identifier))
     else:
         return node
+
 
 @register.filter
 def rdfrellink (node):
@@ -60,11 +65,13 @@ def rdfrellink (node):
     else:
         return node
 
+
 @register.filter
 def rdfrelnamespace (node):
     """ filter by aa-resource """
     # FIXME: what is is supposed to return?
     uri = str(node.uri)
+
 
 @register.filter
 def rdfviewslink (node):
@@ -95,6 +102,7 @@ def compacturl (url):
             return ns.name + ":" + url[len(ns.url):]
     return url
 
+
 @register.filter
 @stringfilter
 def namespace_for_url (url):
@@ -103,6 +111,7 @@ def namespace_for_url (url):
         if url.startswith(ns.url):
             return ns.name
     return url
+
 
 @register.filter
 @stringfilter
@@ -117,20 +126,34 @@ def url_filename (url):
     else:
         return url
 
+
 @register.filter
 @stringfilter
 def url_hostname (url):
+    """
+    Returns the hostname of the given URL
+
+    Usage format::
+
+        <dl>
+            <dt>Host name</dt>
+            <dd property="http:hostname">{{ resource.url|url_hostname }}</dd>
+        </dl>
+    """
     return urlparse.urlparse(url).netloc
+
 
 @register.filter
 @stringfilter
 def html5tidy (src):
     return mark_safe(tidy(src, fragment=True))
 
+
 @register.filter
 @stringfilter
 def xmlescape (src):
     return xml.sax.saxutils.escape(src)
+
 
 @register.filter
 def rdfnode (n):
@@ -157,8 +180,10 @@ def rdfnodedisplay (node):
     else:
         return node
 
+
 # ok this is a bit crappy here...
-pageurlbase = "http://"+Site.objects.get_current().domain + "/pages/"
+#pageurlbase = "http://"+Site.objects.get_current().domain + "/pages/"
+
 
 #@register.filter
 #def rdfnode_fix_pagenames (url):
@@ -170,6 +195,9 @@ pageurlbase = "http://"+Site.objects.get_current().domain + "/pages/"
 
 @register.filter
 def iso8601_date (date):
+    """
+    Renders the given datetime object to its iso8601 representations
+    """
     if type(date) == datetime.datetime:
         return "%04d-%02d-%02d" % (date.year, date.month, date.day)
     else:

@@ -17,7 +17,6 @@ class Command(BaseCommand):
 #        )
 
     def handle(self, *args, **options):
-        rdfmodel = aacore.utils.get_rdf_model()
         if args:
             models = []
             for modelname in args:

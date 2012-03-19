@@ -30,7 +30,7 @@ def get_model (storagename, storagedir):
     Open/Create and return the default RDF Store (RDF.Model in bdb hashes format, contexts enabled)
     File Name(s) set by settings.RDF_STORAGE_DIR & RDF_STORAGE_NAME
     """
-    storage = RDF.HashStorage(storagename, options="hash-type='bdb',contexts='yes',dir='"+storagedir+"'") # dir='.'
+    storage = RDF.HashStorage(storagename, options="hash-type='bdb',contexts='yes',dir='" + storagedir + "'") # dir='.'
     return RDF.Model(storage)
 
 def groupby (results, groupbyvar, collectvar):
@@ -60,9 +60,11 @@ def rdfnode (n):
     """
     Unpeel an RDF.Node object to a displayable string
     """
-    if n == None: return ""
+    if n == None:
+        return ""
     ret = n
-    if type(n) == str or type(n) == unicode: return n
+    if type(n) == str or type(n) == unicode:
+        return n
     if n.is_resource():
         ret = str(n.uri)
     elif n.is_literal():
@@ -145,17 +147,17 @@ class SparqlQuery (object):
 
     Example of use:
 
-    q = SparqlQuery()
-    q.prefix("dc:<http://purl.org/dc/elements/1.1/>")
-    q.prefix("sarma:<http://sarma.be/terms/>")
-    q.select("?value ?label ?doc")
-    q.where("?doc <%s> ?value." % relurl)
-    q.where("?value dc:title ?label.")
-    q.orderby("?label ?value")
-    querytext = q.render()
-    # to actually perform the query using RDF:
-    rdfquery = RDF.Query(querytext.encode("utf-8"), query_language="sparql")
-    results = rdfquery.execute(rdfmodel)
+    >>> q = SparqlQuery()
+    >>> q.prefix("dc:<http://purl.org/dc/elements/1.1/>")
+    >>> q.prefix("sarma:<http://sarma.be/terms/>")
+    >>> q.select("?value ?label ?doc")
+    >>> q.where("?doc <%s> ?value." % relurl)
+    >>> q.where("?value dc:title ?label.")
+    >>> q.orderby("?label ?value")
+    >>> querytext = q.render()
+    >>> # to actually perform the query using RDF:
+    >>> rdfquery = RDF.Query(querytext.encode("utf-8"), query_language="sparql")
+    >>> results = rdfquery.execute(rdfmodel)
 
     """
     def __init__(self):
@@ -228,6 +230,7 @@ def load_links (model, context, uri=None, literal=None):
         s = "<%s>" % uri
 
     q = "SELECT DISTINCT ?relation ?object WHERE {{ %s ?relation ?object . }} ORDER BY ?relation" % s
+
     for b in query(q, model):
         if b['relation'].is_resource() and str(b['relation'].uri) == "http://purl.org/dc/elements/1.1/title":
             context['title'] = b['object'].literal_value.get("string")
