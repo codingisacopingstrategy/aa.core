@@ -113,6 +113,32 @@ Quick Installation
    on a local server.
 
 
+Concepts
+========
+
+Resource
+    Resource can be two things:
+
+    1. an Internet resource, referenced by a URI
+    2. a django object represention an Internet resource
+    3. ...
+
+Resource delegate
+   Description to come.
+
+RDF Delegate
+   Description to come.
+
+Namespace
+   Description to come.
+
+Model
+   Description to come.
+
+Store
+   Description to come.
+
+
 Indexing resources
 ==================
 

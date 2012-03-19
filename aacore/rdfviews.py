@@ -1,6 +1,3 @@
-#
-# Generic RDF views useful for debugging / maintenance
-#
 # This file is part of Active Archives.
 # Copyright 2006-2011 the Active Archives contributors (see AUTHORS)
 #
@@ -17,6 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Also add information on how to contact you by electronic and paper mail.
+
+""" Generic RDF views useful for debugging / maintenance """
 #
 
 import RDF
