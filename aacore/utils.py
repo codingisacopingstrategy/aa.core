@@ -21,31 +21,25 @@ Utilities specific to the core application
 """
 
 
-
-
-import urlparse
 import RDF
+import urlparse
 
 import django
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import resolve
-from django.conf import settings as projectsettings
 from django.http import HttpRequest
-import html5tidy
 
-from aacore.settings import (RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS)
-from aacore.rdfutils import (get_model, rdf_parse_into_model, prep_uri)
 import aacore.models
-from aacore import RDF_MODEL
-
-
+from aacore import (RDF_MODEL, get_indexed_models)
+from aacore.rdfutils import (rdf_parse_into_model, prep_uri)
 
 
 def full_site_url(url):
     """
     Returns the fully qualified URL (joined with
-    Site.objects.get_current().domain) for a given URL path. Requires that
-    the Site is properly setup in the admin!
+    Site.objects.get_current().domain) for a given URL path.
+    
+    Requires that the Site is properly setup in the admin!
     """
     return urlparse.urljoin("http://%s" % Site.objects.get_current().domain, url)
 
@@ -64,14 +58,9 @@ def reindex (item, rdf_model=RDF_MODEL):
     try:                
         rdf_parse_into_model(rdf_model, url, format="rdfa", baseuri=url, context=url)
         return True
-    except RDF.RedlandError, e:
+    except RDF.RedlandError:
         return False
 
-##################
-
-# Multi-step resource ADD
-# "Sniff" / "Add"
-# Main Resource View -- allow "preview" of non-added resources
 
 def add_resource (url, rdf_model=RDF_MODEL, request=None, reload=False):
     """
@@ -99,22 +88,6 @@ def add_resource (url, rdf_model=RDF_MODEL, request=None, reload=False):
         aacore.models.reindex_request.send(sender=resource.__class__, instance=resource)
 
 
-def get_indexed_models():
-    """
-    Returns a list of the classes registered in settings.INDEXED_MODELS
-    """
-    models = []
-    for model_name in INDEXED_MODELS:
-        try:
-            (module_name, class_name) = model_name.rsplit(".", 1)
-            module = __import__(module_name, fromlist=[class_name])
-            klass = getattr(module, class_name)
-            models.append(klass)
-        except ImportError:
-            print "ERROR IMPORTING", model_name
-    return models
-
-
 def direct_get_response (url, request=None):
     """ 
     Hack to load a view contents without going through the (local) server, work
@@ -126,7 +99,6 @@ def direct_get_response (url, request=None):
 
     Returns response object (resp.content is content in bytes)
     """
-    # de-absolutize the URL
     if request == None:
         request = HttpRequest()
         request.user = django.contrib.auth.models.AnonymousUser()
@@ -134,14 +106,14 @@ def direct_get_response (url, request=None):
         request.POST = {}
         request.GET = {}
 
+    # de-absolutize the URL
     rurl = urlparse.urlparse(url).path
     (func, args, kwargs) = resolve(rurl)
 
     try:
-        resp = func(request, *args, **kwargs)
-        return resp
+        return func(request, *args, **kwargs)
     except Exception, e:
-        print "aacore.utils.direct_get_response: Exception:", e    
+        print("aacore.utils.direct_get_response: Exception:", e)
 
 
 def parse_localurl_into_model (model, uri, format=None, baseuri=None, 

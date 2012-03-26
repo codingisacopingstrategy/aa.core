@@ -17,33 +17,35 @@
 
 
 """
-Implements active archives models
+Active Archives aacore models
 """
 
-
-import re
-import RDF
 import os
 import os.path
+import RDF
+import re
+import resource_opener
 import urllib2
+
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_delete
+
+from aacore import (RDF_MODEL, get_indexed_models)
 from aacore.rdfutils import (rdfnode, prep_uri)
 from aacore.settings import (CACHE_DIR, CACHE_URL)
-import aacore.utils
-import resource_opener
 from aacore.signals import (reindex_request, indexing_reindex, indexing_post_delete)
-from django.db.models.signals import post_delete
-from aacore import RDF_MODEL
 
 
 class Resource (models.Model):
     """
-    Represents an (augmented) URL. Acts like a proxy to access to the
-    associated RDF store but caches the last information of an URL for
-    convenience. This is the main class of Active Archives. 
+    Represents an (augmented) URL.
+    
+    Acts like a proxy to access to the associated RDF store but caches the last
+    information of an URL for convenience. This is the main class of Active
+    Archives.
     """
     url = models.URLField(verify_exists=False)
     _filter = models.CharField(max_length=1024, blank=True)
@@ -169,7 +171,7 @@ class Resource (models.Model):
                     """ % (self.url, rel)
 
             query = query.encode("utf-8")
-            bindings = RDF.Query(query, query_language="sparql").execute(rdfmodel)
+            bindings = RDF.Query(query, query_language="sparql").execute(rdf_model)
             ret = []
             for row in bindings:
                 ret.append(rdfnode(row['obj']))
@@ -190,8 +192,9 @@ class ResourceDelegate (models.Model):
 
 class Namespace (models.Model):
     """
-    Defines RDF namespaces and assigns HTML colors (used to generate
-    stylesheets). 
+    Defines RDF namespaces and assigns them HTML colors.
+    
+    Colors are used to generate stylesheets. 
     """
     name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
@@ -257,6 +260,6 @@ class RDFDelegate (models.Model):
         return parser.parse_as_stream(uri)
 
 
-for model in aacore.utils.get_indexed_models():
+for model in get_indexed_models():
     reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
     post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")

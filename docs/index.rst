@@ -52,24 +52,31 @@ Dependencies
 
 Please first install these software in order to get aacore running properly:
 
-  - Django += 1.3 <http://www.djangoproject.org/>
-  - SQLite3 <http://www.sqlite.org/>
-  - PySQLite2 <http://trac.edgewall.org/wiki/PySqlite>
-  - Python librdf (Redland) <http://librdf.org/>
-  - Python html5lib <http://code.google.com/p/html5lib/>
-  - Python dateutil <http://labix.org/python-dateutil>
+  - Django += 1.3 (http://www.djangoproject.org/)
+  - SQLite3 (http://www.sqlite.org/)
+  - PySQLite2 (http://trac.edgewall.org/wiki/PySqlite)
+  - Python librdf (Redland) (http://librdf.org/)
+  - Python html5lib (http://code.google.com/p/html5lib/)
+  - Python dateutil (http://labix.org/python-dateutil)
+  - Python docutils (http://docutils.sourceforge.net/)
+  - Python lxml (http://lxml.de/)
+
+The prefered way to install the python dependencies is to set up a virtual
+environment and use ``pip``. Unfortunatly, librdf isn't available on Pypi which
+mean you'll have to install it using your distribution package manager.
 
 On Ubuntu, this should do the trick:
 
 .. code-block:: bash
 
-     sudo apt-get install python-pip
-     sudo pip install django
-     sudo pip install html5lib
-     sudo pip install python-dateutil
      sudo apt-get install python-librdf
+     sudo apt-get install virtualenv
+     cd $AACORE_PATH
+     virtualenv venv
+     source venv/bin/activate
+     pip install -r requirements.txt
 
-Additionally, you'll need the following for the RDF sniffers:
+Additionally, you'll need the following programs for the default RDF sniffers:
 
   - Exiftool
   - Ffmpeg
@@ -113,7 +120,7 @@ Quick Installation
    on a local server.
 
 
-Concepts
+Glossary
 ========
 
 Resource

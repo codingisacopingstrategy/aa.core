@@ -7,9 +7,8 @@ from django.template.defaultfilters import stringfilter
 from django import template
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
-from django.contrib.sites.models import Site
 from aacore.html5tidy import tidy
-from aacore.models import *
+from aacore.models import Namespace
 
 
 
@@ -69,13 +68,12 @@ def rdfrellink (node):
 @register.filter
 def rdfrelnamespace (node):
     """ filter by aa-resource """
-    # FIXME: what is is supposed to return?
-    uri = str(node.uri)
+    return str(node.uri)
 
 
 @register.filter
 def rdfviewslink (node):
-    """ filter used in rdfviews.browse (debug) """
+    """ filter used in aacore.views.browse (debug) """
     if node.is_resource():
         uri = str(node.uri)
         link = reverse('aa-rdf-browse') + "?" + urllib.urlencode({'uri': uri})

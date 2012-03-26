@@ -20,7 +20,14 @@
 #
 #
 
+
 # TODO: Rename HttpUtils ?
+
+
+"""
+Utilities to deal with conditional GET built on top of urllib2.
+"""
+
 
 import re
 import urllib2
@@ -29,13 +36,16 @@ import email.utils
 import urlparse
 import os
 
+
 USER_AGENT = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1) Gecko/20090624 Firefox/3.5"
 
 
 def parse_http_datetime(string):
     """
-    Parses datetime strings returned by HTTP servers following the RFC 2616
-    standard (which supports three datetime formats) and returns a datetime instance.
+    Parses datetime strings returned by HTTP servers and returns datetime
+    instances.
+    
+    It supports the three datetime formats defined in the RFC 2616 standard.
 
     >>> rcf_822 = "Sun, 06 Nov 1994 08:49:37 GMT"
     >>> print(parse_http_datetime(rcf_822))
@@ -73,9 +83,13 @@ class NotModifiedHandler(urllib2.BaseHandler):
 
 def split_content_type(ct):
     """
+    Parses the HTTP response Content-Type entity-header field and returns a
+    tuple contening the content-type and the media-type.
+
     >>> ct = "image/jpeg"
     >>> print(split_content_type(ct))
     ('image/jpeg', '')
+
     >>> ct = "text/html; charset=iso-8859-1"
     >>> print(split_content_type(ct))
     ('text/html', 'iso-8859-1')
@@ -191,13 +205,13 @@ class ResourceOpener():
                             print "\t%d%% completed (%d/%d)..." % (progress, bytes, total)
                         lastprogress = progress
             if verbose:
-                print "\tWrote %d bytes to %s" % (bytes, cpath)
+                print "\tWrote %d bytes to %s" % (bytes, outfile)
             outfile.close()
             return bytes
 
-        except ValueError, e:
+        except ValueError:
             return -1  # Bad URL
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             return -1
 
 

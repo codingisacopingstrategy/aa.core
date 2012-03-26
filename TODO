@@ -95,12 +95,6 @@ Bug
 - Pages names must not contain non-sacci characters
 
 
-Meeting 27/01/2012
-==================
-
-- Namespace for Ritz
-
-
 LGRU
 ====
 
@@ -108,6 +102,4 @@ LGRU
 - editable stylesheets
 - file upload
 - Rester en contact avec Bachir pour l'hébergement + donner accès à Active Archives. Serveur des laboratoires.
-
-
 - html5tidy everything (in templates notably) so there is no problem at parsing the pages
