@@ -19,20 +19,16 @@
 # Also add information on how to contact you by electronic and paper mail.
 #
 
-import RDF, urllib
-try: import simplejson as json
-except ImportError: import json
-
-from django.shortcuts import (render_to_response, redirect, get_object_or_404)
+import RDF
+from django.conf.urls.defaults import *
+from django.shortcuts import (render_to_response)
 from django.http import (HttpResponse, HttpResponseRedirect)
-from django.template import (RequestContext, Template, Context)
-from django.core.urlresolvers import reverse
-
-from models import *
-from utils import (get_rdf_model, full_site_url, dewikify, url_for_pagename, convert_line_endings, pagename_for_url, add_resource)
+from django.template import RequestContext
+from aacore.models import *
+from aacore.utils import (get_rdf_model, full_site_url)
 import rdfutils
 
-from django.conf.urls.defaults import *
+
 urlpatterns = patterns('aacore.rdfviews',
     url(r'^reindex/$', 'reindex', {}, name='aa-rdf-reindex'),
     url(r'^dump/$', 'dump', {}, name='aa-rdf-dump'),

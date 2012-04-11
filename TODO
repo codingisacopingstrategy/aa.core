@@ -1,18 +1,21 @@
-# High priority
-- bug with column ":" in url: sould be escaped by the wikify function.
-- BUG: negative positions
+High priority
+=============
+
+- Skip tag
 - Create new page: default content that give clues
     - First page directly created?
     - Give a location to the first annotation
-    - more meaningful default text for new pages
     - add annotation button: predefined location + meaningful text too.
 * Improve history 
     * Be able to revert a page
 - layer palette doesn't refresh
-- list pages filter ?
 
 
-## Low priority
+Low priority
+============
+
+- BUG: negative positions
+- bug with column ":" in url: sould be escaped by the wikify function.
 - shift to enable the grid snapping
 - javascript scrollbars (less ugly)
 - draggable help
@@ -25,6 +28,7 @@
 - configure serve to serve best html5 video/audio
 - RSS feeds
 - Still a problem with non consecutive header levels...
+- list pages filter ?
 
 Ideas
 =====
@@ -36,11 +40,11 @@ Ideas
 - How to preserve the title attribute with the new syntax ([[embed::ressource]])?
 - manual sectioning "8<---"? What about the <br /> tag which is semantically correct for this?
 - Notion of focus for media, to know which one is being controlled
+- different types of landmarks... what syntax?
 
-# Oralsite workshop remarks:
+Oralsite workshop remarks
+=========================
 
-- URL and BROWSE buttons are too present.
-- "Browse" term leads to other expectations than getting metadata. (but is there something better?)
 - video leads text/text leads video
 - embed webpages = iframe?
 
@@ -51,10 +55,7 @@ Ideas
 
 - annotation negative position happens when one rescales the annotation "outside" the screen.
 - manual to update
-- bug with the layer palette
-- zoom filter to reimplement
-- how to change the embed wrapper? how to execute script loaded in ajax?
-- metadata that says if it plays automatically or not
+- how to change the embed wrapper?
 
 Meeting 01/2012
 ===============
@@ -72,7 +73,6 @@ Navigation
 - cinematic mode shows hidden boxes in edit mode
 - drag and drop classes
 - more explicit class names
-- different types of landmarks... what syntax?
 - show sound files in the timeline
 - background appears in cinematic mode?
 - remove decorations with classes
@@ -89,5 +89,24 @@ Bug
 - history: date sections not accurate
 - Jonathan Burrows on Scores: play mode: sidebar opened the images overflow
 - lightbox: missing navigation buttons
-- Log out, go back to the current page
 - renumber section when one gets deleted
+- Question marks in wiki links are mistakenly decoded
+    [[What's the Score Now?]] --> http://localhost:8000/pages/What%27s_the_Score_Now/?/edit/
+- Pages names must not contain non-sacci characters
+
+
+Meeting 27/01/2012
+==================
+
+- Namespace for Ritz
+
+
+LGRU
+====
+
+- sidebar opened by default.
+- editable stylesheets
+- file upload
+- Rester en contact avec Bachir pour l'hébergement + donner accès à Active Archives. Serveur des laboratoires.
+
+

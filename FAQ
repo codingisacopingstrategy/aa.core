@@ -6,7 +6,10 @@ Create a link to the feed with an embed relation, like this:
 
 # How can I put an image in the background?
 
-Add the following code at the top of the page source:
+Because Active Archives wiki syntax is based on Markdown, it is possible to use
+plain HTML in your documents, including css directives. If you want to put an
+image in the background of your page you can put somewhere in the source of the
+page the following snippet:
 
     <style>
     body {

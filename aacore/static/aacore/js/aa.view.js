@@ -28,6 +28,7 @@
     var $canvas;
     var $sidebar;
     var embedUrl;
+    //var actionStack = [];  // Not Implemented
 
 
     function commit_attributes (elt) {
@@ -37,11 +38,13 @@
          */
         // TODO: update the regex to match timecodes as well
         // RegExp
+        // FIXME: find how \s can not match newlines
+        var TIMECODE_RE =    /(^|\n)(\d{2}:\d{2}:\d{2}([.,]\d{1,3})?\s*-->\s*(\d{2}:\d{2}:\d{2}([.,]\d{1,3})?)?.*?)(\n|$)/;
         var HASH_HEADER_RE = /(^|\n)(#{1,2}[^#].*?)#*(\n|$)/;
         var ATTR_RE = /{:[^}]*}/;
         var NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
                 'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
-                'highlight', 'drophover'].join(' ');
+                'highlight', 'drophover', 'active'].join(' ');
 
         // As we don't want all attributes/values to be persistent we need to
         // perform some cleaning first. In order not to alter the original element
@@ -78,6 +81,7 @@
             section: section
         }, function(data) {
             // Searches for Header
+            //var header_match = HASH_HEADER_RE.exec(data) ? HASH_HEADER_RE.exec(data) : TIMECODE_RE.exec(data);
             var header_match = HASH_HEADER_RE.exec(data);
             if (header_match) {
                 var start, end;
@@ -87,7 +91,7 @@
                     start = header_match.index + attr_match.index;
                     end = start + attr_match[0].length;
                 } else {
-                    start = header_match.slice(1,3).join('').length;
+                    start = header_match.slice(1, 3).join('').length;
                     end = start;
                 }
                 var before = data.substring(0, start);
@@ -116,12 +120,9 @@
         $('section.section1').each(function(i) {
             var section2 = $('section.section2', this);
             if (section2.length) {
-                var line = $("<div>").addClass('line').css({
-                    'position': 'absolute',
-                    'top': 26 + (5 * j),
-                    'height': 5
-                })
+                var line = $("<div>").addClass('line');
                 section2.each(function() {
+                    var $this = $(this);
                     var extraClass = $(this).has('audio').length ? 'audio ' : 'normal'; 
                     //var extraClass = $(this).has('audio').length ? '' : ''; 
                     var start = $(this).data('start');
@@ -135,38 +136,26 @@
                     var offset = $.timecode_tosecs(start) / duration;
                     var width = ($.timecode_tosecs(end) - $.timecode_tosecs(start)) / duration;
                     //$('<a>').attr('href', '#' + $(this).attr('id')).addClass('landmark').css({
-                    $('<a>').attr('href', '#').addClass('landmark').css({
-                        'position': 'absolute',
+                    var foo = $('<a>').attr('href', '#').addClass('landmark').css({
                         'left': (100 * offset) + "%",
                         'width': (100 * width) + "%",
                     }).addClass(extraClass).data('position', start)
                         .attr('title', start + " --> " + end)
-                        //.bind('click', function() {
-                            //console.log('ok');
-                            //$("body").timeline('currentTime', duration + 0.01);
-                        //})
+                        .bind('click', function() {
+                            $this.find('span[property="aa:start"]').click();
+                        })
                         .appendTo(line);
+
+                    $('a[rel="aa:landmark"]', this).each(function() {
+                        //var bar = foo.clone().attr('class', 'landmark2').text('♦').appendTo(line);
+                        foo.addClass('foo');
+                    });
                 });
 
                 line.appendTo(lines);
                 j += 1;
             }
             lines.appendTo('#timeline');
-        });
-        
-        $('a[rel="aa:landmark"]').each(function() {
-            var data_start = $(this).closest('section').data('start');
-            var elt_duration = $.timecode_tosecs(data_start);
-            var elt_pos = elt_duration / duration;
-            $('<a href="#"><img src="/static/aacore/img/landmark.png" /></a>').css({
-                'position': 'absolute',
-                'left': (100 * elt_pos) + "%"
-            }).data('position', data_start)
-                .attr('title', $(this).text())
-                //.bind('click', function() {
-                    //$("body").timeline('currentTime', elt_duration + 0.01);
-                //})
-                .appendTo('#timeline');
         });
     }
 
@@ -269,6 +258,7 @@
         // then on any <section> or other dynamically loaded/created element to "activate" it
         $canvas.bind("refresh", function (evt) {
             var context = evt.target;
+            //console.log('refresh');
 
             $("section.section1 > div.wrapper", $canvas).autoscrollable();
 
@@ -327,7 +317,12 @@
                         section.toggleClass('collapsed');
                         section.trigger("geometrychange");
                     }
-                }).attr('title', 'Double-click to toggle collapsing.');
+                })
+                    .filter('h1')
+                        .attr('title', 'Drag to move. Double-click to open/close.')
+                    .end()
+                    .filter('h2')
+                        .attr('title', 'Double-click to open/close.');
 
                 var nonhead = $(this).children(":not(:header)");
                 var wrapped = $('<div class="wrapper"></div>').append(nonhead);
@@ -407,7 +402,7 @@
             /* }}} */
 
             /* Clickable timecodes {{{ */
-            $(context).ffind('span[property="aa:start"],span[property="aa:end"]').bind("click", function () {
+            $(context).ffind('span[property="aa:start"], span[property="aa:end"]').bind("click", function () {
                 var about = $(this).parents('[about]').attr('about');
                 var timeline;
                 if (about) {
@@ -452,7 +447,7 @@
             if ($('#timelineslider').is(':visible')) {
                 placeLandmarks();
             }
-            $(context).ffind("[rel='aa:embed']").each(function () {
+            $(context).add('#sidebar').find("[rel='aa:embed']").each(function () {
                 var that = this;
                 function poll () {
                     $.ajax(embedUrl, {
@@ -638,17 +633,18 @@
             applyDefaultStyles: false,
             enableCursorHotkey: false,
             west: {
-                size: "350",
+                size: "250",
                 fxName: "slide",
                 fxSpeed: "fast",
-                initClosed: true,
+                initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
+                closable: true,
                 resizable: false,
                 togglerAlign_closed : 'center',
                 togglerAlign_open : 'center',
-                togglerContent_open: '-',
-                togglerContent_closed: '+',
+                togglerContent_open: '&larr;',
+                togglerContent_closed: '&rarr;',
                 spacing_closed: 16,
                 spacing_open: 16,
                 togglerLength_open: -1,
@@ -662,6 +658,25 @@
             slidable: false,
             resizable: false,
             closable: false,
+            south: {
+                size: "250",
+                fxName: "slide",
+                fxSpeed: "fast",
+                initClosed: true,
+                enableCursorHotkey: false,
+                slidable: true,
+                closable: true,
+                resizable: true,
+                togglerAlign_closed : 'center',
+                togglerAlign_open : 'center',
+                togglerContent_open: '&darr;',
+                togglerContent_closed: '&uarr;',
+                spacing_closed: 0,
+                spacing_open: 18,
+                togglerLength_open: -1,
+                togglerLength_closed: -1,
+                showOverflowOnHover: false
+            }
         });
 
         $("#add").click(function() {
@@ -693,8 +708,10 @@
             var mode = $(this).val();
             if (mode == "play") {
                 $("article").addClass("play");
+                $("body").layout().close("west");
             } else {
                 $("article").removeClass("play");
+                $("body").layout().open("west");
             }
         });
 
@@ -802,6 +819,8 @@
             $target.trigger("geometrychange");
             return false;
         });
+
+        $("section.section1 > div.wrapper", $canvas).autoscrollable();  // FIXME: quick fix to make autoscrollable work on load
     });
 })(jQuery);
 

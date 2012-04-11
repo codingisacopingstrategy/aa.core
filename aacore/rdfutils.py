@@ -19,11 +19,11 @@
 Thin wrapper functions to work with an RDF store based on the Redland C library & Python bindings
 (librdf, python-librdf (python module name: RDF))
 
-Requires: RDF, urlparse
+Requires: RDF
 
 """
 
-import RDF, urlparse
+import RDF
 
 def get_model (storagename, storagedir):
     """

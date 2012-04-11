@@ -56,9 +56,12 @@ var aTimeline = function (options) {
 
         // addTitleByStart
         /* maintain min/maxTime */
+        /* FIXME: timecodes using a period rather than a comma lead cannot be parsed */
         if ((minTime === undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
         if ((maxTime === undefined) || (newtitle.start > maxTime)) { maxTime = newtitle.start; }
         if ((maxTime === undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
+        //console.log(newtitle.elt);
+        //console.log(minTime, maxTime);
 
         /* insert annotation in the correct (sorted) location */
         for (var i=0; i<titlesByStart.length; i++) {
