@@ -3,6 +3,8 @@ import RDF
 from django.core.management.base import BaseCommand
 import aacore.models
 import aacore.utils
+from aacore import get_indexed_models 
+import aacore.signals
 
 
 class Command(BaseCommand):
@@ -17,7 +19,6 @@ class Command(BaseCommand):
 #        )
 
     def handle(self, *args, **options):
-        rdfmodel = aacore.utils.get_rdf_model()
         if args:
             models = []
             for modelname in args:
@@ -26,15 +27,16 @@ class Command(BaseCommand):
                 klass = getattr(module, classname)
                 models.append(klass)
         else:
-            models = aacore.utils.get_indexed_models()
+            models = get_indexed_models()
 
         for model in models:
-            print(model)
+            print("Reindexing %s instances" % model)
             for item in model.objects.all():
                 print item.get_absolute_url()
                 try:
-                    aacore.models.indexing_reindex_item(item)
+                    aacore.signals.indexing_reindex_item(item)
                 except RDF.RedlandError, e:
                     print "\tERROR,", e
+            print
 
 

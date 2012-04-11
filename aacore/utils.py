@@ -21,124 +21,72 @@ Utilities specific to the core application
 """
 
 
-
-
-import urlparse
 import RDF
+import urlparse
 
 import django
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import resolve
-from django.conf import settings as projectsettings
 from django.http import HttpRequest
 
-from aacore.settings import (RDF_STORAGE_NAME, RDF_STORAGE_DIR, INDEXED_MODELS)
-from aacore.rdfutils import (get_model, rdf_parse_into_model, prep_uri)
 import aacore.models
+from aacore import (RDF_MODEL, get_indexed_models)
+from aacore.rdfutils import (rdf_parse_into_model, prep_uri)
 
-
-def get_rdf_model ():
-    """
-    Opens the Active Archives RDF Store.
-    """
-    rdfmodel = get_model(RDF_STORAGE_NAME, RDF_STORAGE_DIR)
-    return rdfmodel
 
 def full_site_url(url):
     """
-    Return a FULL absolute URL for a given URL, join with Site.objects.get_current().domain
-    Requires: That the Site is properly setup in the admin!
+    Returns the fully qualified URL (joined with
+    Site.objects.get_current().domain) for a given URL path.
+    
+    Requires that the Site is properly setup in the admin!
     """
-    try:
-        base = projectsettings.SITE_URL
-    except AttributeError:
-        base = None
+    return urlparse.urljoin("http://%s" % Site.objects.get_current().domain, url)
 
-    base = base or "http://"+Site.objects.get_current().domain
-    return urlparse.urljoin(base, url)
 
 def is_local_url(url):
     """
-    Returns True if url.startswith SITE_URL (or Site.domain)
+    Returns True if the given URL belongs to the current :model:`Site.domain`
     """
-    try:
-        base = projectsettings.SITE_URL
-    except AttributeError:
-        base = None
-    base = base or "http://" + Site.objects.get_current().domain
-    return url.startswith(base)
+    domain = Site.objects.get_current().domain
+    url = urlparse.urlparse(url).netloc
+    return (url == domain)
 
-def reindex (item, rdfmodel=None):
-    if rdfmodel == None:
-        rdfmodel = get_rdf_model()
+
+def reindex (item, rdf_model=RDF_MODEL):
     url = full_site_url(item.get_absolute_url())
     try:                
-        rdf_parse_into_model(rdfmodel, url, format="rdfa", baseuri=url, context=url)
+        rdf_parse_into_model(rdf_model, url, format="rdfa", baseuri=url, context=url)
         return True
-    except RDF.RedlandError, e:
+    except RDF.RedlandError:
         return False
-##################
 
-# Multi-step resource ADD
-# "Sniff" / "Add"
-# Main Resource View -- allow "preview" of non-added resources
 
-def add_resource (url, rdfmodel=None, request=None, reload=False):
+def add_resource (url, rdf_model=RDF_MODEL, request=None, reload=False):
     """
     This is what gets called when in the aa browser you type a URL.
     """
-    if rdfmodel == None:
-        rdfmodel = get_rdf_model()
-
     ## TODO: DEAL WITH URL NORMALIZATION HERE ?!
     ## actually need to peek ahead in models for tips on normalizing ...
     ## and actually, should a resource be created if no model claims the URL?
 
-    (r, created) = aacore.models.Resource.get_or_create_from_url(url, reload=reload)
+    (resource, created) = aacore.models.Resource.get_or_create_from_url(url, reload=reload)
     if created or reload:
-#        sniff_url = full_site_url(r.get_absolute_url())
-#        parse_localurl_into_model(rdfmodel, sniff_url, format="rdfa", baseuri=sniff_url, context=sniff_url, request=request)
-
         # relink delegates
-        r.delegates.all().delete()
+        resource.delegates.all().delete()
         for model in get_indexed_models():
             if model == aacore.models.Resource:
                 continue
             try:
-                delegate, created = model.get_or_create_from_url(url, reload=reload)
+                (delegate, created) = model.get_or_create_from_url(url, reload=reload)
                 # are they already linked?
                 if delegate:
-#                    print "\tlinking to", delegate
-                    rd = aacore.models.ResourceDelegate(resource=r, delegate=delegate)
-                    rd.save()
-#                    delegate_url = full_site_url(delegate.get_absolute_url())
-#                    if hasattr(delegate, 'get_rdf_as_stream'):
-#                        stream = delegate.get_rdf_as_stream()
-#                        context = RDF.Node(delegate_url)
-#                        rdfmodel.context_remove_statements(context=context)
-#                        rdfmodel.add_statements(stream, context=context)
-#                    else:
-#                        parse_localurl_into_model(rdfmodel, delegate_url, format="rdfa", baseuri=delegate_url, context=delegate_url, request=request)
+                    resource_delegate = aacore.models.ResourceDelegate(resource=resource, delegate=delegate)
+                    resource_delegate.save()
             except AttributeError:
-                # print "attribute error in", model, "skipping."
                 pass
-        # Force Reindex of resource (to get delegate/sniffer links)        
-        ## r.sync()
-        aacore.models.reindex_request.send(sender=r.__class__, instance=r)
+        aacore.models.reindex_request.send(sender=resource.__class__, instance=resource)
 
-
-def get_indexed_models():
-    modelnames = INDEXED_MODELS
-    ret = []
-    for modelname in modelnames:
-        try:
-            (modulename, classname) = modelname.rsplit(".", 1)
-            module = __import__(modulename, fromlist=[classname])
-            klass = getattr(module, classname)
-            ret.append(klass)
-        except ImportError:
-            print "ERROR IMPORTING", modelname
-    return ret
 
 def direct_get_response (url, request=None):
     """ 
@@ -151,7 +99,6 @@ def direct_get_response (url, request=None):
 
     Returns response object (resp.content is content in bytes)
     """
-    # de-absolutize the URL
     if request == None:
         request = HttpRequest()
         request.user = django.contrib.auth.models.AnonymousUser()
@@ -159,16 +106,18 @@ def direct_get_response (url, request=None):
         request.POST = {}
         request.GET = {}
 
+    # de-absolutize the URL
     rurl = urlparse.urlparse(url).path
-    func, args, kwargs = resolve(rurl)
+    (func, args, kwargs) = resolve(rurl)
 
     try:
-        resp = func(request, *args, **kwargs)
-        return resp
+        return func(request, *args, **kwargs)
     except Exception, e:
-        print "aacore.utils.direct_get_response: Exception:", e    
+        print("aacore.utils.direct_get_response: Exception:", e)
 
-def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=None, request=None):
+
+def parse_localurl_into_model (model, uri, format=None, baseuri=None, 
+                               context=None, request=None):
 
     content = direct_get_response(uri, request).content
     # FIXME: html5tidy breaks the browse/sniff code.
@@ -195,3 +144,8 @@ def parse_localurl_into_model (model, uri, format=None, baseuri=None, context=No
     stream = parser.parse_string_as_stream(content, baseuri)
     model.context_remove_statements(context=context)
     model.add_statements(stream, context=context)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

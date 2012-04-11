@@ -1,35 +1,51 @@
-"""
-Implements active archives models
-"""
+# This file is part of Active Archives.
+# Copyright 2006-2011 the Active Archives contributors (see AUTHORS)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Also add information on how to contact you by electronic and paper mail.
 
 
-import re
-import RDF
+"""
+Active Archives aacore models
+"""
+
 import os
 import os.path
+import RDF
+import re
+import resource_opener
 import urllib2
-import django.dispatch
+
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.signals import post_delete
+
+from aacore import (RDF_MODEL, get_indexed_models)
 from aacore.rdfutils import (rdfnode, prep_uri)
 from aacore.settings import (CACHE_DIR, CACHE_URL)
-import aacore.utils
-import rdfutils
-import resource_opener
-
+from aacore.signals import (reindex_request, indexing_reindex, indexing_post_delete)
 
 
 class Resource (models.Model):
-    """ Represents an (augmented) URL.
-
-    Acts like a proxy to access to the associated RDF store but caches the
-    last information of an URL for convenience.
+    """
+    Represents an (augmented) URL.
     
-    This is the main class of Active Archives. 
-
+    Acts like a proxy to access to the associated RDF store but caches the last
+    information of an URL for convenience. This is the main class of Active
+    Archives.
     """
     url = models.URLField(verify_exists=False)
     _filter = models.CharField(max_length=1024, blank=True)
@@ -73,6 +89,9 @@ class Resource (models.Model):
         return ret, True
 
     def load_data(self):
+        """
+        Returns an instance of ``resource_opener.ResourceOpener``
+        """
         r = resource_opener.ResourceOpener(url=self.url)
         r.get()
         return r
@@ -97,7 +116,9 @@ class Resource (models.Model):
         reindex_request.send(sender=self.__class__, instance=self)
 
     def get_about_url(self):
-        """ this gets used to do reverse lookup to resource """
+        """
+        Returns the original URL of the resource
+        """
         return self.url
 
     @staticmethod
@@ -114,16 +135,11 @@ class Resource (models.Model):
     def get_local_path_from_url(url):
         return os.path.join(settings.MEDIA_ROOT, url)
 
-    def foo(self):
-        return "%06d" % self.id
-        
     def get_local_file(self, forcereload=False):
         """
         Returns: an absolute path to a local file (if available)
         Throws: AAWait when local file is not (yet) available
         """
-        # local_dir = os.path.join(CACHE_DIR, "{:06d}".format(self.id))
-        #import pdb; pdb.set_trace()
         local_dir = os.path.join(CACHE_DIR, "%06d" % self.id)
         try:
             os.makedirs(local_dir)
@@ -143,13 +159,11 @@ class Resource (models.Model):
         local_url = os.path.join(local_dir, "original" + os.path.splitext(self.url)[1])
         return local_url
 
-    def get_metadata(self, rel=None, rdfmodel=None):
+    def get_metadata(self, rel=None, rdf_model=RDF_MODEL):
         """
         Returns: a dictionary of key-value pairs (where keys are RDF style URLs)
         Throws: AAWait when not yet available.
         """
-        if rdfmodel == None:
-            rdfmodel = aacore.utils.get_rdf_model()
         if rel:
             query = """SELECT DISTINCT ?obj 
                     WHERE {{ <%s> <%s> ?obj. }} 
@@ -157,7 +171,7 @@ class Resource (models.Model):
                     """ % (self.url, rel)
 
             query = query.encode("utf-8")
-            bindings = RDF.Query(query, query_language="sparql").execute(rdfmodel)
+            bindings = RDF.Query(query, query_language="sparql").execute(rdf_model)
             ret = []
             for row in bindings:
                 ret.append(rdfnode(row['obj']))
@@ -178,7 +192,9 @@ class ResourceDelegate (models.Model):
 
 class Namespace (models.Model):
     """
-    Defines RDF namespaces and assigns colors. 
+    Defines RDF namespaces and assigns them HTML colors.
+    
+    Colors are used to generate stylesheets. 
     """
     name = models.CharField(max_length=255)
     url = models.CharField(max_length=255)
@@ -243,60 +259,7 @@ class RDFDelegate (models.Model):
         # stream = parser.parse_as_stream(uri, uri)
         return parser.parse_as_stream(uri)
 
-##############################################
-# SIGNALS
-##############################################
-#
-# (1) Creates the "reindex_request" signal to:
-#     Allow Indexed Models or Delegates to request (re)indexing of their RDF,
-# (2) Watches indexed models/delegates post_delete signal to:
-#     Clear RDF index related to Delegate instances when deleted
-#
-# NB: Delegates must themselves request reindexing by
-# sending the reindex_request signal, for example:
-#
-# from aacore.models import reindex_request
-# def some_method(self):
-#     ...
-#     reindex_request.send(sender=self.__class__, instance=self)
 
-reindex_request = django.dispatch.Signal(providing_args=[])
-
-def indexing_reindex_item (item):
-    rdfmodel = aacore.utils.get_rdf_model()
-    full_url = aacore.utils.full_site_url(item.get_absolute_url())
-    if hasattr(item, 'get_rdf_as_stream'):
-        # in a way the URL here is the resource.url directly ?!
-        stream = item.get_rdf_as_stream()
-        context = RDF.Node(full_url)
-        rdfmodel.context_remove_statements(context=context)
-        rdfmodel.add_statements(stream, context=context)
-    else:
-#        # FOR DEBUGGING
-#        resp = utils.direct_get_response(item.get_absolute_url())
-#        page = resp.content
-#        rdfaparser = RDF.Parser("rdfa")
-#        furl = utils.full_site_url(item.get_absolute_url())
-#        s = rdfaparser.parse_string_as_stream(page, furl)
-#        print "RDFA:", (len(list(s))), "triples"
-
-        aacore.utils.parse_localurl_into_model(rdfmodel, full_url, format="rdfa", baseuri=full_url, context=full_url)
-    # rdfmodel.sync()
-
-def indexing_drop_item (item):
-    rdfmodel = aacore.utils.get_rdf_model()
-    full_url = aacore.utils.full_site_url(item.get_absolute_url())
-    rdfutils.rdf_context_remove_statements (rdfmodel, full_url)
-    # rdfmodel.sync()
-
-def indexing_post_delete(sender, instance, **kwargs):
-    indexing_drop_item(instance)
-
-def indexing_reindex(sender, instance, **kwargs):
-    indexing_reindex_item(instance)
-
-for model in aacore.utils.get_indexed_models():
+for model in get_indexed_models():
     reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
     post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")
-
-
