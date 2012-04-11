@@ -9,7 +9,7 @@ def lgru():
     env.media_path = '/home/constant/www/aa.lgru.net/static/media/'
 
 def sarma():
-    env.hosts = ['sarma@sarma.stdin.fr']
+    env.hosts = ['sarma@sarma.be']
     env.path = '/home/sarma/www/be.sarma/'
     env.git_path = '/home/sarma/www/be.sarma/db/repositories/'
     env.media_path = '/home/sarma/www/be.sarma/static/media/'
