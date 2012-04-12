@@ -259,7 +259,7 @@ class RDFDelegate (models.Model):
         # stream = parser.parse_as_stream(uri, uri)
         return parser.parse_as_stream(uri)
 
-
-for model in get_indexed_models():
-    reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
-    post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")
+# MM: April 2012, This is causing annoying problems with management tasks
+#for model in get_indexed_models():
+#    reindex_request.connect(indexing_reindex, sender=model, dispatch_uid="aa-indexer")
+#    post_delete.connect(indexing_post_delete, sender=model, dispatch_uid="aa-indexer")
