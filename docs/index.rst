@@ -63,18 +63,23 @@ Please first install these software in order to get aacore running properly:
 
 The prefered way to install the python dependencies is to set up a virtual
 environment and use ``pip``. Unfortunatly, librdf isn't available on Pypi which
-mean you'll have to install it using your distribution package manager.
+mean you'll have to install it using your distribution package manager. Python
+lxml also requires libxslt1 and libxml2 development packages to be installed
+(at least using pip).
 
 On Ubuntu, this should do the trick:
 
 .. code-block:: bash
 
-     sudo apt-get install python-librdf
-     sudo apt-get install virtualenv
-     cd $AACORE_PATH
-     virtualenv venv
-     source venv/bin/activate
-     pip install -r requirements.txt
+
+    sudo apt-get install libxslt1-dev
+    sudo apt-get install libxml2-dev
+    sudo apt-get install python-librdf
+    sudo apt-get install virtualenv
+    cd $AACORE_PATH
+    virtualenv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 
 Additionally, you'll need the following programs for the default RDF sniffers:
 
