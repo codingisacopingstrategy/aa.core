@@ -8,11 +8,17 @@ def lgru():
     env.git_path = '/home/constant/www/aa.lgru.net/db/repositories'
     env.media_path = '/home/constant/www/aa.lgru.net/static/media/'
 
+def cuicuidada():
+    env.hosts = ['stdin@mozzarella.stdin.fr']
+    env.path = '/home/stdin/www/cuicuidada.stdin.fr/'
+    #env.git_path = '/home/constant/www/aa.lgru.net/db/repositories'
+    #env.media_path = '/home/constant/www/aa.lgru.net/static/media/'
+
 def sarma():
     env.hosts = ['sarma@sarma.be']
     env.path = '/home/sarma/www/be.sarma/'
-    env.git_path = '/home/sarma/www/be.sarma/db/repositories/'
-    env.media_path = '/home/sarma/www/be.sarma/static/media/'
+    #env.git_path = '/home/sarma/www/be.sarma/db/repositories/'
+    #env.media_path = '/home/sarma/www/be.sarma/static/media/'
 
 def aa():
     env.hosts = ['activearchives@activearchives.org']
@@ -23,7 +29,7 @@ def aa():
 def fix_permissions():
     # fixes permission issues
     sudo('chown -R %s:www-data %s' % (env.user, env.path))
-    sudo('chown -R www-data:www-data %s' % env.git_path)
+    #sudo('chown -R www-data:www-data %s' % env.git_path)
     sudo('chmod -R g+w %saa.core' % env.path)
     sudo('apache2ctl graceful')
 
