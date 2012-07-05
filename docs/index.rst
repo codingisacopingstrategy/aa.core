@@ -75,7 +75,7 @@ On Ubuntu, this should do the trick:
     sudo apt-get install libxslt1-dev
     sudo apt-get install libxml2-dev
     sudo apt-get install python-librdf
-    sudo apt-get install virtualenv
+    sudo apt-get install python-virtualenv
     cd $AACORE_PATH
     virtualenv venv
     source venv/bin/activate
