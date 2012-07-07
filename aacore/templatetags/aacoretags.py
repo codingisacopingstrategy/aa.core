@@ -7,7 +7,7 @@ from django.template.defaultfilters import stringfilter
 from django import template
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
-from aacore.html5tidy import tidy
+from html5tidy import tidy
 from aacore.models import Namespace
 
 
