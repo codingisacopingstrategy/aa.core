@@ -1,4 +1,4 @@
-from aacore import settings
+import settings
 from aacore.rdfutils import get_model
 
 
