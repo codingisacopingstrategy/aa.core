@@ -10,3 +10,4 @@ venv/
 repositories/
 run/media/
 docs/_build/
+run/settings.py

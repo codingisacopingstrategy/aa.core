@@ -57,29 +57,10 @@ Please first install these software in order to get aacore running properly:
   - PySQLite2 (http://trac.edgewall.org/wiki/PySqlite)
   - Python librdf (Redland) (http://librdf.org/)
   - Python html5lib (http://code.google.com/p/html5lib/)
+  - Python html5tidy (https://github.com/aleray/html5tidy)
   - Python dateutil (http://labix.org/python-dateutil)
   - Python docutils (http://docutils.sourceforge.net/)
   - Python lxml (http://lxml.de/)
-
-The prefered way to install the python dependencies is to set up a virtual
-environment and use ``pip``. Unfortunatly, librdf isn't available on Pypi which
-mean you'll have to install it using your distribution package manager. Python
-lxml also requires libxslt1 and libxml2 development packages to be installed
-(at least using pip).
-
-On Ubuntu, this should do the trick:
-
-.. code-block:: bash
-
-
-    sudo apt-get install libxslt1-dev
-    sudo apt-get install libxml2-dev
-    sudo apt-get install python-librdf
-    sudo apt-get install python-virtualenv
-    cd $AACORE_PATH
-    virtualenv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
 
 Additionally, you'll need the following programs for the default RDF sniffers:
 
@@ -87,6 +68,7 @@ Additionally, you'll need the following programs for the default RDF sniffers:
   - Ffmpeg
   - Imagemagick
 
+Refer to the installation instructions below on how to obtain these programs.
 
 Quick Installation
 ------------------
@@ -97,27 +79,55 @@ Quick Installation
 
            git clone git@git.constantvzw.org:aa.core.git 
 
-2. Once you've installed the required dependencies:
+2. Install the required dependencies.
+
+    The prefered way to install the python dependencies is to set up a virtual
+    environment and use ``pip``. Unfortunatly, librdf isn't available on Pypi
+    which means you'll have to install it using your distribution package
+    manager. Python lxml also requires libxslt1 and libxml2 development
+    packages to be installed (at least using pip).
+    
+    On Debian or Ubuntu, this should do the trick:
+
+    .. code-block:: bash
+    
+        sudo apt-get install libxslt1-dev
+        sudo apt-get install libxml2-dev
+        sudo apt-get install python-librdf
+        sudo apt-get install python-virtualenv
+        cd aa.core
+        virtualenv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+    
+    For the dependencies of the RDF sniffers:
+    
+    .. code-block:: bash
+        
+        sudo apt-get install libimage-exiftool-perl ffmpeg imagemagick
+
+3. Provide a settings.py:
 
     .. code-block:: bash
 
-           cd /path/to/aa.core/run
+           cp settings.example.py settings.py
 
-3. Build the database:
+4. Build the database:
 
     .. code-block:: bash
-
+    
+           cd run
            python manage syncdb
 
    The prompt will ask for the admin infos and fixtures will be loaded.
    
-4. Run the django webserver:
+5. Run the django webserver:
 
     .. code-block:: bash
 
            python manage.py runserver
 
-5. Configure the project domain name at:
+6. Configure the project domain name at:
 
        http://localhost:8000/admin/sites/site/1/
 
